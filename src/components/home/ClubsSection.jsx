@@ -54,7 +54,7 @@ const MarqueeText = () => {
               fontFamily: 'system-ui, sans-serif'
             }}
           >
-            PHIVE
+            FITHIVE
           </span>
         ))}
       </div>
@@ -73,7 +73,7 @@ export default function ClubsSection() {
           viewport={{ once: true }}
           className="text-lg md:text-xl text-gray-600 max-w-2xl"
         >
-          Phive has clubs located in Coimbra, Leiria, Lisbon, and Porto. Get to know each one!
+          FitHive has clubs located in Coimbra, Leiria, Lisbon, and Porto. Get to know each one!
         </motion.p>
       </div>
 

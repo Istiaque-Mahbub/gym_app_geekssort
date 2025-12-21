@@ -5,13 +5,13 @@ import { ChevronRight } from 'lucide-react';
 const slides = [
   {
     image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&q=80&fit=crop',
-    title: 'PHIVE PORTO',
+    title: 'FITHIVE PORTO',
     subtitle: 'PORTO',
     label: "IT'S OPEN!",
   },
   {
     image: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=1920&q=80&fit=crop',
-    title: 'PHIVE LISBON',
+    title: 'FITHIVE LISBON',
     subtitle: 'LISBON',
     label: 'NOW OPEN',
   },
@@ -30,7 +30,7 @@ const MarqueeText = ({ text, direction = 1 }) => {
         {[...Array(6)].map((_, i) => (
           <span
             key={i}
-            className="text-[8vw] md:text-[10vw] font-black tracking-tighter text-yellow-400 opacity-90 mx-8 inline-block"
+            className="text-[4vw] md:text-[5vw] font-black tracking-tighter text-black opacity-90 mx-8 inline-block"
             style={{ 
               fontFamily: 'system-ui, sans-serif',
               animation: direction > 0 ? 'marquee 20s linear infinite' : 'marquee-reverse 20s linear infinite'
@@ -75,13 +75,13 @@ export default function HeroSection() {
       </AnimatePresence>
 
       {/* Top Marquee */}
-      <div className="absolute top-0 left-0 right-0 bg-yellow-400 py-2 z-20">
-        <MarqueeText text={`${slides[currentSlide].subtitle} • PHIVE •`} direction={1} />
+      <div className="absolute top-0 left-0 right-0 bg-yellow-400 py-1 z-20">
+        <MarqueeText text={`${slides[currentSlide].subtitle} • FITHIVE •`} direction={1} />
       </div>
 
       {/* Bottom Marquee */}
-      <div className="absolute bottom-0 left-0 right-0 bg-yellow-400 py-2 z-20">
-        <MarqueeText text={`PHIVE • ${slides[currentSlide].subtitle} •`} direction={-1} />
+      <div className="absolute bottom-0 left-0 right-0 bg-yellow-400 py-1 z-20">
+        <MarqueeText text={`FITHIVE • ${slides[currentSlide].subtitle} •`} direction={-1} />
       </div>
 
       {/* Center Content */}
@@ -156,7 +156,7 @@ export default function HeroSection() {
         </button>
         
         <div className="text-yellow-400 font-black text-2xl tracking-tight">
-          PHIVE
+          FITHIVE
         </div>
 
         <div className="flex items-center gap-1">

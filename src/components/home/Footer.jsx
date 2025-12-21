@@ -45,7 +45,7 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Logo */}
           <div className="text-3xl font-black tracking-tight text-yellow-400">
-            PHIVE
+            FITHIVE
           </div>
 
           {/* Links */}

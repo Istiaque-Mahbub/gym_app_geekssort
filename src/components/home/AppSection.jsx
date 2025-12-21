@@ -14,7 +14,7 @@ export default function AppSection() {
             viewport={{ once: true }}
           >
             <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-6">
-              Phive App
+              FitHive App
             </h2>
             <p className="text-gray-600 text-lg md:text-xl mb-8 leading-relaxed">
               Schedule and manage your classes,
@@ -79,8 +79,8 @@ export default function AppSection() {
                   {/* Screen Content */}
                   <div className="aspect-[9/19] bg-gradient-to-br from-yellow-400 to-yellow-500 relative">
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-black p-6">
-                      <div className="text-6xl font-black mb-4">P</div>
-                      <div className="text-xl font-bold tracking-tight">PHIVE</div>
+                      <div className="text-6xl font-black mb-4">F</div>
+                      <div className="text-xl font-bold tracking-tight">FITHIVE</div>
                       <div className="text-sm mt-2 opacity-75">Your Fitness Journey</div>
                     </div>
                   </div>

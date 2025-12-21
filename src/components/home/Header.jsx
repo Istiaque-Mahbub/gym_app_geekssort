@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
 const navLinks = [
-  { name: 'Clubs', href: '#clubs' },
-  { name: 'Classes', href: '#classes' },
-  { name: 'App', href: '#app' },
-  { name: 'About', href: '#about' },
+  { name: 'Clubs', href: '/Clubs' },
+  { name: 'Classes', href: '/Classes' },
+  { name: 'Packages', href: '/Packages' },
+  { name: 'App', href: '/App' },
+  { name: 'About', href: '/About' },
+  { name: 'Contact', href: '/Contact' },
 ];
 
 export default function Header() {
@@ -32,27 +36,23 @@ export default function Header() {
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
-          <a 
-            href="#" 
+          <Link 
+            to={createPageUrl('Home')}
             className="text-2xl font-black tracking-tight text-yellow-400"
-            onClick={(e) => {
-              e.preventDefault();
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
           >
-            PHIVE
-          </a>
+            FITHIVE
+          </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
-                href={link.href}
+                to={createPageUrl(link.href.replace('/', ''))}
                 className="text-white text-sm font-medium tracking-wider hover:text-yellow-400 transition-colors"
               >
-                {link.name}
-              </a>
+                {link.name.toUpperCase()}
+              </Link>
             ))}
           </nav>
 
@@ -88,17 +88,20 @@ export default function Header() {
           >
             <div className="flex flex-col items-center gap-8 p-8">
               {navLinks.map((link, index) => (
-                <motion.a
+                <motion.div
                   key={link.name}
-                  href={link.href}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  onClick={() => setIsOpen(false)}
-                  className="text-white text-3xl font-bold tracking-wider hover:text-yellow-400 transition-colors"
                 >
-                  {link.name}
-                </motion.a>
+                  <Link
+                    to={createPageUrl(link.href.replace('/', ''))}
+                    onClick={() => setIsOpen(false)}
+                    className="text-white text-3xl font-bold tracking-wider hover:text-yellow-400 transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                </motion.div>
               ))}
               <motion.button
                 initial={{ opacity: 0, y: 20 }}

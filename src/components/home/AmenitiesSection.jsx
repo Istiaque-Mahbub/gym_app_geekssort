@@ -22,7 +22,7 @@ export default function AmenitiesSection() {
               viewport={{ once: true }}
               className="text-3xl md:text-4xl font-light mb-4"
             >
-              What you can find at Phive Clubs
+              What you can find at FitHive Clubs
             </motion.h2>
           </div>
 

@@ -29,7 +29,7 @@ export default function ScheduleSection() {
             </p>
             
             <p className="text-lg text-black/70 mb-8">
-              On your Phive Club
+              On your FitHive Club
             </p>
 
             <motion.button
@@ -114,7 +114,7 @@ export default function ScheduleSection() {
         >
           <MapPin className="w-5 h-5" />
           <span className="text-lg font-medium">
-            Available at all Phive locations across Portugal
+            Available at all FitHive locations across Portugal
           </span>
         </motion.div>
       </div>
