@@ -47,45 +47,48 @@ export default function AmenitiesSection() {
         </div>
 
         {/* Big Text */}
-        <div className="mt-24 flex flex-wrap items-center justify-center gap-4 md:gap-8">
-          <motion.span
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-5xl md:text-8xl lg:text-9xl font-black text-yellow-400"
-          >
-            Fitness
-          </motion.span>
-          <motion.span
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-5xl md:text-8xl lg:text-9xl font-light text-white/20"
-          >
-            Go
-          </motion.span>
-        </div>
-        
-        <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 -mt-4">
-          <motion.span
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-5xl md:text-8xl lg:text-9xl font-light text-white/20"
-          >
-            Strong
-          </motion.span>
-          <motion.span
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            className="text-5xl md:text-8xl lg:text-9xl font-black text-yellow-400"
-          >
-            Get
-          </motion.span>
+        <div className="mt-24 overflow-hidden">
+          <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
+            <motion.span
+              initial={{ opacity: 0, x: -100 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, type: "spring" }}
+              className="text-5xl md:text-8xl lg:text-9xl font-black text-yellow-400"
+            >
+              Fitness
+            </motion.span>
+            <motion.span
+              initial={{ opacity: 0, x: 100 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, delay: 0.2, type: "spring" }}
+              className="text-5xl md:text-8xl lg:text-9xl font-light text-white/20"
+            >
+              Go
+            </motion.span>
+          </div>
+          
+          <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 -mt-4">
+            <motion.span
+              initial={{ opacity: 0, x: -100 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, delay: 0.3, type: "spring" }}
+              className="text-5xl md:text-8xl lg:text-9xl font-light text-white/20"
+            >
+              Strong
+            </motion.span>
+            <motion.span
+              initial={{ opacity: 0, x: 100 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, delay: 0.5, type: "spring" }}
+              className="text-5xl md:text-8xl lg:text-9xl font-black text-yellow-400"
+            >
+              Get
+            </motion.span>
+          </div>
         </div>
       </div>
     </section>

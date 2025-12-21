@@ -26,21 +26,20 @@ const slides = [
 const MarqueeText = ({ text, direction = 1 }) => {
   return (
     <div className="overflow-hidden whitespace-nowrap">
-      <motion.div
-        className="flex"
-        animate={{ x: direction > 0 ? ['0%', '-50%'] : ['-50%', '0%'] }}
-        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-      >
-        {[...Array(4)].map((_, i) => (
+      <div className="flex animate-marquee">
+        {[...Array(6)].map((_, i) => (
           <span
             key={i}
-            className="text-[12vw] font-black tracking-tighter text-yellow-400 opacity-90 mx-4"
-            style={{ fontFamily: 'system-ui, sans-serif' }}
+            className="text-[8vw] md:text-[10vw] font-black tracking-tighter text-yellow-400 opacity-90 mx-8 inline-block"
+            style={{ 
+              fontFamily: 'system-ui, sans-serif',
+              animation: direction > 0 ? 'marquee 20s linear infinite' : 'marquee-reverse 20s linear infinite'
+            }}
           >
             {text}
           </span>
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 };
@@ -86,33 +85,49 @@ export default function HeroSection() {
       </div>
 
       {/* Center Content */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-        <motion.div
-          key={`label-${currentSlide}`}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-yellow-400 text-sm tracking-[0.3em] mb-4"
-        >
-          {slides[currentSlide].label}
-        </motion.div>
+      <div className="absolute inset-0 flex flex-col items-center justify-center z-10 px-6">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`label-${currentSlide}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+            className="text-yellow-400 text-xs md:text-sm tracking-[0.3em] mb-4 uppercase"
+          >
+            {slides[currentSlide].label}
+          </motion.div>
+        </AnimatePresence>
         
-        <motion.h1
-          key={`title-${currentSlide}`}
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+        <AnimatePresence mode="wait">
+          <motion.h1
+            key={`title-${currentSlide}`}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-white text-4xl md:text-6xl lg:text-8xl font-black tracking-tight text-center mb-2"
+          >
+            {slides[currentSlide].title}
+          </motion.h1>
+        </AnimatePresence>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="text-white text-5xl md:text-7xl lg:text-8xl font-black tracking-tight text-center"
+          className="text-white/70 text-lg md:text-xl mb-8 text-center"
         >
           FIND OUT MORE
-        </motion.h1>
+        </motion.p>
 
         <motion.button
-          key={`button-${currentSlide}`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="mt-8 px-8 py-4 border-2 border-white/50 rounded-full text-white text-sm tracking-wider hover:bg-white hover:text-black transition-all duration-300 flex items-center gap-2 group"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="px-8 py-4 border-2 border-white/50 rounded-full text-white text-sm tracking-wider hover:bg-white hover:text-black transition-all duration-300 flex items-center gap-2 group"
         >
           DISCOVER THE CLUB
           <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

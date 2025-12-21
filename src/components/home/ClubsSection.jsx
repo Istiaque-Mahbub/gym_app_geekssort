@@ -44,15 +44,11 @@ const clubs = [
 const MarqueeText = () => {
   return (
     <div className="overflow-hidden whitespace-nowrap py-8">
-      <motion.div
-        className="flex"
-        animate={{ x: ['0%', '-50%'] }}
-        transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
-      >
-        {[...Array(4)].map((_, i) => (
+      <div className="flex animate-marquee-slow">
+        {[...Array(8)].map((_, i) => (
           <span
             key={i}
-            className="text-[20vw] font-black tracking-tighter text-transparent mx-4"
+            className="text-[15vw] md:text-[20vw] font-black tracking-tighter text-transparent mx-8 inline-block"
             style={{ 
               WebkitTextStroke: '2px #000',
               fontFamily: 'system-ui, sans-serif'
@@ -61,7 +57,7 @@ const MarqueeText = () => {
             PHIVE
           </span>
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 };
@@ -87,21 +83,22 @@ export default function ClubsSection() {
           {clubs.map((club, index) => (
             <motion.div
               key={club.id}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
               className="flex-shrink-0 w-48 md:w-full snap-start group cursor-pointer"
             >
-              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden mb-4">
+              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden mb-4 shadow-lg">
                 <img
                   src={club.image}
                   alt={club.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="text-white text-sm font-medium">{club.city}</span>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                  <h3 className="text-white text-lg font-bold mb-1">{club.name}</h3>
+                  <span className="text-yellow-400 text-sm font-medium">{club.city}</span>
                 </div>
               </div>
             </motion.div>

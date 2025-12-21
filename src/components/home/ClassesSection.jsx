@@ -32,20 +32,16 @@ const classes = [
 const MarqueeText = () => {
   return (
     <div className="overflow-hidden whitespace-nowrap py-4 bg-yellow-400">
-      <motion.div
-        className="flex"
-        animate={{ x: ['0%', '-50%'] }}
-        transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-      >
-        {[...Array(8)].map((_, i) => (
+      <div className="flex animate-marquee-fast">
+        {[...Array(10)].map((_, i) => (
           <span
             key={i}
-            className="text-6xl md:text-8xl font-black tracking-tighter text-black mx-8"
+            className="text-6xl md:text-8xl font-black tracking-tighter text-black mx-8 inline-block"
           >
             CLASSES
           </span>
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 };
@@ -72,34 +68,39 @@ export default function ClassesSection() {
           {classes.map((classItem, index) => (
             <motion.div
               key={classItem.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: index * 0.15 }}
+              whileHover={{ y: -10 }}
               className="group cursor-pointer"
             >
-              <div className="relative aspect-[2/3] rounded-2xl overflow-hidden mb-4">
+              <div className="relative aspect-[2/3] rounded-2xl overflow-hidden mb-4 shadow-xl">
                 <img
                   src={classItem.image}
                   alt={classItem.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
                 
                 {/* Content Overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
-                  <span className="text-yellow-400 text-xs md:text-sm tracking-wider mb-1 block">
+                <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                  <span className="text-yellow-400 text-xs md:text-sm tracking-wider mb-1 block uppercase font-bold">
                     {classItem.category}
                   </span>
-                  <h3 className="text-white text-lg md:text-2xl font-bold">
+                  <h3 className="text-white text-xl md:text-3xl font-black">
                     {classItem.name}
                   </h3>
                 </div>
 
                 {/* Hover Arrow */}
-                <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <ArrowUpRight className="w-5 h-5 text-black" />
-                </div>
+                <motion.div
+                  initial={{ scale: 0, rotate: -45 }}
+                  whileHover={{ scale: 1, rotate: 0 }}
+                  className="absolute top-4 right-4 w-12 h-12 rounded-full bg-yellow-400 flex items-center justify-center shadow-lg"
+                >
+                  <ArrowUpRight className="w-6 h-6 text-black" />
+                </motion.div>
               </div>
             </motion.div>
           ))}

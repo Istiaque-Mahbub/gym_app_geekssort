@@ -66,23 +66,25 @@ export default function SocialSection() {
               href={social.url}
               target="_blank"
               rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="group relative aspect-square rounded-2xl overflow-hidden bg-gray-100"
+              initial={{ opacity: 0, scale: 0.8, y: 30 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: index * 0.15, type: "spring" }}
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="group relative aspect-square rounded-2xl overflow-hidden bg-gray-100 shadow-lg"
             >
               {/* Stacked Images */}
               <div className="absolute inset-0">
                 {social.images.map((img, imgIndex) => (
-                  <motion.img
+                  <img
                     key={imgIndex}
                     src={img}
                     alt=""
-                    className="absolute inset-0 w-full h-full object-cover"
-                    initial={{ opacity: imgIndex === 0 ? 1 : 0 }}
-                    whileHover={{ opacity: imgIndex === social.images.length - 1 ? 1 : 0 }}
-                    style={{ zIndex: imgIndex }}
+                    className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
+                    style={{ 
+                      opacity: imgIndex === 0 ? 1 : 0,
+                      zIndex: imgIndex 
+                    }}
                   />
                 ))}
               </div>
