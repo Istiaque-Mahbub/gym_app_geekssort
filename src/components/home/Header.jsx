@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Calculator } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import BMICalculator from '@/components/BMICalculator';
 
 const navLinks = [
   { name: 'Clubs', href: '/Clubs' },
@@ -16,6 +17,7 @@ const navLinks = [
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [showBMI, setShowBMI] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,6 +47,13 @@ export default function Header() {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
+            <button
+              onClick={() => setShowBMI(true)}
+              className="flex items-center gap-2 text-white text-sm font-medium tracking-wider hover:text-yellow-400 transition-colors"
+            >
+              <Calculator className="w-4 h-4" />
+              BMI CALCULATOR
+            </button>
             {navLinks.map((link) => (
               <Link
                 key={link.name}
@@ -115,6 +124,9 @@ export default function Header() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* BMI Calculator Modal */}
+      <BMICalculator isOpen={showBMI} onClose={() => setShowBMI(false)} />
     </>
   );
 }

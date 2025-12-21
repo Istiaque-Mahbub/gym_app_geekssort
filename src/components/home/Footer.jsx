@@ -59,6 +59,11 @@ export default function Footer() {
                   About Us
                 </Link>
               </li>
+              <li>
+                <Link to={createPageUrl('ClassSchedule')} className="text-gray-400 hover:text-yellow-400 transition-colors">
+                  Class Schedule
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -72,19 +77,19 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-yellow-400 transition-colors">
+                <Link to={createPageUrl('FAQs')} className="text-gray-400 hover:text-yellow-400 transition-colors">
                   FAQs
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-yellow-400 transition-colors">
+                <Link to={createPageUrl('PrivacyPolicy')} className="text-gray-400 hover:text-yellow-400 transition-colors">
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-yellow-400 transition-colors">
+                <Link to={createPageUrl('TermsOfService')} className="text-gray-400 hover:text-yellow-400 transition-colors">
                   Terms of Service
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -96,16 +101,16 @@ export default function Footer() {
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0" />
                 <span className="text-gray-400 text-sm">
-                  Av. da Liberdade 123<br />Lisboa, Portugal
+                  Mirpur DOHS, Pallabi<br />Dhaka 1216, Bangladesh
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-yellow-400 flex-shrink-0" />
-                <span className="text-gray-400 text-sm">+351 211 000 000</span>
+                <span className="text-gray-400 text-sm">+8801341869125</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-yellow-400 flex-shrink-0" />
-                <span className="text-gray-400 text-sm">info@fithive.pt</span>
+                <span className="text-gray-400 text-sm">contact@geekssort.com</span>
               </li>
             </ul>
           </div>
@@ -116,8 +121,8 @@ export default function Footer() {
       <div className="border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-400">
-            <p>© 2024 FitHive. All rights reserved.</p>
-            <p>Made with ❤️ in Portugal</p>
+            <p>© 2025 FitHive. All rights reserved.</p>
+            <p>Developed by <a href="https://geekssort.com" target="_blank" rel="noopener noreferrer" className="text-yellow-400 hover:text-yellow-300 transition-colors">GeekSSort</a></p>
           </div>
         </div>
       </div>
