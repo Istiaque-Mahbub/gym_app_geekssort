@@ -313,6 +313,30 @@ export default function Packages() {
                   ))}
                 </div>
               </motion.div>
+              )}
+
+              {packageType === 'elite' && (
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-3xl p-12 text-center"
+                >
+                  <h2 className="text-4xl font-black text-black mb-6">All Add-ons Included!</h2>
+                  <p className="text-black/80 text-xl mb-8">
+                    Elite package includes everything - no need to pick and choose
+                  </p>
+                  <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                    {addons.map((addon) => (
+                      <div key={addon.id} className="flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-xl p-4">
+                        <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0">
+                          <Check className="w-5 h-5 text-yellow-400" />
+                        </div>
+                        <span className="text-black font-bold text-left">{addon.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
             </div>
           </div>
         </div>
