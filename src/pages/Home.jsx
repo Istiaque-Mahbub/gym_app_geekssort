@@ -2,6 +2,7 @@ import React from 'react';
 import Header from '@/components/home/Header';
 import HeroSection from '@/components/home/HeroSection';
 import ClubsSection from '@/components/home/ClubsSection';
+import ScheduleSection from '@/components/home/ScheduleSection';
 import AmenitiesSection from '@/components/home/AmenitiesSection';
 import ClassesSection from '@/components/home/ClassesSection';
 import AppSection from '@/components/home/AppSection';
@@ -17,6 +18,7 @@ export default function Home() {
         <section id="clubs">
           <ClubsSection />
         </section>
+        <ScheduleSection />
         <AmenitiesSection />
         <section id="classes">
           <ClassesSection />
