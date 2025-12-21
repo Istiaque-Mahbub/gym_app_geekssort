@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
 const slides = [
   {
@@ -113,17 +115,19 @@ export default function HeroSection() {
           FIND OUT MORE
         </motion.p>
 
-        <motion.button
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="px-8 py-4 border-2 border-white/50 rounded-full text-white text-sm tracking-wider hover:bg-white hover:text-black transition-all duration-300 flex items-center gap-2 group"
-        >
-          DISCOVER THE CLUB
-          <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-        </motion.button>
+        <Link to={createPageUrl('Clubs')}>
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-8 py-4 border-2 border-white/50 rounded-full text-white text-sm tracking-wider hover:bg-white hover:text-black transition-all duration-300 flex items-center gap-2 group"
+          >
+            DISCOVER THE CLUB
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </motion.button>
+        </Link>
       </div>
 
       {/* Slide Indicators */}

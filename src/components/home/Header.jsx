@@ -11,7 +11,6 @@ const navLinks = [
   { name: 'Packages', href: '/Packages' },
   { name: 'App', href: '/App' },
   { name: 'About', href: '/About' },
-  { name: 'Contact', href: '/Contact' },
 ];
 
 export default function Header() {
@@ -67,13 +66,15 @@ export default function Header() {
 
           {/* CTA Button */}
           <div className="hidden md:block">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="px-6 py-3 bg-yellow-400 text-black rounded-full text-sm font-bold tracking-wider"
-            >
-              SIGN UP
-            </motion.button>
+            <Link to={createPageUrl('Contact')}>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-6 py-3 bg-yellow-400 text-black rounded-full text-sm font-bold tracking-wider"
+              >
+                CONTACT US
+              </motion.button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -112,14 +113,17 @@ export default function Header() {
                   </Link>
                 </motion.div>
               ))}
-              <motion.button
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="mt-8 px-8 py-4 bg-yellow-400 text-black rounded-full text-lg font-bold tracking-wider"
-              >
-                SIGN UP
-              </motion.button>
+              <Link to={createPageUrl('Contact')}>
+                <motion.button
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  onClick={() => setIsOpen(false)}
+                  className="mt-8 px-8 py-4 bg-yellow-400 text-black rounded-full text-lg font-bold tracking-wider"
+                >
+                  CONTACT US
+                </motion.button>
+              </Link>
             </div>
           </motion.div>
         )}

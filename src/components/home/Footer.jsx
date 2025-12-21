@@ -15,7 +15,7 @@ export default function Footer() {
               FITHIVE
             </div>
             <p className="text-gray-400 mb-6">
-              Your premier fitness destination across Portugal. Transform your body, elevate your mind.
+              Your premier fitness destination World Wide. Transform your body, elevate your mind.
             </p>
             <div className="flex gap-4">
               <a href="#" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all">

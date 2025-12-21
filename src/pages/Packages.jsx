@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Plus, Minus } from 'lucide-react';
+import { Check, X, Sparkles, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const packageTypes = [
@@ -23,8 +23,19 @@ const packageTypes = [
       { duration: '6month', name: '6 Months', price: 85, savings: 23, popular: true },
       { duration: '12month', name: '12 Months', price: 75, savings: 23 },
     ],
-    included: ['All Add-ons Included', 'Priority Booking', 'VIP Locker Room', 'Free Guest Passes (2/month)'],
   },
+];
+
+const premiumFeatures = [
+  { id: 'pool', name: 'Swimming Pool Access' },
+  { id: 'sauna', name: 'Sauna & Spa' },
+  { id: 'classes', name: 'Unlimited Classes' },
+  { id: 'pt', name: 'Personal Training Sessions' },
+  { id: 'nutrition', name: 'Nutrition Consultation' },
+  { id: 'locker', name: 'Private Locker' },
+  { id: 'priority', name: 'Priority Booking' },
+  { id: 'vip', name: 'VIP Locker Room' },
+  { id: 'guest', name: 'Guest Passes' },
 ];
 
 const addons = [
@@ -72,7 +83,7 @@ export default function Packages() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
       {/* Hero */}
       <section className="relative bg-black text-white py-32 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-transparent" />
@@ -85,260 +96,278 @@ export default function Packages() {
           >
             <h1 className="text-5xl md:text-7xl font-black mb-6">Choose Your Package</h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto">
-              Build your perfect fitness plan with flexible pricing and custom add-ons
+              Build your perfect fitness plan with flexible pricing
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Pricing Calculator */}
+      {/* Package Type Selector - Premium Cards */}
       <section className="py-24">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-3 gap-12">
-            {/* Calculator Sidebar */}
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16">
+            {/* Starter Package Card */}
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              className="lg:col-span-1"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -8 }}
+              onClick={() => {
+                setPackageType('starter');
+              }}
+              className={`relative cursor-pointer rounded-3xl p-8 transition-all duration-300 ${
+                packageType === 'starter'
+                  ? 'bg-gradient-to-br from-yellow-400 to-yellow-500 shadow-2xl scale-105'
+                  : 'bg-white shadow-lg hover:shadow-xl'
+              }`}
             >
-              <div className="sticky top-24 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-3xl p-8 shadow-2xl">
-                <h3 className="text-3xl font-black text-black mb-6">Your Package</h3>
-                
-                <div className="mb-4 pb-4 border-b border-black/20">
-                  <span className="text-black text-sm font-bold">Package Type</span>
-                  <div className="text-2xl font-black text-black mt-1">
-                    {packageTypes.find(p => p.id === packageType)?.name}
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className={`w-6 h-6 ${packageType === 'starter' ? 'text-black' : 'text-yellow-400'}`} />
+                    <h3 className={`text-3xl font-black ${packageType === 'starter' ? 'text-black' : 'text-gray-900'}`}>
+                      Starter
+                    </h3>
                   </div>
+                  <p className={`text-lg ${packageType === 'starter' ? 'text-black/80' : 'text-gray-600'}`}>
+                    Customize your experience
+                  </p>
                 </div>
-
-                <div className="space-y-4 mb-6">
-                  <div className="flex justify-between items-center pb-3 border-b border-black/20">
-                    <span className="text-black font-bold">Base Plan</span>
-                    <span className="text-black font-black">
-                      €{packageTypes.find(p => p.id === packageType)?.plans.find(pl => pl.duration === selectedPlan)?.price}/mo
-                    </span>
+                {packageType === 'starter' && (
+                  <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
+                    <Check className="w-5 h-5 text-yellow-400" />
                   </div>
-                  
-                  {packageType === 'starter' && selectedAddons.map(addonId => {
-                    const addon = addons.find(a => a.id === addonId);
-                    return (
-                      <div key={addonId} className="flex justify-between items-center pb-3 border-b border-black/20">
-                        <span className="text-black text-sm">{addon?.name}</span>
-                        <span className="text-black font-bold">€{addon?.price}/mo</span>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                {premiumFeatures.map((feature) => {
+                  const isIncluded = ['pool', 'sauna', 'classes', 'pt', 'nutrition', 'locker'].includes(feature.id);
+                  return (
+                    <div key={feature.id} className="flex items-center gap-3">
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        isIncluded 
+                          ? (packageType === 'starter' ? 'bg-black' : 'bg-gray-800')
+                          : (packageType === 'starter' ? 'bg-black/20' : 'bg-gray-200')
+                      }`}>
+                        {isIncluded ? (
+                          <Check className={`w-4 h-4 ${packageType === 'starter' ? 'text-yellow-400' : 'text-white'}`} />
+                        ) : (
+                          <X className={`w-4 h-4 ${packageType === 'starter' ? 'text-black/40' : 'text-gray-400'}`} />
+                        )}
                       </div>
-                    );
-                  })}
-
-                  {packageType === 'elite' && (
-                    <div className="bg-black/10 rounded-xl p-4 mt-4">
-                      <p className="text-black font-bold text-sm mb-2">✓ All Add-ons Included</p>
-                      <p className="text-green-700 font-black text-lg">
-                        Save €{calculateSavings()}/mo
-                      </p>
+                      <span className={`text-sm font-medium ${
+                        packageType === 'starter' 
+                          ? (isIncluded ? 'text-black' : 'text-black/50')
+                          : (isIncluded ? 'text-gray-900' : 'text-gray-400')
+                      }`}>
+                        {feature.name}
+                      </span>
                     </div>
-                  )}
-                </div>
+                  );
+                })}
+              </div>
 
-                <div className="pt-4 border-t-2 border-black">
-                  <div className="flex justify-between items-center mb-6">
-                    <span className="text-2xl font-black text-black">Total</span>
-                    <span className="text-4xl font-black text-black">
-                      €{calculateTotal()}
-                      <span className="text-lg">/mo</span>
+              <div className="mt-8 pt-6 border-t border-black/20">
+                <div className="flex items-baseline gap-2">
+                  <span className={`text-sm font-bold ${packageType === 'starter' ? 'text-black/70' : 'text-gray-500'}`}>
+                    FROM
+                  </span>
+                  <span className={`text-4xl font-black ${packageType === 'starter' ? 'text-black' : 'text-gray-900'}`}>
+                    €35
+                  </span>
+                  <span className={`text-lg ${packageType === 'starter' ? 'text-black/70' : 'text-gray-500'}`}>
+                    /month
+                  </span>
+                </div>
+                <p className={`text-xs mt-2 ${packageType === 'starter' ? 'text-black/60' : 'text-gray-500'}`}>
+                  + Selected add-ons
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Elite Package Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              whileHover={{ y: -8 }}
+              onClick={() => {
+                setPackageType('elite');
+                setSelectedAddons([]);
+              }}
+              className={`relative cursor-pointer rounded-3xl p-8 transition-all duration-300 ${
+                packageType === 'elite'
+                  ? 'bg-gradient-to-br from-black via-gray-900 to-black shadow-2xl scale-105 border-2 border-yellow-400'
+                  : 'bg-gradient-to-br from-gray-900 to-gray-800 text-white shadow-lg hover:shadow-xl'
+              }`}
+            >
+              {/* Premium Badge */}
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                <div className="px-6 py-2 bg-yellow-400 text-black text-xs font-black rounded-full flex items-center gap-2">
+                  <Crown className="w-4 h-4" />
+                  MOST POPULAR
+                </div>
+              </div>
+
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Crown className="w-6 h-6 text-yellow-400" />
+                    <h3 className="text-3xl font-black text-white">Elite</h3>
+                  </div>
+                  <p className="text-lg text-gray-300">
+                    All-inclusive experience
+                  </p>
+                </div>
+                {packageType === 'elite' && (
+                  <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center">
+                    <Check className="w-5 h-5 text-black" />
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                {premiumFeatures.map((feature) => (
+                  <div key={feature.id} className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-yellow-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-4 h-4 text-black" />
+                    </div>
+                    <span className="text-sm font-medium text-white">
+                      {feature.name}
                     </span>
                   </div>
-                  
-                  <Button className="w-full bg-black text-yellow-400 hover:bg-gray-800 py-6 text-lg font-bold">
-                    Get Started
-                  </Button>
-                </div>
+                ))}
+              </div>
 
-                <div className="mt-6 text-center">
-                  <p className="text-black/70 text-sm">
-                    ✓ No commitment • Cancel anytime
+              <div className="mt-8 pt-6 border-t border-yellow-400/30">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-sm font-bold text-gray-400">FROM</span>
+                  <span className="text-4xl font-black text-yellow-400">€75</span>
+                  <span className="text-lg text-gray-400">/month</span>
+                </div>
+                <div className="mt-3 inline-block px-4 py-2 bg-green-500/20 rounded-full">
+                  <p className="text-sm font-bold text-green-400">
+                    💰 Save €23/mo compared to Starter
                   </p>
                 </div>
               </div>
             </motion.div>
+          </div>
 
-            {/* Plans & Add-ons */}
-            <div className="lg:col-span-2 space-y-12">
-              {/* Package Type Selector */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
-                <h2 className="text-3xl font-black mb-4">Choose Your Package Type</h2>
-                <p className="text-gray-600 mb-8">Start with flexibility or go all-in with Elite</p>
-                <div className="grid md:grid-cols-2 gap-6 mb-12">
-                  {packageTypes.map((pkg) => (
-                    <motion.div
-                      key={pkg.id}
-                      whileHover={{ scale: 1.02 }}
-                      onClick={() => {
-                        setPackageType(pkg.id);
-                        if (pkg.id === 'elite') setSelectedAddons([]);
-                      }}
-                      className={`p-8 rounded-2xl border-2 cursor-pointer transition-all ${
-                        packageType === pkg.id
-                          ? 'border-yellow-400 bg-yellow-50 shadow-xl'
-                          : 'border-gray-200 bg-white hover:border-gray-300'
-                      }`}
-                    >
-                      <h3 className="text-3xl font-black mb-2">{pkg.name}</h3>
-                      <p className="text-gray-600 mb-4">{pkg.description}</p>
-                      {pkg.id === 'elite' && (
-                        <div className="space-y-2">
-                          {pkg.included.map((item, i) => (
-                            <div key={i} className="flex items-center gap-2 text-sm">
-                              <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-                                <Check className="w-3 h-3 text-white" />
-                              </div>
-                              <span className="font-medium">{item}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Duration Plans */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-              >
-                <h2 className="text-3xl font-black mb-8">Select Duration</h2>
-                <div className="grid md:grid-cols-3 gap-6">
-                  {packageTypes.find(p => p.id === packageType)?.plans.map((plan) => (
-                    <motion.div
-                      key={plan.duration}
-                      whileHover={{ y: -5 }}
-                      onClick={() => setSelectedPlan(plan.duration)}
-                      className={`relative p-8 rounded-2xl border-2 cursor-pointer transition-all ${
-                        selectedPlan === plan.duration
-                          ? 'border-yellow-400 bg-yellow-50 shadow-lg'
-                          : 'border-gray-200 bg-white hover:border-gray-300'
-                      }`}
-                    >
-                      {plan.popular && (
-                        <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                          <span className="px-4 py-1 bg-yellow-400 text-black text-sm font-bold rounded-full">
-                            POPULAR
-                          </span>
-                        </div>
-                      )}
-                      
-                      <div className="text-center">
-                        <h3 className="text-2xl font-black mb-4">{plan.name}</h3>
-                        <div className="mb-4">
-                          <span className="text-5xl font-black">€{plan.price}</span>
-                          <span className="text-gray-600">/month</span>
-                        </div>
-                        {plan.savings && (
-                          <div className="inline-block px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-bold">
-                            💰 Save €{plan.savings}/mo
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="mt-6 space-y-2">
-                        <div className="flex items-center gap-2 text-sm">
-                          <Check className="w-4 h-4 text-green-600" />
-                          <span>Access to all equipment</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Check className="w-4 h-4 text-green-600" />
-                          <span>Locker room access</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Check className="w-4 h-4 text-green-600" />
-                          <span>Mobile app access</span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Add-ons */}
-              {packageType === 'starter' && (
+          {/* Duration Plans */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="max-w-5xl mx-auto"
+          >
+            <h2 className="text-3xl font-black mb-8 text-center">Select Duration</h2>
+            <div className="grid md:grid-cols-3 gap-6 mb-12">
+              {packageTypes.find(p => p.id === packageType)?.plans.map((plan) => (
                 <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.4 }}
+                  key={plan.duration}
+                  whileHover={{ y: -5 }}
+                  onClick={() => setSelectedPlan(plan.duration)}
+                  className={`relative p-6 rounded-2xl cursor-pointer transition-all ${
+                    selectedPlan === plan.duration
+                      ? 'bg-yellow-400 text-black shadow-xl'
+                      : 'bg-white border-2 border-gray-200 hover:border-yellow-400'
+                  }`}
                 >
-                  <h2 className="text-3xl font-black mb-4">Customize with Add-ons</h2>
-                  <p className="text-gray-600 mb-8">
-                    Build your perfect package by adding services you need
-                  </p>
-                
-                <div className="space-y-4">
-                  {addons.map((addon) => (
-                    <motion.div
-                      key={addon.id}
-                      whileHover={{ x: 5 }}
-                      onClick={() => toggleAddon(addon.id)}
-                      className={`flex items-center justify-between p-6 rounded-xl border-2 cursor-pointer transition-all ${
-                        selectedAddons.includes(addon.id)
-                          ? 'border-yellow-400 bg-yellow-50 shadow-md'
-                          : 'border-gray-200 bg-white hover:border-gray-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                          selectedAddons.includes(addon.id)
-                            ? 'bg-yellow-400'
-                            : 'bg-gray-100'
-                        }`}>
-                          {selectedAddons.includes(addon.id) ? (
-                            <Check className="w-5 h-5 text-black" />
-                          ) : (
-                            <Plus className="w-5 h-5 text-gray-400" />
-                          )}
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-lg">{addon.name}</h4>
-                        </div>
+                  {plan.popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <span className="px-3 py-1 bg-black text-yellow-400 text-xs font-bold rounded-full">
+                        BEST VALUE
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className="text-center">
+                    <h3 className="text-xl font-black mb-3">{plan.name}</h3>
+                    <div className="mb-3">
+                      <span className="text-4xl font-black">€{plan.price}</span>
+                      <span className="text-sm opacity-70">/month</span>
+                    </div>
+                    {plan.savings && (
+                      <div className={`text-xs font-bold ${selectedPlan === plan.duration ? 'text-green-700' : 'text-green-600'}`}>
+                        Save €{plan.savings}/mo
                       </div>
-                      <div className="text-right">
-                        <span className="text-2xl font-black">€{addon.price}</span>
-                        <span className="text-gray-600">/mo</span>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-              )}
-
-              {packageType === 'elite' && (
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-3xl p-12 text-center"
-                >
-                  <h2 className="text-4xl font-black text-black mb-6">All Add-ons Included!</h2>
-                  <p className="text-black/80 text-xl mb-8">
-                    Elite package includes everything - no need to pick and choose
-                  </p>
-                  <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-                    {addons.map((addon) => (
-                      <div key={addon.id} className="flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-xl p-4">
-                        <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0">
-                          <Check className="w-5 h-5 text-yellow-400" />
-                        </div>
-                        <span className="text-black font-bold text-left">{addon.name}</span>
-                      </div>
-                    ))}
+                    )}
                   </div>
                 </motion.div>
-              )}
+              ))}
             </div>
-          </div>
+          </motion.div>
+
+          {/* Add-ons for Starter */}
+          {packageType === 'starter' && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="max-w-5xl mx-auto"
+            >
+              <h2 className="text-3xl font-black mb-4 text-center">Customize with Add-ons</h2>
+              <p className="text-gray-600 mb-8 text-center">
+                Build your perfect package by adding services you need
+              </p>
+            
+              <div className="grid md:grid-cols-2 gap-4">
+                {addons.map((addon) => (
+                  <motion.div
+                    key={addon.id}
+                    whileHover={{ x: 5 }}
+                    onClick={() => toggleAddon(addon.id)}
+                    className={`flex items-center justify-between p-6 rounded-xl cursor-pointer transition-all ${
+                      selectedAddons.includes(addon.id)
+                        ? 'bg-yellow-400 shadow-lg'
+                        : 'bg-white border-2 border-gray-200 hover:border-yellow-400'
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        selectedAddons.includes(addon.id) ? 'bg-black' : 'bg-gray-100'
+                      }`}>
+                        <Check className={`w-5 h-5 ${
+                          selectedAddons.includes(addon.id) ? 'text-yellow-400' : 'text-gray-400'
+                        }`} />
+                      </div>
+                      <h4 className="font-bold">{addon.name}</h4>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-2xl font-black">€{addon.price}</span>
+                      <span className="text-sm opacity-70">/mo</span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Summary & CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-2xl mx-auto mt-16"
+          >
+            <div className="bg-gradient-to-br from-gray-900 to-black rounded-3xl p-8 text-white text-center">
+              <h3 className="text-2xl font-black mb-4">Your Total</h3>
+              <div className="text-6xl font-black text-yellow-400 mb-2">
+                €{calculateTotal()}
+                <span className="text-2xl text-white/70">/mo</span>
+              </div>
+              {packageType === 'elite' && (
+                <p className="text-green-400 font-bold mb-6">
+                  💰 Saving €{calculateSavings()}/month
+                </p>
+              )}
+              <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-500 py-6 text-xl font-bold mt-4">
+                Get Started Now
+              </Button>
+              <p className="text-sm text-white/60 mt-4">
+                ✓ No commitment • Cancel anytime
+              </p>
+            </div>
+          </motion.div>
         </div>
       </section>
     </div>
