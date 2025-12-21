@@ -263,7 +263,7 @@ export default function Packages() {
                     </motion.div>
                   ))}
                 </div>
-              </motion.div>
+                </motion.div>
 
               {/* Add-ons */}
               {packageType === 'starter' && (
