@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
 const clubs = [
   {
@@ -81,14 +83,18 @@ export default function ClubsSection() {
       <div className="relative">
         <div className="flex overflow-x-auto pb-8 px-6 gap-4 snap-x snap-mandatory md:grid md:grid-cols-3 lg:grid-cols-6 md:max-w-7xl md:mx-auto md:overflow-visible" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {clubs.map((club, index) => (
-            <motion.div
+            <Link
               key={club.id}
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="flex-shrink-0 w-48 md:w-full snap-start group cursor-pointer"
+              to={createPageUrl('Clubs')}
             >
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileHover={{ scale: 1.05 }}
+                className="flex-shrink-0 w-48 md:w-full snap-start group cursor-pointer"
+              >
               <div className="relative aspect-[3/4] rounded-2xl overflow-hidden mb-4 shadow-lg">
                 <img
                   src={club.image}
@@ -102,6 +108,7 @@ export default function ClubsSection() {
                 </div>
               </div>
             </motion.div>
+            </Link>
           ))}
         </div>
       </div>
@@ -121,23 +128,27 @@ export default function ClubsSection() {
         </motion.h2>
         
         <div className="flex flex-wrap gap-4">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="px-8 py-4 bg-black text-white rounded-full font-medium flex items-center gap-3 group"
-          >
-            View all Clubs
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </motion.button>
+          <Link to={createPageUrl('Clubs')}>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-8 py-4 bg-black text-white rounded-full font-medium flex items-center gap-3 group"
+            >
+              View all Clubs
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </motion.button>
+          </Link>
           
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="px-8 py-4 border-2 border-black text-black rounded-full font-medium flex items-center gap-3 group"
-          >
-            Schedule a visit
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </motion.button>
+          <Link to={createPageUrl('Contact')}>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-8 py-4 border-2 border-black text-black rounded-full font-medium flex items-center gap-3 group"
+            >
+              Schedule a visit
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </motion.button>
+          </Link>
         </div>
       </div>
     </section>

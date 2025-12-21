@@ -63,25 +63,7 @@ export default function ScheduleSection() {
               </div>
               <div className="flex items-center gap-2 text-black font-bold">
                 <Clock className="w-4 h-4" />
-                <span>06:30 - 12:00</span>
-              </div>
-            </motion.div>
-
-            {/* Afternoon */}
-            <motion.div
-              whileHover={{ scale: 1.02, x: 10 }}
-              className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-black/10"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h3 className="text-2xl font-black text-black mb-1">Afternoon Power</h3>
-                  <p className="text-gray-600">Peak performance time</p>
-                </div>
-                <Calendar className="w-6 h-6 text-black/50" />
-              </div>
-              <div className="flex items-center gap-2 text-black font-bold">
-                <Clock className="w-4 h-4" />
-                <span>12:00 - 18:00</span>
+                <span>06:30 - 14:00</span>
               </div>
             </motion.div>
 
@@ -99,7 +81,7 @@ export default function ScheduleSection() {
               </div>
               <div className="flex items-center gap-2 text-black font-bold">
                 <Clock className="w-4 h-4" />
-                <span>18:00 - 22:00</span>
+                <span>14:00 - 22:00</span>
               </div>
             </motion.div>
           </motion.div>

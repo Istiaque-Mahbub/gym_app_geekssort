@@ -74,15 +74,7 @@ export default function HeroSection() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Top Marquee */}
-      <div className="absolute top-0 left-0 right-0 bg-yellow-400 py-1 z-20">
-        <MarqueeText text={`${slides[currentSlide].subtitle} • FITHIVE •`} direction={1} />
-      </div>
 
-      {/* Bottom Marquee */}
-      <div className="absolute bottom-0 left-0 right-0 bg-yellow-400 py-1 z-20">
-        <MarqueeText text={`FITHIVE • ${slides[currentSlide].subtitle} •`} direction={-1} />
-      </div>
 
       {/* Center Content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center z-10 px-6">

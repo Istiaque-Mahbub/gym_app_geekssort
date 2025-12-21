@@ -3,28 +3,27 @@ import { motion } from 'framer-motion';
 import { Check, Plus, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const basePlans = [
+const packageTypes = [
   {
-    id: '3month',
-    name: '3 Months',
-    price: 45,
-    description: 'Perfect for getting started',
-    discount: 0,
+    id: 'starter',
+    name: 'Starter',
+    description: 'Build your perfect package',
+    plans: [
+      { duration: '3month', name: '3 Months', price: 45 },
+      { duration: '6month', name: '6 Months', price: 40, popular: true },
+      { duration: '12month', name: '12 Months', price: 35 },
+    ],
   },
   {
-    id: '6month',
-    name: '6 Months',
-    price: 40,
-    description: 'Most popular choice',
-    discount: 10,
-    popular: true,
-  },
-  {
-    id: '12month',
-    name: '12 Months',
-    price: 35,
-    description: 'Best value, maximum savings',
-    discount: 20,
+    id: 'elite',
+    name: 'Elite',
+    description: 'All-inclusive fitness experience',
+    plans: [
+      { duration: '3month', name: '3 Months', price: 95, savings: 23 },
+      { duration: '6month', name: '6 Months', price: 85, savings: 23, popular: true },
+      { duration: '12month', name: '12 Months', price: 75, savings: 23 },
+    ],
+    included: ['All Add-ons Included', 'Priority Booking', 'VIP Locker Room', 'Free Guest Passes (2/month)'],
   },
 ];
 
@@ -38,6 +37,7 @@ const addons = [
 ];
 
 export default function Packages() {
+  const [packageType, setPackageType] = useState('starter');
   const [selectedPlan, setSelectedPlan] = useState('6month');
   const [selectedAddons, setSelectedAddons] = useState([]);
 
@@ -50,12 +50,25 @@ export default function Packages() {
   };
 
   const calculateTotal = () => {
-    const plan = basePlans.find(p => p.id === selectedPlan);
+    const pkg = packageTypes.find(p => p.id === packageType);
+    const plan = pkg?.plans.find(p => p.duration === selectedPlan);
+    
+    if (packageType === 'elite') {
+      return plan?.price || 0;
+    }
+    
     const addonsTotal = selectedAddons.reduce((sum, addonId) => {
       const addon = addons.find(a => a.id === addonId);
       return sum + (addon?.price || 0);
     }, 0);
     return (plan?.price || 0) + addonsTotal;
+  };
+
+  const calculateSavings = () => {
+    if (packageType !== 'elite') return 0;
+    const pkg = packageTypes.find(p => p.id === packageType);
+    const plan = pkg?.plans.find(p => p.duration === selectedPlan);
+    return plan?.savings || 0;
   };
 
   return (
@@ -92,15 +105,22 @@ export default function Packages() {
               <div className="sticky top-24 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-3xl p-8 shadow-2xl">
                 <h3 className="text-3xl font-black text-black mb-6">Your Package</h3>
                 
+                <div className="mb-4 pb-4 border-b border-black/20">
+                  <span className="text-black text-sm font-bold">Package Type</span>
+                  <div className="text-2xl font-black text-black mt-1">
+                    {packageTypes.find(p => p.id === packageType)?.name}
+                  </div>
+                </div>
+
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between items-center pb-3 border-b border-black/20">
                     <span className="text-black font-bold">Base Plan</span>
                     <span className="text-black font-black">
-                      €{basePlans.find(p => p.id === selectedPlan)?.price}/mo
+                      €{packageTypes.find(p => p.id === packageType)?.plans.find(pl => pl.duration === selectedPlan)?.price}/mo
                     </span>
                   </div>
                   
-                  {selectedAddons.map(addonId => {
+                  {packageType === 'starter' && selectedAddons.map(addonId => {
                     const addon = addons.find(a => a.id === addonId);
                     return (
                       <div key={addonId} className="flex justify-between items-center pb-3 border-b border-black/20">
@@ -109,6 +129,15 @@ export default function Packages() {
                       </div>
                     );
                   })}
+
+                  {packageType === 'elite' && (
+                    <div className="bg-black/10 rounded-xl p-4 mt-4">
+                      <p className="text-black font-bold text-sm mb-2">✓ All Add-ons Included</p>
+                      <p className="text-green-700 font-black text-lg">
+                        Save €{calculateSavings()}/mo
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="pt-4 border-t-2 border-black">
@@ -135,21 +164,63 @@ export default function Packages() {
 
             {/* Plans & Add-ons */}
             <div className="lg:col-span-2 space-y-12">
-              {/* Base Plans */}
+              {/* Package Type Selector */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
               >
-                <h2 className="text-3xl font-black mb-8">Select Your Base Plan</h2>
-                <div className="grid md:grid-cols-3 gap-6">
-                  {basePlans.map((plan) => (
+                <h2 className="text-3xl font-black mb-4">Choose Your Package Type</h2>
+                <p className="text-gray-600 mb-8">Start with flexibility or go all-in with Elite</p>
+                <div className="grid md:grid-cols-2 gap-6 mb-12">
+                  {packageTypes.map((pkg) => (
                     <motion.div
-                      key={plan.id}
+                      key={pkg.id}
+                      whileHover={{ scale: 1.02 }}
+                      onClick={() => {
+                        setPackageType(pkg.id);
+                        if (pkg.id === 'elite') setSelectedAddons([]);
+                      }}
+                      className={`p-8 rounded-2xl border-2 cursor-pointer transition-all ${
+                        packageType === pkg.id
+                          ? 'border-yellow-400 bg-yellow-50 shadow-xl'
+                          : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                      <h3 className="text-3xl font-black mb-2">{pkg.name}</h3>
+                      <p className="text-gray-600 mb-4">{pkg.description}</p>
+                      {pkg.id === 'elite' && (
+                        <div className="space-y-2">
+                          {pkg.included.map((item, i) => (
+                            <div key={i} className="flex items-center gap-2 text-sm">
+                              <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                                <Check className="w-3 h-3 text-white" />
+                              </div>
+                              <span className="font-medium">{item}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Duration Plans */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+              >
+                <h2 className="text-3xl font-black mb-8">Select Duration</h2>
+                <div className="grid md:grid-cols-3 gap-6">
+                  {packageTypes.find(p => p.id === packageType)?.plans.map((plan) => (
+                    <motion.div
+                      key={plan.duration}
                       whileHover={{ y: -5 }}
-                      onClick={() => setSelectedPlan(plan.id)}
+                      onClick={() => setSelectedPlan(plan.duration)}
                       className={`relative p-8 rounded-2xl border-2 cursor-pointer transition-all ${
-                        selectedPlan === plan.id
+                        selectedPlan === plan.duration
                           ? 'border-yellow-400 bg-yellow-50 shadow-lg'
                           : 'border-gray-200 bg-white hover:border-gray-300'
                       }`}
@@ -163,15 +234,14 @@ export default function Packages() {
                       )}
                       
                       <div className="text-center">
-                        <h3 className="text-2xl font-black mb-2">{plan.name}</h3>
-                        <p className="text-gray-600 text-sm mb-4">{plan.description}</p>
+                        <h3 className="text-2xl font-black mb-4">{plan.name}</h3>
                         <div className="mb-4">
                           <span className="text-5xl font-black">€{plan.price}</span>
                           <span className="text-gray-600">/month</span>
                         </div>
-                        {plan.discount > 0 && (
-                          <div className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold">
-                            Save {plan.discount}%
+                        {plan.savings && (
+                          <div className="inline-block px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-bold">
+                            💰 Save €{plan.savings}/mo
                           </div>
                         )}
                       </div>
@@ -196,15 +266,16 @@ export default function Packages() {
               </motion.div>
 
               {/* Add-ons */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-              >
-                <h2 className="text-3xl font-black mb-4">Customize with Add-ons</h2>
-                <p className="text-gray-600 mb-8">
-                  Build your perfect package by adding services you need
-                </p>
+              {packageType === 'starter' && (
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                >
+                  <h2 className="text-3xl font-black mb-4">Customize with Add-ons</h2>
+                  <p className="text-gray-600 mb-8">
+                    Build your perfect package by adding services you need
+                  </p>
                 
                 <div className="space-y-4">
                   {addons.map((addon) => (
