@@ -4,19 +4,19 @@ import { ChevronRight } from 'lucide-react';
 
 const slides = [
   {
-    image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&q=80',
+    image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&q=80&fit=crop',
     title: 'PHIVE PORTO',
     subtitle: 'PORTO',
     label: "IT'S OPEN!",
   },
   {
-    image: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=1920&q=80',
+    image: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=1920&q=80&fit=crop',
     title: 'PHIVE LISBON',
     subtitle: 'LISBON',
     label: 'NOW OPEN',
   },
   {
-    image: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1920&q=80',
+    image: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1920&q=80&fit=crop',
     title: 'TRAIN EVERYDAY',
     subtitle: 'FITNESS',
     label: 'JOIN NOW',

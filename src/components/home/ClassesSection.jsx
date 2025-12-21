@@ -7,25 +7,25 @@ const classes = [
     id: 1,
     name: 'TRX',
     category: 'Power',
-    image: 'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=600&h=900&q=80&fit=crop',
   },
   {
     id: 2,
     name: 'Yoga',
     category: 'Flow',
-    image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&h=900&q=80&fit=crop',
   },
   {
     id: 3,
     name: 'Yoguitos Kids',
     category: 'Kids',
-    image: 'https://images.unsplash.com/photo-1588286840104-8957b019727f?w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1588286840104-8957b019727f?w=600&h=900&q=80&fit=crop',
   },
   {
     id: 4,
     name: 'Zumba',
     category: 'Moves',
-    image: 'https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?w=600&h=900&q=80&fit=crop',
   },
 ];
 

@@ -7,37 +7,37 @@ const clubs = [
     id: 1,
     name: 'Club Boavista',
     city: 'Porto',
-    image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=800&q=80&fit=crop',
   },
   {
     id: 2,
     name: 'Club 5 de Outubro',
     city: 'Lisbon',
-    image: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=600&h=800&q=80&fit=crop',
   },
   {
     id: 3,
     name: 'Club Coimbra Celas',
     city: 'Coimbra',
-    image: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=600&h=800&q=80&fit=crop',
   },
   {
     id: 4,
     name: 'Club Coimbra Lágrimas',
     city: 'Coimbra',
-    image: 'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?w=600&h=800&q=80&fit=crop',
   },
   {
     id: 5,
     name: 'Club Leiria',
     city: 'Leiria',
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=800&q=80&fit=crop',
   },
   {
     id: 6,
     name: 'Club Figueira',
     city: 'Figueira da Foz',
-    image: 'https://images.unsplash.com/photo-1576678927484-cc907957088c?w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1576678927484-cc907957088c?w=600&h=800&q=80&fit=crop',
   },
 ];
 
@@ -83,7 +83,7 @@ export default function ClubsSection() {
 
       {/* Clubs Grid - Horizontal Scroll on Mobile */}
       <div className="relative">
-        <div className="flex overflow-x-auto pb-8 px-6 gap-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-3 lg:grid-cols-6 md:max-w-7xl md:mx-auto md:overflow-visible">
+        <div className="flex overflow-x-auto pb-8 px-6 gap-4 snap-x snap-mandatory md:grid md:grid-cols-3 lg:grid-cols-6 md:max-w-7xl md:mx-auto md:overflow-visible" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {clubs.map((club, index) => (
             <motion.div
               key={club.id}

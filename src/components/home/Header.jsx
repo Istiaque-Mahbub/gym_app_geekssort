@@ -6,7 +6,7 @@ const navLinks = [
   { name: 'Clubs', href: '#clubs' },
   { name: 'Classes', href: '#classes' },
   { name: 'App', href: '#app' },
-  { name: 'Contact', href: '#contact' },
+  { name: 'About', href: '#about' },
 ];
 
 export default function Header() {
@@ -32,7 +32,14 @@ export default function Header() {
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
-          <a href="#" className="text-2xl font-black tracking-tight text-yellow-400">
+          <a 
+            href="#" 
+            className="text-2xl font-black tracking-tight text-yellow-400"
+            onClick={(e) => {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          >
             PHIVE
           </a>
 

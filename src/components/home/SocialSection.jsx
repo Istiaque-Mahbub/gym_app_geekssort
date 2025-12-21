@@ -7,9 +7,9 @@ const socials = [
     short: 'IG',
     url: 'https://www.instagram.com/phiveclubs/',
     images: [
-      'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=400&q=80',
-      'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&q=80',
-      'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=400&q=80',
+      'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=400&h=400&q=80&fit=crop',
     ],
   },
   {
@@ -17,9 +17,9 @@ const socials = [
     short: 'FB',
     url: 'https://www.facebook.com/phiveclubs/',
     images: [
-      'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400&q=80',
-      'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?w=400&q=80',
-      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
+      'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&q=80&fit=crop',
     ],
   },
   {
@@ -27,9 +27,9 @@ const socials = [
     short: 'YT',
     url: 'https://www.youtube.com/',
     images: [
-      'https://images.unsplash.com/photo-1576678927484-cc907957088c?w=400&q=80',
-      'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&q=80',
-      'https://images.unsplash.com/photo-1588286840104-8957b019727f?w=400&q=80',
+      'https://images.unsplash.com/photo-1576678927484-cc907957088c?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1588286840104-8957b019727f?w=400&h=400&q=80&fit=crop',
     ],
   },
   {
@@ -37,9 +37,9 @@ const socials = [
     short: 'TK',
     url: 'https://www.tiktok.com/',
     images: [
-      'https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?w=400&q=80',
-      'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=400&q=80',
-      'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400&q=80',
+      'https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400&h=400&q=80&fit=crop',
     ],
   },
 ];

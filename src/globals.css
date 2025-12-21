@@ -88,6 +88,25 @@
   display: none;
 }
 
+/* Additional scrollbar hiding */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.overflow-x-auto::-webkit-scrollbar {
+  height: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
 /* Smooth scroll */
 html {
   scroll-behavior: smooth;

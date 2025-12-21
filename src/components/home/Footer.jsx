@@ -29,11 +29,7 @@ export default function Footer() {
                 className="group"
               >
                 <div className="aspect-video bg-gray-800 rounded-lg overflow-hidden mb-3">
-                  <img
-                    src={`https://images.unsplash.com/photo-${1534438327276 + index * 1000}-14e5300c3a48?w=400&q=80`}
-                    alt={club.name}
-                    className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity"
-                  />
+                  <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 opacity-70 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <span className="text-sm font-medium group-hover:text-yellow-400 transition-colors">
                   {club.name}
