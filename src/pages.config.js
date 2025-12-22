@@ -11,6 +11,10 @@ import Home from './pages/Home';
 import Packages from './pages/Packages';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
+import WorkoutPlanner from './pages/WorkoutPlanner';
+import MealPlanner from './pages/MealPlanner';
+import ProgressTracker from './pages/ProgressTracker';
+import Challenges from './pages/Challenges';
 import __Layout from './Layout.jsx';
 
 
@@ -28,6 +32,10 @@ export const PAGES = {
     "Packages": Packages,
     "PrivacyPolicy": PrivacyPolicy,
     "TermsOfService": TermsOfService,
+    "WorkoutPlanner": WorkoutPlanner,
+    "MealPlanner": MealPlanner,
+    "ProgressTracker": ProgressTracker,
+    "Challenges": Challenges,
 }
 
 export const pagesConfig = {
