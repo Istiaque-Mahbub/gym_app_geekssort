@@ -1,14 +1,51 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Facebook, Instagram, Youtube, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Instagram, Youtube, Mail, Phone, MapPin, Send, Dumbbell, Utensils, TrendingUp, Trophy } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 export default function Footer() {
+  const [email, setEmail] = useState('');
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleNewsletterSubmit = (e) => {
+    e.preventDefault();
+    setSubscribed(true);
+    setEmail('');
+    setTimeout(() => setSubscribed(false), 3000);
+  };
+
   return (
     <footer className="bg-black text-white">
+      {/* Newsletter Section */}
+      <div className="border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div>
+              <h3 className="text-2xl md:text-3xl font-black mb-2">Stay Updated</h3>
+              <p className="text-gray-400">Get fitness tips, exclusive offers, and updates delivered to your inbox</p>
+            </div>
+            <form onSubmit={handleNewsletterSubmit} className="flex gap-3 w-full md:w-auto">
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="bg-white/10 border-white/20 text-white placeholder:text-gray-500 md:w-80"
+              />
+              <Button type="submit" className="bg-yellow-400 text-black hover:bg-yellow-500 font-bold">
+                {subscribed ? '✓ Subscribed!' : <><Send className="w-4 h-4 mr-2" /> Subscribe</>}
+              </Button>
+            </form>
+          </div>
+        </div>
+      </div>
+
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Brand Column */}
           <div>
             <div className="text-3xl font-black tracking-tight text-yellow-400 mb-4">
@@ -62,6 +99,37 @@ export default function Footer() {
               <li>
                 <Link to={createPageUrl('ClassSchedule')} className="text-gray-400 hover:text-yellow-400 transition-colors">
                   Class Schedule
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* AI Tools */}
+          <div>
+            <h3 className="text-lg font-bold mb-4">AI Tools</h3>
+            <ul className="space-y-3">
+              <li>
+                <Link to={createPageUrl('WorkoutPlanner')} className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-2">
+                  <Dumbbell className="w-4 h-4" />
+                  Workout Planner
+                </Link>
+              </li>
+              <li>
+                <Link to={createPageUrl('MealPlanner')} className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-2">
+                  <Utensils className="w-4 h-4" />
+                  Meal Planner
+                </Link>
+              </li>
+              <li>
+                <Link to={createPageUrl('ProgressTracker')} className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4" />
+                  Progress Tracker
+                </Link>
+              </li>
+              <li>
+                <Link to={createPageUrl('Challenges')} className="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-2">
+                  <Trophy className="w-4 h-4" />
+                  Challenges
                 </Link>
               </li>
             </ul>
