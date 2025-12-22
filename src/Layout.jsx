@@ -4,6 +4,9 @@ import Footer from '@/components/home/Footer';
 
 export default function Layout({ children, currentPageName }) {
   useEffect(() => {
+    // Scroll to top on page change
+    window.scrollTo(0, 0);
+    
     // Set page title dynamically
     const pageTitles = {
       'Home': 'FitHive - Transform Your Body, Elevate Your Mind',
