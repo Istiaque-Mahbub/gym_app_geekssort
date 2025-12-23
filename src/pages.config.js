@@ -19,6 +19,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import ProgressTracker from './pages/ProgressTracker';
 import TermsOfService from './pages/TermsOfService';
 import WorkoutPlanner from './pages/WorkoutPlanner';
+import AdminDashboard from './pages/AdminDashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -44,6 +45,7 @@ export const PAGES = {
     "ProgressTracker": ProgressTracker,
     "TermsOfService": TermsOfService,
     "WorkoutPlanner": WorkoutPlanner,
+    "AdminDashboard": AdminDashboard,
 }
 
 export const pagesConfig = {
