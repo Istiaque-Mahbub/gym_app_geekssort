@@ -44,7 +44,7 @@ export default function ChatWidget({ currentPageName }) {
         setIsOpen(true);
         setView('contact-cta');
         setHasAutoOpened(true);
-      }, 60000); // 60 seconds
+      }, 25000); // 25 seconds
 
       return () => clearTimeout(timer);
     }
