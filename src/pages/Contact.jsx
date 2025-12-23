@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle2, MessageSquare, Globe } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -17,9 +18,20 @@ export default function Contact() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState('email');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    
+    await base44.entities.Inquiry.create({
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      club: formData.club,
+      subject: formData.subject,
+      message: formData.message,
+      source: 'contact_page',
+      status: 'new'
+    });
+    
     setIsSubmitted(true);
     setTimeout(() => {
       setIsSubmitted(false);
