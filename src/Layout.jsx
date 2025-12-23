@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import Header from '@/components/home/Header';
 import Footer from '@/components/home/Footer';
+import ChatWidget from '@/components/ChatWidget';
 
 export default function Layout({ children, currentPageName }) {
   useEffect(() => {
@@ -34,6 +35,7 @@ export default function Layout({ children, currentPageName }) {
         {children}
       </main>
       <Footer />
+      <ChatWidget currentPageName={currentPageName} />
     </div>
   );
 }
