@@ -23,6 +23,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export default function UserManager() {
   const [user, setUser] = useState(null);
@@ -32,6 +39,7 @@ export default function UserManager() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('user');
   const [deleteUserId, setDeleteUserId] = useState(null);
+  const [editingUser, setEditingUser] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -80,6 +88,16 @@ export default function UserManager() {
       setDeleteUserId(null);
     } catch (error) {
       alert('Error deleting user: ' + error.message);
+    }
+  };
+
+  const handleChangeRole = async (userId, newRole) => {
+    try {
+      await base44.entities.User.update(userId, { role: newRole });
+      await loadUsers();
+      setEditingUser(null);
+    } catch (error) {
+      alert('Error changing role: ' + error.message);
     }
   };
 
@@ -204,27 +222,35 @@ export default function UserManager() {
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Mail className="w-4 h-4" />
                         <span>{u.email}</span>
-                        <span className="px-2 py-0.5 bg-gray-200 rounded-full text-xs font-bold">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                          u.role === 'admin' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-200'
+                        }`}>
                           {u.role}
                         </span>
                       </div>
                     </div>
                   </div>
                   
-                  {u.id !== user.id && (
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => setDeleteUserId(u.id)}
-                    >
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Delete
-                    </Button>
-                  )}
-                  
-                  {u.id === user.id && (
+                  {u.id !== user.id ? (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setEditingUser(u)}
+                      >
+                        {u.role === 'admin' ? 'Remove Admin' : 'Make Admin'}
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => setDeleteUserId(u.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
                     <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-bold">
-                      Current User
+                      You
                     </span>
                   )}
                 </motion.div>
@@ -273,6 +299,31 @@ export default function UserManager() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteUser} className="bg-red-600 hover:bg-red-700">
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Change Role Confirmation */}
+      <AlertDialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Change User Role</AlertDialogTitle>
+            <AlertDialogDescription>
+              {editingUser?.role === 'admin' ? (
+                <>Remove admin privileges from <strong>{editingUser?.full_name}</strong>? They will become a regular user.</>
+              ) : (
+                <>Make <strong>{editingUser?.full_name}</strong> an admin? They will have full access to the admin dashboard.</>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => handleChangeRole(editingUser?.id, editingUser?.role === 'admin' ? 'user' : 'admin')}
+              className="bg-yellow-400 hover:bg-yellow-500 text-black"
+            >
+              {editingUser?.role === 'admin' ? 'Remove Admin' : 'Make Admin'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
