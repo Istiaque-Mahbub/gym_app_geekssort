@@ -8,7 +8,8 @@ import {
   FileText, 
   Settings, 
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -102,6 +103,7 @@ export default function AdminDashboard() {
     { title: 'Manage Inquiries', icon: MessageSquare, link: 'InquiryManager', color: 'blue' },
     { title: 'Content Manager', icon: FileText, link: 'ContentManager', color: 'green' },
     { title: 'Banner Manager', icon: TrendingUp, link: 'BannerManager', color: 'purple' },
+    { title: 'User Management', icon: Users, link: 'UserManager', color: 'red' },
     { title: 'Notification Settings', icon: Settings, link: 'NotificationSettings', color: 'gray' }
   ];
 
@@ -176,6 +178,7 @@ export default function AdminDashboard() {
                     action.color === 'blue' ? 'bg-blue-500' :
                     action.color === 'green' ? 'bg-green-500' :
                     action.color === 'purple' ? 'bg-purple-500' :
+                    action.color === 'red' ? 'bg-red-500' :
                     'bg-gray-800'
                   }`}>
                     <action.icon className="w-7 h-7 text-white" />
