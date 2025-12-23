@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, ChevronLeft, Send, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -55,9 +56,18 @@ export default function ChatWidget({ currentPageName }) {
     setView('faq');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    
+    await base44.entities.Inquiry.create({
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone || '',
+      message: formData.message,
+      source: 'chat_widget',
+      status: 'new'
+    });
+    
     setView('success');
     setTimeout(() => {
       setIsOpen(false);
