@@ -23,10 +23,27 @@ export default function Layout({ children, currentPageName }) {
       'ProgressTracker': 'Progress Tracker - FitHive',
       'Challenges': 'Challenges & Rewards - FitHive',
       'App': 'Mobile App - FitHive',
+      'AdminDashboard': 'Admin Dashboard - FitHive',
+      'InquiryManager': 'Inquiry Manager - FitHive',
+      'ContentManager': 'Content Manager - FitHive',
+      'BannerManager': 'Banner Manager - FitHive',
+      'NotificationSettings': 'Notification Settings - FitHive',
     };
     
     document.title = pageTitles[currentPageName] || 'FitHive';
   }, [currentPageName]);
+
+  // Admin pages - hide header, footer, and chat widget
+  const adminPages = ['AdminDashboard', 'InquiryManager', 'ContentManager', 'BannerManager', 'NotificationSettings'];
+  const isAdminPage = adminPages.includes(currentPageName);
+
+  if (isAdminPage) {
+    return (
+      <div className="min-h-screen">
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
