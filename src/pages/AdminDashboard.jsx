@@ -43,7 +43,6 @@ export default function AdminDashboard() {
 
       setUser(currentUser);
 
-      // Load stats
       const inquiries = await base44.entities.Inquiry.list();
       const pages = await base44.entities.PageContent.list();
       const banners = await base44.entities.SiteBanner.list();
@@ -113,7 +112,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
       <div className="bg-black text-white py-8 px-6 shadow-lg">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
@@ -131,7 +129,6 @@ export default function AdminDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Stats Grid */}
         <div className="grid md:grid-cols-4 gap-6 mb-12">
           {statCards.map((stat, index) => (
             <motion.div
@@ -167,7 +164,6 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {/* Quick Actions */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -179,7 +175,7 @@ export default function AdminDashboard() {
               <Link key={index} to={createPageUrl(action.link)}>
                 <motion.div
                   whileHover={{ y: -5 }}
-                  className={`bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all cursor-pointer border-2 border-transparent hover:border-${action.color}-500`}
+                  className="bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all cursor-pointer"
                 >
                   <div className={`w-14 h-14 rounded-xl mb-4 flex items-center justify-center ${
                     action.color === 'blue' ? 'bg-blue-500' :
