@@ -1,5 +1,4 @@
 import About from './pages/About';
-import AdminDashboard from './pages/AdminDashboard';
 import App from './pages/App';
 import BannerManager from './pages/BannerManager';
 import BlogPost from './pages/BlogPost';
@@ -25,7 +24,6 @@ import __Layout from './Layout.jsx';
 
 export const PAGES = {
     "About": About,
-    "AdminDashboard": AdminDashboard,
     "App": App,
     "BannerManager": BannerManager,
     "BlogPost": BlogPost,
