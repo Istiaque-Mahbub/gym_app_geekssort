@@ -22,6 +22,7 @@ import ProgressTracker from './pages/ProgressTracker';
 import TermsOfService from './pages/TermsOfService';
 import UserManager from './pages/UserManager';
 import WorkoutPlanner from './pages/WorkoutPlanner';
+import UserDashboard from './pages/UserDashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -50,6 +51,7 @@ export const PAGES = {
     "TermsOfService": TermsOfService,
     "UserManager": UserManager,
     "WorkoutPlanner": WorkoutPlanner,
+    "UserDashboard": UserDashboard,
 }
 
 export const pagesConfig = {
