@@ -47,7 +47,7 @@ export default function Layout({ children, currentPageName }) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <Header currentPageName={currentPageName} />
       <main className="flex-grow">
         {children}
       </main>

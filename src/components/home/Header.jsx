@@ -13,7 +13,7 @@ const navLinks = [
   { name: 'About', href: '/About' },
 ];
 
-export default function Header() {
+export default function Header({ currentPageName }) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showBMI, setShowBMI] = useState(false);
@@ -32,6 +32,7 @@ export default function Header() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          currentPageName === 'UserDashboard' ? 'bg-black py-4' :
           scrolled ? 'bg-black/90 backdrop-blur-md py-4' : 'bg-transparent py-6'
         }`}
       >
