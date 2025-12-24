@@ -33,8 +33,8 @@ export default function Layout({ children, currentPageName }) {
     document.title = pageTitles[currentPageName] || 'FitHive';
   }, [currentPageName]);
 
-  // Admin pages and User Dashboard - hide header, footer, and chat widget
-  const adminPages = ['AdminDashboard', 'InquiryManager', 'ContentManager', 'BannerManager', 'NotificationSettings', 'UserManager', 'BlogManager', 'UserDashboard'];
+  // Admin pages - hide header, footer, and chat widget
+  const adminPages = ['AdminDashboard', 'InquiryManager', 'ContentManager', 'BannerManager', 'NotificationSettings', 'UserManager', 'BlogManager'];
   const isAdminPage = adminPages.includes(currentPageName);
 
   if (isAdminPage) {
