@@ -64,8 +64,17 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* CTA Button */}
-          <div className="hidden md:block">
+          {/* CTA Buttons */}
+          <div className="hidden md:flex items-center gap-3">
+            <Link to={createPageUrl('UserDashboard')}>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-6 py-3 bg-transparent border-2 border-yellow-400 text-yellow-400 rounded-full text-sm font-bold tracking-wider hover:bg-yellow-400 hover:text-black transition-all"
+              >
+                USER PANEL
+              </motion.button>
+            </Link>
             <Link to={createPageUrl('Contact')}>
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -113,13 +122,24 @@ export default function Header() {
                   </Link>
                 </motion.div>
               ))}
-              <Link to={createPageUrl('Contact')}>
+              <Link to={createPageUrl('UserDashboard')}>
                 <motion.button
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
                   onClick={() => setIsOpen(false)}
-                  className="mt-8 px-8 py-4 bg-yellow-400 text-black rounded-full text-lg font-bold tracking-wider"
+                  className="mt-8 px-8 py-4 border-2 border-yellow-400 text-yellow-400 rounded-full text-lg font-bold tracking-wider"
+                >
+                  USER PANEL
+                </motion.button>
+              </Link>
+              <Link to={createPageUrl('Contact')}>
+                <motion.button
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  onClick={() => setIsOpen(false)}
+                  className="px-8 py-4 bg-yellow-400 text-black rounded-full text-lg font-bold tracking-wider"
                 >
                   CONTACT US
                 </motion.button>
