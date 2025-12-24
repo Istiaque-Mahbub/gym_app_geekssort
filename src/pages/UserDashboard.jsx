@@ -199,7 +199,7 @@ export default function UserDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-24">
+    <div className="min-h-screen bg-black pt-24">
       {/* Header */}
       <div className="bg-gradient-to-r from-black to-gray-900 text-white py-12 px-6">
         <div className="max-w-7xl mx-auto">
