@@ -1,49 +1,45 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { ArrowRight, Calendar, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
-const blogs = [
-  {
-    id: 1,
-    title: '10 Essential Tips for Building Muscle Mass',
-    excerpt: 'Discover the proven strategies that will help you gain lean muscle and transform your physique.',
-    image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=400&q=80&fit=crop',
-    author: 'John Smith',
-    date: '2024-01-15',
-    category: 'Training',
-  },
-  {
-    id: 2,
-    title: 'Nutrition Guide: Fueling Your Workouts',
-    excerpt: 'Learn what to eat before and after training for maximum performance and recovery.',
-    image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&h=400&q=80&fit=crop',
-    author: 'Sarah Johnson',
-    date: '2024-01-12',
-    category: 'Nutrition',
-  },
-  {
-    id: 3,
-    title: 'Yoga for Athletes: Flexibility & Recovery',
-    excerpt: 'Why every athlete should incorporate yoga into their training routine for better results.',
-    image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&h=400&q=80&fit=crop',
-    author: 'Emma Wilson',
-    date: '2024-01-10',
-    category: 'Wellness',
-  },
-  {
-    id: 4,
-    title: 'HIIT vs Steady State: Which is Better?',
-    excerpt: 'Compare different cardio methods and find out which one aligns with your fitness goals.',
-    image: 'https://images.unsplash.com/photo-1601422407692-ec4eeec1d9b3?w=600&h=400&q=80&fit=crop',
-    author: 'Mike Rodriguez',
-    date: '2024-01-08',
-    category: 'Cardio',
-  },
-];
-
 export default function BlogsSection() {
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadBlogs();
+  }, []);
+
+  const loadBlogs = async () => {
+    try {
+      const allBlogs = await base44.entities.Blog.filter(
+        { status: 'published', show_on_homepage: true },
+        '-created_date',
+        4
+      );
+      setBlogs(allBlogs);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error loading blogs:', error);
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <section className="bg-white py-24">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
+        </div>
+      </section>
+    );
+  }
+
+  if (blogs.length === 0) return null;
+
   return (
     <section className="bg-white py-24">
       <div className="max-w-7xl mx-auto px-6">
@@ -70,7 +66,7 @@ export default function BlogsSection() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Link to={createPageUrl(`BlogPost?id=${blog.id}`)}>
+              <Link to={createPageUrl('BlogPost') + '?slug=' + blog.slug}>
                 <div className="group cursor-pointer h-full flex flex-col">
                   <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4 shadow-lg">
                     <img
@@ -89,7 +85,7 @@ export default function BlogsSection() {
                     <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
-                        <span>{new Date(blog.date).toLocaleDateString()}</span>
+                        <span>{new Date(blog.created_date).toLocaleDateString()}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <User className="w-4 h-4" />
@@ -101,7 +97,7 @@ export default function BlogsSection() {
                       {blog.title}
                     </h3>
                     
-                    <p className="text-gray-600 mb-4 flex-grow">
+                    <p className="text-gray-600 mb-4 flex-grow line-clamp-3">
                       {blog.excerpt}
                     </p>
                     
