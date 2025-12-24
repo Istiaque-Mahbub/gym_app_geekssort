@@ -5,6 +5,9 @@ import { MapPin, Phone, Mail, Clock, Send, CheckCircle2, MessageSquare, Globe } 
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -17,6 +20,17 @@ export default function Contact() {
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState('email');
+
+  // Fix Leaflet default icon issue
+  delete L.Icon.Default.prototype._getIconUrl;
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  });
+
+  // Coordinates for Mirpur DOHS, Pallabi, Dhaka
+  const position = [23.8223, 90.3654];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -269,6 +283,73 @@ export default function Contact() {
               )}
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* Google Map Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl font-black mb-4">Visit Our Location</h2>
+            <p className="text-xl text-gray-600">Find us at our headquarters in Dhaka</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl overflow-hidden shadow-2xl"
+          >
+            <MapContainer
+              center={position}
+              zoom={15}
+              style={{ height: '500px', width: '100%' }}
+              scrollWheelZoom={false}
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <Marker position={position}>
+                <Popup>
+                  <div className="text-center">
+                    <h3 className="font-black text-lg mb-2">FitHive Headquarters</h3>
+                    <p className="text-sm text-gray-600">Mirpur DOHS, Pallabi</p>
+                    <p className="text-sm text-gray-600">Dhaka 1216, Bangladesh</p>
+                    <p className="text-sm font-bold mt-2">+8801341869125</p>
+                  </div>
+                </Popup>
+              </Marker>
+            </MapContainer>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-8 grid md:grid-cols-3 gap-6"
+          >
+            <div className="bg-white rounded-xl p-6 shadow-lg text-center">
+              <MapPin className="w-10 h-10 text-yellow-400 mx-auto mb-4" />
+              <h3 className="font-black text-lg mb-2">Address</h3>
+              <p className="text-gray-600 text-sm">Mirpur DOHS, Pallabi<br />Dhaka 1216, Bangladesh</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-lg text-center">
+              <Phone className="w-10 h-10 text-yellow-400 mx-auto mb-4" />
+              <h3 className="font-black text-lg mb-2">Phone</h3>
+              <p className="text-gray-600 text-sm">+8801341869125</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-lg text-center">
+              <Clock className="w-10 h-10 text-yellow-400 mx-auto mb-4" />
+              <h3 className="font-black text-lg mb-2">Hours</h3>
+              <p className="text-gray-600 text-sm">Mon-Fri: 09:00 - 18:00<br />Sat: 10:00 - 16:00</p>
+            </div>
+          </motion.div>
         </div>
       </section>
     </div>

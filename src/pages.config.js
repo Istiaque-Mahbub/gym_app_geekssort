@@ -2,6 +2,7 @@ import About from './pages/About';
 import AdminDashboard from './pages/AdminDashboard';
 import App from './pages/App';
 import BannerManager from './pages/BannerManager';
+import BlogManager from './pages/BlogManager';
 import BlogPost from './pages/BlogPost';
 import Blogs from './pages/Blogs';
 import Challenges from './pages/Challenges';
@@ -21,7 +22,6 @@ import ProgressTracker from './pages/ProgressTracker';
 import TermsOfService from './pages/TermsOfService';
 import UserManager from './pages/UserManager';
 import WorkoutPlanner from './pages/WorkoutPlanner';
-import BlogManager from './pages/BlogManager';
 import __Layout from './Layout.jsx';
 
 
@@ -30,6 +30,7 @@ export const PAGES = {
     "AdminDashboard": AdminDashboard,
     "App": App,
     "BannerManager": BannerManager,
+    "BlogManager": BlogManager,
     "BlogPost": BlogPost,
     "Blogs": Blogs,
     "Challenges": Challenges,
@@ -49,7 +50,6 @@ export const PAGES = {
     "TermsOfService": TermsOfService,
     "UserManager": UserManager,
     "WorkoutPlanner": WorkoutPlanner,
-    "BlogManager": BlogManager,
 }
 
 export const pagesConfig = {
