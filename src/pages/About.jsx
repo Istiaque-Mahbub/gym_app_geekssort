@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { Target, Users, Award, Heart } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { Target, Users, Award, Heart, ArrowRight } from 'lucide-react';
 
 const values = [
   {
@@ -33,6 +36,24 @@ const stats = [
 ];
 
 export default function About() {
+  const [trainers, setTrainers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadTrainers();
+  }, []);
+
+  const loadTrainers = async () => {
+    try {
+      const data = await base44.entities.Trainer.filter({ is_active: true });
+      setTrainers(data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error loading trainers:', error);
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
@@ -112,6 +133,67 @@ export default function About() {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Elite Trainers Section */}
+      <section className="py-24 bg-black text-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-6xl font-black mb-6">Meet Our Elite Trainers</h2>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              World-class experts dedicated to your transformation
+            </p>
+          </motion.div>
+
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-400">Loading trainers...</p>
+            </div>
+          ) : trainers.length > 0 ? (
+            <div className="grid md:grid-cols-3 gap-8">
+              {trainers.map((trainer, index) => (
+                <motion.div
+                  key={trainer.id}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Link to={`${createPageUrl('TrainerDetail')}?id=${trainer.id}`}>
+                    <div className="group relative overflow-hidden rounded-2xl cursor-pointer">
+                      <div className="aspect-[3/4] overflow-hidden">
+                        <img
+                          src={trainer.photo}
+                          alt={trainer.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-90 group-hover:opacity-100 transition-opacity" />
+                      <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-2 group-hover:translate-y-0 transition-transform">
+                        <h3 className="text-2xl font-black text-white mb-2">{trainer.name}</h3>
+                        <p className="text-yellow-400 font-bold text-lg mb-2">{trainer.body_type}</p>
+                        <p className="text-gray-300 text-sm mb-4 line-clamp-2">{trainer.specialization}</p>
+                        <div className="flex items-center gap-2 text-yellow-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                          View Profile <ArrowRight className="w-5 h-5" />
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-400">No trainers available at the moment</p>
+            </div>
+          )}
         </div>
       </section>
 

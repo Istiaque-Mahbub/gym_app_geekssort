@@ -23,6 +23,7 @@ import TermsOfService from './pages/TermsOfService';
 import UserManager from './pages/UserManager';
 import WorkoutPlanner from './pages/WorkoutPlanner';
 import UserDashboard from './pages/UserDashboard';
+import TrainerDetail from './pages/TrainerDetail';
 import __Layout from './Layout.jsx';
 
 
@@ -52,6 +53,7 @@ export const PAGES = {
     "UserManager": UserManager,
     "WorkoutPlanner": WorkoutPlanner,
     "UserDashboard": UserDashboard,
+    "TrainerDetail": TrainerDetail,
 }
 
 export const pagesConfig = {
