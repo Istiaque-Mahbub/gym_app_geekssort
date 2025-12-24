@@ -101,6 +101,7 @@ export default function AdminDashboard() {
 
   const quickActions = [
     { title: 'Manage Inquiries', icon: MessageSquare, link: 'InquiryManager', color: 'blue' },
+    { title: 'Blog Manager', icon: FileText, link: 'BlogManager', color: 'indigo' },
     { title: 'Content Manager', icon: FileText, link: 'ContentManager', color: 'green' },
     { title: 'Banner Manager', icon: TrendingUp, link: 'BannerManager', color: 'purple' },
     { title: 'User Management', icon: Users, link: 'UserManager', color: 'red' },
@@ -176,6 +177,7 @@ export default function AdminDashboard() {
                 >
                   <div className={`w-14 h-14 rounded-xl mb-4 flex items-center justify-center ${
                     action.color === 'blue' ? 'bg-blue-500' :
+                    action.color === 'indigo' ? 'bg-indigo-500' :
                     action.color === 'green' ? 'bg-green-500' :
                     action.color === 'purple' ? 'bg-purple-500' :
                     action.color === 'red' ? 'bg-red-500' :
