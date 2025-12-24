@@ -38,6 +38,8 @@ export default function UserDashboard() {
   const [progressData, setProgressData] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);
   const [achievements, setAchievements] = useState([]);
+  const [bmi, setBmi] = useState(null);
+  const [bmiCategory, setBmiCategory] = useState('');
 
   const [profileForm, setProfileForm] = useState({
     full_name: '',
@@ -67,6 +69,18 @@ export default function UserDashboard() {
 
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+
+      // Calculate BMI
+      if (currentUser.current_weight && currentUser.height) {
+        const heightInMeters = currentUser.height / 100;
+        const calculatedBMI = (currentUser.current_weight / (heightInMeters * heightInMeters)).toFixed(1);
+        setBmi(calculatedBMI);
+        
+        if (calculatedBMI < 18.5) setBmiCategory('Underweight');
+        else if (calculatedBMI < 25) setBmiCategory('Normal');
+        else if (calculatedBMI < 30) setBmiCategory('Overweight');
+        else setBmiCategory('Obese');
+      }
 
       setProfileForm({
         full_name: currentUser.full_name || '',
@@ -147,8 +161,23 @@ export default function UserDashboard() {
     e.preventDefault();
     try {
       await base44.auth.updateMe(profileForm);
-      setUser({ ...user, ...profileForm });
+      const updatedUser = { ...user, ...profileForm };
+      setUser(updatedUser);
+      
+      // Recalculate BMI
+      if (profileForm.current_weight && profileForm.height) {
+        const heightInMeters = profileForm.height / 100;
+        const calculatedBMI = (profileForm.current_weight / (heightInMeters * heightInMeters)).toFixed(1);
+        setBmi(calculatedBMI);
+        
+        if (calculatedBMI < 18.5) setBmiCategory('Underweight');
+        else if (calculatedBMI < 25) setBmiCategory('Normal');
+        else if (calculatedBMI < 30) setBmiCategory('Overweight');
+        else setBmiCategory('Obese');
+      }
+      
       setEditingProfile(false);
+      await loadUserData(updatedUser);
     } catch (error) {
       alert('Error updating profile: ' + error.message);
     }
@@ -170,7 +199,7 @@ export default function UserDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-24">
       {/* Header */}
       <div className="bg-gradient-to-r from-black to-gray-900 text-white py-12 px-6">
         <div className="max-w-7xl mx-auto">
@@ -245,6 +274,34 @@ export default function UserDashboard() {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
+            {/* BMI Card */}
+            {bmi && (
+              <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100">
+                <CardHeader>
+                  <CardTitle>Your Current BMI</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-5xl font-black text-yellow-600">{bmi}</p>
+                      <p className="text-lg font-bold mt-2">{bmiCategory}</p>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Weight: {user?.current_weight} kg | Height: {user?.height} cm
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <Activity className="w-16 h-16 text-yellow-400 mb-2" />
+                      {user?.target_weight && (
+                        <p className="text-sm text-gray-600">
+                          Target: {user.target_weight} kg
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             <div className="grid md:grid-cols-2 gap-6">
               {/* BMI Progress Chart */}
               <Card>
