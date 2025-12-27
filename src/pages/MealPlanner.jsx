@@ -237,13 +237,15 @@ For each day, include: breakfast, lunch, dinner, and 2 snacks (morning snack and
               </div>
 
               <Tabs defaultValue="day-1" className="w-full">
-                <TabsList className="grid w-full grid-cols-7 mb-6">
-                  {mealPlan.plan_data.days.map((day, idx) => (
-                    <TabsTrigger key={idx} value={`day-${idx + 1}`} className="font-bold">
-                      Day {idx + 1}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
+                <div className="mb-6 overflow-x-auto">
+                  <TabsList className="grid w-full grid-cols-7 min-w-[600px]">
+                    {mealPlan.plan_data.days.map((day, idx) => (
+                      <TabsTrigger key={idx} value={`day-${idx + 1}`} className="font-bold text-xs md:text-sm">
+                        Day {idx + 1}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </div>
 
                 {mealPlan.plan_data.days.map((day, dayIdx) => (
                   <TabsContent key={dayIdx} value={`day-${dayIdx + 1}`}>
