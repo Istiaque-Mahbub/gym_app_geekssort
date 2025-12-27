@@ -25,6 +25,7 @@ import WorkoutPlanner from './pages/WorkoutPlanner';
 import UserDashboard from './pages/UserDashboard';
 import TrainerDetail from './pages/TrainerDetail';
 import VisitorAnalytics from './pages/VisitorAnalytics';
+import SiteSettingsManager from './pages/SiteSettingsManager';
 import __Layout from './Layout.jsx';
 
 
@@ -56,6 +57,7 @@ export const PAGES = {
     "UserDashboard": UserDashboard,
     "TrainerDetail": TrainerDetail,
     "VisitorAnalytics": VisitorAnalytics,
+    "SiteSettingsManager": SiteSettingsManager,
 }
 
 export const pagesConfig = {

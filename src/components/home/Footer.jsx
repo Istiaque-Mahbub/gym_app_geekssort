@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 export default function Footer() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [siteSettings, setSiteSettings] = useState(null);
+  const [footerLinks, setFooterLinks] = useState([]);
 
   const handleNewsletterSubmit = (e) => {
     e.preventDefault();
