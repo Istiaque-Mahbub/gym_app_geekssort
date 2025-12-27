@@ -15,6 +15,10 @@ export default function Challenges() {
 
   useEffect(() => {
     loadData();
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(loadData, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const loadData = async () => {
@@ -37,7 +41,30 @@ export default function Challenges() {
       setAchievements(myAchievements);
 
       const allProfiles = await base44.entities.UserProfile.list('-total_points', 10);
-      setLeaderboard(allProfiles);
+      
+      // Enrich with user names
+      const enrichedLeaderboard = await Promise.all(
+        allProfiles.map(async (profile, idx) => {
+          try {
+            const users = await base44.entities.User.filter({ email: profile.user_id });
+            return {
+              ...profile,
+              rank: idx + 1,
+              name: users[0]?.full_name || 'Anonymous User',
+              email: profile.user_id
+            };
+          } catch (error) {
+            return {
+              ...profile,
+              rank: idx + 1,
+              name: 'Anonymous User',
+              email: profile.user_id
+            };
+          }
+        })
+      );
+      
+      setLeaderboard(enrichedLeaderboard);
     } catch (error) {
       console.error('Error loading data:', error);
     }
@@ -241,9 +268,9 @@ export default function Challenges() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: idx * 0.1 }}
                         className={`flex items-center gap-4 p-4 rounded-xl transition-all ${
-                          player.user_id === user?.email
-                            ? 'bg-yellow-100 border-2 border-yellow-400'
-                            : 'bg-gray-50 hover:bg-gray-100'
+                         player.email === user?.email
+                           ? 'bg-yellow-100 border-2 border-yellow-400'
+                           : 'bg-gray-50 hover:bg-gray-100'
                         }`}
                       >
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-lg ${
@@ -256,9 +283,9 @@ export default function Challenges() {
                         </div>
                         <div className="flex-1">
                           <div className="font-bold">
-                            {player.user_id === user?.email ? 'You' : `User ${player.user_id.substring(0, 8)}`}
+                            {player.email === user?.email ? '👤 You' : player.name}
                           </div>
-                          <div className="text-sm text-gray-500">{player.fitness_goal?.replace('_', ' ')}</div>
+                          <div className="text-sm text-gray-500 capitalize">{player.fitness_goal?.replace('_', ' ')}</div>
                         </div>
                         <div className="text-right">
                           <div className="text-xl font-black text-yellow-400">{player.total_points || 0}</div>

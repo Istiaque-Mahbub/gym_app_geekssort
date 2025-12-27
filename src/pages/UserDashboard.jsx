@@ -56,7 +56,13 @@ export default function UserDashboard() {
 
   useEffect(() => {
     checkAuthAndLoadData();
-  }, []);
+    
+    // Auto-refresh data every 30 seconds
+    const interval = setInterval(() => {
+      if (user) loadUserData(user);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   const checkAuthAndLoadData = async () => {
     try {
@@ -144,12 +150,22 @@ export default function UserDashboard() {
       const allProfiles = await base44.entities.UserProfile.list('-total_points', 10);
       const leaderboardData = await Promise.all(
         allProfiles.map(async (profile) => {
-          const user = await base44.entities.User.filter({ id: profile.user_id });
-          return {
-            name: user[0]?.full_name || 'Anonymous',
-            points: profile.total_points || 0,
-            level: profile.fitness_level || 'beginner'
-          };
+          try {
+            const users = await base44.entities.User.filter({ email: profile.user_id });
+            return {
+              name: users[0]?.full_name || 'Anonymous User',
+              points: profile.total_points || 0,
+              level: profile.fitness_level || 'beginner',
+              email: profile.user_id
+            };
+          } catch (error) {
+            return {
+              name: 'Anonymous User',
+              points: profile.total_points || 0,
+              level: profile.fitness_level || 'beginner',
+              email: profile.user_id
+            };
+          }
         })
       );
       setLeaderboard(leaderboardData);
@@ -625,7 +641,8 @@ export default function UserDashboard() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
                       className={`flex items-center gap-4 p-4 rounded-xl ${
-                        index < 3 ? 'bg-gradient-to-r from-yellow-50 to-yellow-100' : 'bg-gray-50'
+                       member.email === user?.email ? 'bg-yellow-100 border-2 border-yellow-400' :
+                       index < 3 ? 'bg-gradient-to-r from-yellow-50 to-yellow-100' : 'bg-gray-50'
                       }`}
                     >
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center font-black text-xl ${
@@ -637,8 +654,10 @@ export default function UserDashboard() {
                         {index + 1}
                       </div>
                       <div className="flex-1">
-                        <p className="font-black text-lg">{member.name}</p>
-                        <p className="text-sm text-gray-600 capitalize">{member.level}</p>
+                       <p className="font-black text-lg">
+                         {member.email === user?.email ? '👤 You' : member.name}
+                       </p>
+                       <p className="text-sm text-gray-600 capitalize">{member.level}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-2xl font-black text-yellow-600">{member.points}</p>
