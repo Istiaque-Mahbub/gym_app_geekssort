@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Utensils, Sparkles, Loader2, Apple, Coffee, Moon } from 'lucide-react';
+import { Utensils, Sparkles, Loader2, Apple, Coffee, Moon, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
+import GymLoader from '@/components/GymLoader';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function MealPlanner() {
   const [user, setUser] = useState(null);
@@ -126,7 +128,7 @@ Create a structured meal plan with breakfast, lunch, dinner, and 2 snacks for ea
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-yellow-400" />
+        <GymLoader message="Loading..." />
       </div>
     );
   }
@@ -198,10 +200,7 @@ Create a structured meal plan with breakfast, lunch, dinner, and 2 snacks for ea
                   className="w-full bg-yellow-400 text-black hover:bg-yellow-500 py-6 text-lg font-bold"
                 >
                   {loading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Generating Your Meal Plan...
-                    </>
+                    <GymLoader message="Creating your personalized meal plan..." />
                   ) : (
                     <>
                       <Sparkles className="w-5 h-5 mr-2" />
