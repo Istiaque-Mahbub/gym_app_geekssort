@@ -80,18 +80,20 @@ export default function SiteSettingsManager() {
   };
 
   const getDefaultNavbarPages = () => [
-    { page_name: 'Home', label: 'Home', order: 1 },
-    { page_name: 'About', label: 'About', order: 2 },
-    { page_name: 'Classes', label: 'Classes', order: 3 },
-    { page_name: 'Packages', label: 'Packages', order: 4 },
-    { page_name: 'Contact', label: 'Contact', order: 5 }
+    { page_name: 'Clubs', label: 'Clubs', order: 1 },
+    { page_name: 'Classes', label: 'Classes', order: 2 },
+    { page_name: 'Packages', label: 'Packages', order: 3 },
+    { page_name: 'App', label: 'App', order: 4 },
+    { page_name: 'About', label: 'About', order: 5 }
   ];
 
   const getDefaultFooterPages = () => [
-    { page_name: 'About', label: 'About Us', order: 1 },
-    { page_name: 'Clubs', label: 'Our Clubs', order: 2 },
-    { page_name: 'Classes', label: 'Classes', order: 3 },
-    { page_name: 'Contact', label: 'Contact', order: 4 }
+    { page_name: 'Clubs', label: 'Our Clubs', order: 1 },
+    { page_name: 'Classes', label: 'Classes', order: 2 },
+    { page_name: 'Packages', label: 'Packages', order: 3 },
+    { page_name: 'Blogs', label: 'Blog', order: 4 },
+    { page_name: 'About', label: 'About Us', order: 5 },
+    { page_name: 'ClassSchedule', label: 'Class Schedule', order: 6 }
   ];
 
   const handleLogoUpload = async (e) => {
