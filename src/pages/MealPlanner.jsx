@@ -55,12 +55,21 @@ export default function MealPlanner() {
         });
       }
 
-      const prompt = `Generate a detailed 7-day meal plan with the following requirements:
+      const prompt = `Generate a complete 7-day meal plan (Monday through Sunday) with the following requirements:
 - Dietary Preference: ${formData.dietary_preferences}
 - Daily Calories Target: ${formData.daily_calories} calories
 - Fitness Goal: ${profile?.fitness_goal || 'general_fitness'}
 
-Create a structured meal plan with breakfast, lunch, dinner, and 2 snacks for each day. Include calories and macros for each meal.`;
+IMPORTANT: You MUST provide exactly 7 days. Each day should have:
+- Day 1 (Monday)
+- Day 2 (Tuesday)
+- Day 3 (Wednesday)
+- Day 4 (Thursday)
+- Day 5 (Friday)
+- Day 6 (Saturday)
+- Day 7 (Sunday)
+
+For each day, include: breakfast, lunch, dinner, and 2 snacks (morning snack and afternoon snack). Include specific calories and macros (protein, carbs, fats) for each meal, along with ingredients and preparation instructions.`;
 
       const result = await base44.integrations.Core.InvokeLLM({
         prompt: prompt,
@@ -70,6 +79,8 @@ Create a structured meal plan with breakfast, lunch, dinner, and 2 snacks for ea
             plan_name: { type: 'string' },
             days: {
               type: 'array',
+              minItems: 7,
+              maxItems: 7,
               items: {
                 type: 'object',
                 properties: {
