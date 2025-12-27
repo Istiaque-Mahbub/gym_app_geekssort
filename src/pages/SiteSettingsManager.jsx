@@ -65,8 +65,13 @@ export default function SiteSettingsManager() {
         setLogoUrl(siteSettings.logo_url || '');
         setLogoWidth(siteSettings.logo_width || 120);
         setLogoHeight(siteSettings.logo_height || 40);
-        setNavbarPages(siteSettings.navbar_pages || getDefaultNavbarPages());
-        setFooterPages(siteSettings.footer_pages || getDefaultFooterPages());
+        
+        // Sort by order before setting
+        const sortedNav = (siteSettings.navbar_pages || getDefaultNavbarPages()).sort((a, b) => a.order - b.order);
+        const sortedFooter = (siteSettings.footer_pages || getDefaultFooterPages()).sort((a, b) => a.order - b.order);
+        
+        setNavbarPages(sortedNav);
+        setFooterPages(sortedFooter);
       } else {
         setNavbarPages(getDefaultNavbarPages());
         setFooterPages(getDefaultFooterPages());
