@@ -65,19 +65,20 @@ export default function Header({ currentPageName }) {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-4 lg:gap-8">
             <button
               onClick={() => setShowBMI(true)}
-              className="flex items-center gap-2 text-white text-sm font-medium tracking-wider hover:text-yellow-400 transition-colors"
+              className="flex items-center gap-1 lg:gap-2 text-white text-xs lg:text-sm font-medium tracking-wider hover:text-yellow-400 transition-colors"
             >
-              <Calculator className="w-4 h-4" />
-              BMI CALCULATOR
+              <Calculator className="w-3 h-3 lg:w-4 lg:h-4" />
+              <span className="hidden lg:inline">BMI CALCULATOR</span>
+              <span className="lg:hidden">BMI</span>
             </button>
             {navLinks.map((link) => (
               <Link
                 key={link.page_name}
                 to={createPageUrl(link.page_name)}
-                className="text-white text-sm font-medium tracking-wider hover:text-yellow-400 transition-colors"
+                className="text-white text-xs lg:text-sm font-medium tracking-wider hover:text-yellow-400 transition-colors"
               >
                 {link.label.toUpperCase()}
               </Link>
@@ -85,21 +86,12 @@ export default function Header({ currentPageName }) {
           </nav>
 
           {/* CTA Buttons */}
-          <div className="hidden md:flex items-center gap-3">
-            <Link to={createPageUrl('UserDashboard')}>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="px-6 py-3 bg-transparent border-2 border-yellow-400 text-yellow-400 rounded-full text-sm font-bold tracking-wider hover:bg-yellow-400 hover:text-black transition-all"
-              >
-                USER PANEL
-              </motion.button>
-            </Link>
+          <div className="hidden md:flex items-center gap-2 lg:gap-3">
             <Link to={createPageUrl('Contact')}>
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="px-6 py-3 bg-yellow-400 text-black rounded-full text-sm font-bold tracking-wider"
+                className="px-4 lg:px-6 py-2 lg:py-3 bg-yellow-400 text-black rounded-full text-xs lg:text-sm font-bold tracking-wider"
               >
                 CONTACT US
               </motion.button>
@@ -142,17 +134,18 @@ export default function Header({ currentPageName }) {
                   </Link>
                 </motion.div>
               ))}
-              <Link to={createPageUrl('UserDashboard')}>
-                <motion.button
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  onClick={() => setIsOpen(false)}
-                  className="mt-8 px-8 py-4 border-2 border-yellow-400 text-yellow-400 rounded-full text-lg font-bold tracking-wider"
-                >
-                  USER PANEL
-                </motion.button>
-              </Link>
+              <motion.button
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                onClick={() => {
+                  setShowBMI(true);
+                  setIsOpen(false);
+                }}
+                className="mt-8 px-8 py-4 border-2 border-white text-white rounded-full text-lg font-bold tracking-wider"
+              >
+                BMI CALCULATOR
+              </motion.button>
               <Link to={createPageUrl('Contact')}>
                 <motion.button
                   initial={{ opacity: 0, y: 20 }}
