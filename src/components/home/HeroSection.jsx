@@ -8,6 +8,7 @@ import { base44 } from '@/api/base44Client';
 export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slides, setSlides] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadBanners();
@@ -25,11 +26,41 @@ export default function HeroSection() {
   const loadBanners = async () => {
     try {
       const banners = await base44.entities.SiteBanner.filter({ is_active: true }, 'position');
-      setSlides(banners);
+      setSlides(banners.length > 0 ? banners : getDefaultSlides());
     } catch (error) {
       console.error('Error loading banners:', error);
+      setSlides(getDefaultSlides());
+    } finally {
+      setLoading(false);
     }
   };
+
+  const getDefaultSlides = () => [
+    {
+      title: 'FITHIVE PORTO',
+      subtitle: "IT'S OPEN!",
+      media_type: 'image',
+      desktop_url: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&q=80&fit=crop',
+      cta_text: 'DISCOVER THE CLUB',
+      cta_link: '/clubs'
+    },
+    {
+      title: 'FITHIVE LISBON',
+      subtitle: 'NOW OPEN',
+      media_type: 'image',
+      desktop_url: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=1920&q=80&fit=crop',
+      cta_text: 'DISCOVER THE CLUB',
+      cta_link: '/clubs'
+    },
+    {
+      title: 'TRAIN EVERYDAY',
+      subtitle: 'JOIN NOW',
+      media_type: 'image',
+      desktop_url: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1920&q=80&fit=crop',
+      cta_text: 'DISCOVER THE CLUB',
+      cta_link: '/clubs'
+    }
+  ];
 
   const getMediaUrl = (banner) => {
     const width = window.innerWidth;
@@ -40,10 +71,13 @@ export default function HeroSection() {
     return banner.desktop_url || banner.laptop_url || banner.tablet_url || banner.mobile_url;
   };
 
-  if (slides.length === 0) {
+  if (loading) {
     return (
       <section className="relative h-screen w-full bg-black flex items-center justify-center">
-        <p className="text-white text-xl">Loading...</p>
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-xl">Loading...</p>
+        </div>
       </section>
     );
   }
