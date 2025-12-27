@@ -226,70 +226,105 @@ Create a structured meal plan with breakfast, lunch, dinner, and 2 snacks for ea
                 </Button>
               </div>
 
-              {mealPlan.plan_data.days.map((day, dayIdx) => (
-                <motion.div
-                  key={dayIdx}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: dayIdx * 0.1 }}
-                  className="bg-white rounded-2xl p-8 shadow-lg"
-                >
-                  <h3 className="text-2xl font-black mb-6">{day.day_name}</h3>
-                  
-                  <div className="space-y-4">
-                    {day.meals.map((meal, mealIdx) => (
-                      <div key={mealIdx} className="border-2 border-gray-200 rounded-xl p-6 hover:border-yellow-400 transition-all">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                              {getMealIcon(meal.meal_type)}
-                            </div>
-                            <div>
-                              <h4 className="font-black text-lg">{meal.meal_type}</h4>
-                              <p className="text-gray-600">{meal.name}</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-2xl font-black text-yellow-400">{meal.calories}</div>
-                            <div className="text-xs text-gray-500">calories</div>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-3 gap-4 mb-4 p-4 bg-gray-50 rounded-lg">
-                          <div className="text-center">
-                            <div className="font-bold text-lg">{meal.protein}g</div>
-                            <div className="text-xs text-gray-500">Protein</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="font-bold text-lg">{meal.carbs}g</div>
-                            <div className="text-xs text-gray-500">Carbs</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="font-bold text-lg">{meal.fats}g</div>
-                            <div className="text-xs text-gray-500">Fats</div>
-                          </div>
-                        </div>
+              <Tabs defaultValue="day-1" className="w-full">
+                <TabsList className="grid w-full grid-cols-7 mb-6">
+                  {mealPlan.plan_data.days.map((day, idx) => (
+                    <TabsTrigger key={idx} value={`day-${idx + 1}`} className="font-bold">
+                      Day {idx + 1}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
 
-                        <div className="mb-3">
-                          <h5 className="font-bold text-sm mb-2">Ingredients:</h5>
-                          <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                            {meal.ingredients.map((ingredient, idx) => (
-                              <li key={idx}>{ingredient}</li>
-                            ))}
-                          </ul>
-                        </div>
-
-                        {meal.preparation && (
-                          <div>
-                            <h5 className="font-bold text-sm mb-2">Preparation:</h5>
-                            <p className="text-sm text-gray-600">{meal.preparation}</p>
+                {mealPlan.plan_data.days.map((day, dayIdx) => (
+                  <TabsContent key={dayIdx} value={`day-${dayIdx + 1}`}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-white rounded-2xl p-8 shadow-lg"
+                    >
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-3xl font-black">{day.day_name}</h3>
+                        <div className="text-right">
+                          <div className="text-2xl font-black text-yellow-400">
+                            {day.meals.reduce((sum, meal) => sum + (meal.calories || 0), 0)}
                           </div>
-                        )}
+                          <div className="text-sm text-gray-500">Total Calories</div>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </motion.div>
-              ))}
+                      
+                      <div className="grid gap-4">
+                        {day.meals.map((meal, mealIdx) => (
+                          <motion.div
+                            key={mealIdx}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: mealIdx * 0.1 }}
+                            className="border-2 border-gray-200 rounded-xl p-6 hover:border-yellow-400 hover:shadow-lg transition-all"
+                          >
+                            <div className="flex items-center justify-between mb-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg">
+                                  {getMealIcon(meal.meal_type)}
+                                </div>
+                                <div>
+                                  <div className="text-xs font-bold text-yellow-600 uppercase tracking-wider mb-1">
+                                    {meal.meal_type}
+                                  </div>
+                                  <h4 className="font-black text-xl">{meal.name}</h4>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-3xl font-black text-yellow-400">{meal.calories}</div>
+                                <div className="text-xs text-gray-500 font-semibold">CALORIES</div>
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-3 gap-3 mb-4">
+                              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg text-center">
+                                <div className="font-black text-2xl text-blue-600">{meal.protein}g</div>
+                                <div className="text-xs text-blue-600 font-bold uppercase">Protein</div>
+                              </div>
+                              <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg text-center">
+                                <div className="font-black text-2xl text-green-600">{meal.carbs}g</div>
+                                <div className="text-xs text-green-600 font-bold uppercase">Carbs</div>
+                              </div>
+                              <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg text-center">
+                                <div className="font-black text-2xl text-orange-600">{meal.fats}g</div>
+                                <div className="text-xs text-orange-600 font-bold uppercase">Fats</div>
+                              </div>
+                            </div>
+
+                            <div className="mb-4 bg-gray-50 rounded-lg p-4">
+                              <h5 className="font-black text-sm mb-3 flex items-center gap-2">
+                                <ChevronRight className="w-4 h-4 text-yellow-400" />
+                                INGREDIENTS
+                              </h5>
+                              <div className="grid md:grid-cols-2 gap-2">
+                                {meal.ingredients.map((ingredient, idx) => (
+                                  <div key={idx} className="flex items-center gap-2 text-sm text-gray-700">
+                                    <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full"></div>
+                                    {ingredient}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {meal.preparation && (
+                              <div className="bg-yellow-50 rounded-lg p-4">
+                                <h5 className="font-black text-sm mb-2 flex items-center gap-2 text-yellow-700">
+                                  <ChevronRight className="w-4 h-4" />
+                                  HOW TO PREPARE
+                                </h5>
+                                <p className="text-sm text-gray-700 leading-relaxed">{meal.preparation}</p>
+                              </div>
+                            )}
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  </TabsContent>
+                ))}
+              </Tabs>
             </div>
           )}
         </div>
