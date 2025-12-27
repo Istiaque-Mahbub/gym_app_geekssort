@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import Header from '@/components/home/Header';
 import Footer from '@/components/home/Footer';
 import ChatWidget from '@/components/ChatWidget';
+import VisitorTracker from '@/components/VisitorTracker';
 
 export default function Layout({ children, currentPageName }) {
   useEffect(() => {
@@ -34,13 +35,14 @@ export default function Layout({ children, currentPageName }) {
   }, [currentPageName]);
 
   // Admin pages - hide header, footer, and chat widget
-  const adminPages = ['AdminDashboard', 'InquiryManager', 'ContentManager', 'BannerManager', 'NotificationSettings', 'UserManager', 'BlogManager'];
+  const adminPages = ['AdminDashboard', 'InquiryManager', 'ContentManager', 'BannerManager', 'NotificationSettings', 'UserManager', 'BlogManager', 'VisitorAnalytics'];
   const isAdminPage = adminPages.includes(currentPageName);
 
   if (isAdminPage) {
     return (
       <div className="min-h-screen">
         {children}
+        <VisitorTracker currentPageName={currentPageName} />
       </div>
     );
   }
@@ -53,6 +55,7 @@ export default function Layout({ children, currentPageName }) {
       </main>
       <Footer />
       <ChatWidget currentPageName={currentPageName} />
+      <VisitorTracker currentPageName={currentPageName} />
     </div>
   );
 }

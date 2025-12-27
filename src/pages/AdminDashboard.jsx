@@ -104,6 +104,7 @@ export default function AdminDashboard() {
     { title: 'Blog Manager', icon: FileText, link: 'BlogManager', color: 'indigo' },
     { title: 'Content Manager', icon: FileText, link: 'ContentManager', color: 'green' },
     { title: 'Banner Manager', icon: TrendingUp, link: 'BannerManager', color: 'purple' },
+    { title: 'Visitor Analytics', icon: Users, link: 'VisitorAnalytics', color: 'orange' },
     { title: 'User Management', icon: Users, link: 'UserManager', color: 'red' },
     { title: 'Notification Settings', icon: Settings, link: 'NotificationSettings', color: 'gray' }
   ];
@@ -180,6 +181,7 @@ export default function AdminDashboard() {
                     action.color === 'indigo' ? 'bg-indigo-500' :
                     action.color === 'green' ? 'bg-green-500' :
                     action.color === 'purple' ? 'bg-purple-500' :
+                    action.color === 'orange' ? 'bg-orange-500' :
                     action.color === 'red' ? 'bg-red-500' :
                     'bg-gray-800'
                   }`}>
