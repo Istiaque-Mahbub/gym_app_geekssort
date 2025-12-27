@@ -357,7 +357,7 @@ export default function VisitorAnalytics() {
                       <td className="py-3 px-4 text-sm text-gray-600">
                         {getTimeAgo(visitor.created_date)}
                       </td>
-                    </tr>
+                    </motion.tr>
                   ))}
                 </tbody>
               </table>
