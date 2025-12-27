@@ -4,27 +4,46 @@ import { Menu, X, Calculator } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import BMICalculator from '@/components/BMICalculator';
-
-const navLinks = [
-  { name: 'Clubs', href: '/Clubs' },
-  { name: 'Classes', href: '/Classes' },
-  { name: 'Packages', href: '/Packages' },
-  { name: 'App', href: '/App' },
-  { name: 'About', href: '/About' },
-];
+import { base44 } from '@/api/base44Client';
 
 export default function Header({ currentPageName }) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showBMI, setShowBMI] = useState(false);
+  const [siteSettings, setSiteSettings] = useState(null);
+  const [navLinks, setNavLinks] = useState([]);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 100);
     };
     window.addEventListener('scroll', handleScroll);
+    loadSiteSettings();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const loadSiteSettings = async () => {
+    try {
+      const settings = await base44.entities.SiteSettings.filter({ setting_key: 'main' });
+      if (settings.length > 0) {
+        setSiteSettings(settings[0]);
+        const sortedNav = (settings[0].navbar_pages || getDefaultNav()).sort((a, b) => a.order - b.order);
+        setNavLinks(sortedNav);
+      } else {
+        setNavLinks(getDefaultNav());
+      }
+    } catch (error) {
+      setNavLinks(getDefaultNav());
+    }
+  };
+
+  const getDefaultNav = () => [
+    { page_name: 'Clubs', label: 'Clubs', order: 1 },
+    { page_name: 'Classes', label: 'Classes', order: 2 },
+    { page_name: 'Packages', label: 'Packages', order: 3 },
+    { page_name: 'App', label: 'App', order: 4 },
+    { page_name: 'About', label: 'About', order: 5 }
+  ];
 
   return (
     <>
@@ -42,7 +61,19 @@ export default function Header({ currentPageName }) {
             to={createPageUrl('Home')}
             className="text-2xl font-black tracking-tight text-yellow-400"
           >
-            FITHIVE
+            {siteSettings?.logo_url ? (
+              <img 
+                src={siteSettings.logo_url} 
+                alt="Logo" 
+                style={{ 
+                  width: `${siteSettings.logo_width || 120}px`, 
+                  height: `${siteSettings.logo_height || 40}px` 
+                }}
+                className="object-contain"
+              />
+            ) : (
+              'FITHIVE'
+            )}
           </Link>
 
           {/* Desktop Nav */}
@@ -56,11 +87,11 @@ export default function Header({ currentPageName }) {
             </button>
             {navLinks.map((link) => (
               <Link
-                key={link.name}
-                to={createPageUrl(link.href.replace('/', ''))}
+                key={link.page_name}
+                to={createPageUrl(link.page_name)}
                 className="text-white text-sm font-medium tracking-wider hover:text-yellow-400 transition-colors"
               >
-                {link.name.toUpperCase()}
+                {link.label.toUpperCase()}
               </Link>
             ))}
           </nav>
@@ -109,17 +140,17 @@ export default function Header({ currentPageName }) {
             <div className="flex flex-col items-center gap-8 p-8">
               {navLinks.map((link, index) => (
                 <motion.div
-                  key={link.name}
+                  key={link.page_name}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                 >
                   <Link
-                    to={createPageUrl(link.href.replace('/', ''))}
+                    to={createPageUrl(link.page_name)}
                     onClick={() => setIsOpen(false)}
                     className="text-white text-3xl font-bold tracking-wider hover:text-yellow-400 transition-colors"
                   >
-                    {link.name}
+                    {link.label}
                   </Link>
                 </motion.div>
               ))}

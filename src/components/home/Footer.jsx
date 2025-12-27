@@ -1,15 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Facebook, Instagram, Youtube, Mail, Phone, MapPin, Send, Dumbbell, Utensils, TrendingUp, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { base44 } from '@/api/base44Client';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [siteSettings, setSiteSettings] = useState(null);
   const [footerLinks, setFooterLinks] = useState([]);
+
+  useEffect(() => {
+    loadSiteSettings();
+  }, []);
+
+  const loadSiteSettings = async () => {
+    try {
+      const settings = await base44.entities.SiteSettings.filter({ setting_key: 'main' });
+      if (settings.length > 0) {
+        setSiteSettings(settings[0]);
+        const sortedFooter = (settings[0].footer_pages || getDefaultFooter()).sort((a, b) => a.order - b.order);
+        setFooterLinks(sortedFooter);
+      } else {
+        setFooterLinks(getDefaultFooter());
+      }
+    } catch (error) {
+      setFooterLinks(getDefaultFooter());
+    }
+  };
+
+  const getDefaultFooter = () => [
+    { page_name: 'Clubs', label: 'Our Clubs', order: 1 },
+    { page_name: 'Classes', label: 'Classes', order: 2 },
+    { page_name: 'Packages', label: 'Packages', order: 3 },
+    { page_name: 'Blogs', label: 'Blog', order: 4 },
+    { page_name: 'About', label: 'About Us', order: 5 },
+    { page_name: 'ClassSchedule', label: 'Class Schedule', order: 6 }
+  ];
 
   const handleNewsletterSubmit = (e) => {
     e.preventDefault();
@@ -51,7 +80,19 @@ export default function Footer() {
           {/* Brand Column */}
           <div>
             <div className="text-3xl font-black tracking-tight text-yellow-400 mb-4">
-              FITHIVE
+              {siteSettings?.logo_url ? (
+                <img 
+                  src={siteSettings.logo_url} 
+                  alt="Logo" 
+                  style={{ 
+                    width: `${siteSettings.logo_width || 120}px`, 
+                    height: `${siteSettings.logo_height || 40}px` 
+                  }}
+                  className="object-contain"
+                />
+              ) : (
+                'FITHIVE'
+              )}
             </div>
             <p className="text-gray-400 mb-6">
               Your premier fitness destination World Wide. Transform your body, elevate your mind.
@@ -73,36 +114,13 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-bold mb-4">Quick Links</h3>
             <ul className="space-y-3">
-              <li>
-                <Link to={createPageUrl('Clubs')} className="text-gray-400 hover:text-yellow-400 transition-colors">
-                  Our Clubs
-                </Link>
-              </li>
-              <li>
-                <Link to={createPageUrl('Classes')} className="text-gray-400 hover:text-yellow-400 transition-colors">
-                  Classes
-                </Link>
-              </li>
-              <li>
-                <Link to={createPageUrl('Packages')} className="text-gray-400 hover:text-yellow-400 transition-colors">
-                  Packages
-                </Link>
-              </li>
-              <li>
-                <Link to={createPageUrl('Blogs')} className="text-gray-400 hover:text-yellow-400 transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link to={createPageUrl('About')} className="text-gray-400 hover:text-yellow-400 transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link to={createPageUrl('ClassSchedule')} className="text-gray-400 hover:text-yellow-400 transition-colors">
-                  Class Schedule
-                </Link>
-              </li>
+              {footerLinks.map((link) => (
+                <li key={link.page_name}>
+                  <Link to={createPageUrl(link.page_name)} className="text-gray-400 hover:text-yellow-400 transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
