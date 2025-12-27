@@ -6,6 +6,7 @@ import { createPageUrl } from '@/utils';
 import { Award, Calendar, Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import GymLoader from '@/components/GymLoader';
 
 export default function TrainerDetail() {
   const [trainer, setTrainer] = useState(null);
@@ -49,10 +50,7 @@ export default function TrainerDetail() {
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading trainer profile...</p>
-        </div>
+        <GymLoader message="Loading trainer profile..." />
       </div>
     );
   }

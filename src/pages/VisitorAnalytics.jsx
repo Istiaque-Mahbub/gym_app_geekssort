@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import GymLoader from '@/components/GymLoader';
 import * as XLSX from 'xlsx';
 
 export default function VisitorAnalytics() {
@@ -155,10 +156,7 @@ export default function VisitorAnalytics() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading analytics...</p>
-        </div>
+        <GymLoader message="Loading analytics..." />
       </div>
     );
   }

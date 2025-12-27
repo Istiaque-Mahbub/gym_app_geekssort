@@ -6,6 +6,7 @@ import { createPageUrl } from '@/utils';
 import { Search, Calendar, User } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import GymLoader from '@/components/GymLoader';
 
 export default function Blogs() {
   const [blogs, setBlogs] = useState([]);
@@ -43,10 +44,7 @@ export default function Blogs() {
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading blogs...</p>
-        </div>
+        <GymLoader message="Loading blogs..." />
       </div>
     );
   }

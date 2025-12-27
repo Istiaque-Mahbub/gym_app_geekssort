@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Target, Users, Award, Heart, ArrowRight } from 'lucide-react';
+import GymLoader from '@/components/GymLoader';
 
 const values = [
   {
@@ -153,8 +154,7 @@ export default function About() {
 
           {loading ? (
             <div className="text-center py-12">
-              <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-400">Loading trainers...</p>
+              <GymLoader message="Loading trainers..." />
             </div>
           ) : trainers.length > 0 ? (
             <div className="grid md:grid-cols-3 gap-8">

@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Calendar, User, Share2, Facebook, Twitter, Linkedin, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import GymLoader from '@/components/GymLoader';
 
 export default function BlogPost() {
   const [blog, setBlog] = useState(null);
@@ -69,10 +70,7 @@ export default function BlogPost() {
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading blog post...</p>
-        </div>
+        <GymLoader message="Loading blog post..." />
       </div>
     );
   }

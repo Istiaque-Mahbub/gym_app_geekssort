@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import GymLoader from '@/components/GymLoader';
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
@@ -60,10 +61,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading admin panel...</p>
-        </div>
+        <GymLoader message="Loading admin panel..." />
       </div>
     );
   }
