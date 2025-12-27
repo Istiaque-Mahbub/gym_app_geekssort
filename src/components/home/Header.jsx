@@ -61,19 +61,7 @@ export default function Header({ currentPageName }) {
             to={createPageUrl('Home')}
             className="text-2xl font-black tracking-tight text-yellow-400"
           >
-            {siteSettings?.logo_url ? (
-              <img 
-                src={siteSettings.logo_url} 
-                alt="Logo" 
-                style={{ 
-                  width: `${siteSettings.logo_width || 120}px`, 
-                  height: `${siteSettings.logo_height || 40}px` 
-                }}
-                className="object-contain"
-              />
-            ) : (
-              'FITHIVE'
-            )}
+            FITHIVE
           </Link>
 
           {/* Desktop Nav */}

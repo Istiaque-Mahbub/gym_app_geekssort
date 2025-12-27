@@ -80,19 +80,7 @@ export default function Footer() {
           {/* Brand Column */}
           <div>
             <div className="text-3xl font-black tracking-tight text-yellow-400 mb-4">
-              {siteSettings?.logo_url ? (
-                <img 
-                  src={siteSettings.logo_url} 
-                  alt="Logo" 
-                  style={{ 
-                    width: `${siteSettings.logo_width || 120}px`, 
-                    height: `${siteSettings.logo_height || 40}px` 
-                  }}
-                  className="object-contain"
-                />
-              ) : (
-                'FITHIVE'
-              )}
+              FITHIVE
             </div>
             <p className="text-gray-400 mb-6">
               Your premier fitness destination World Wide. Transform your body, elevate your mind.
