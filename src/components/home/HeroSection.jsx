@@ -3,62 +3,54 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-
-const slides = [
-  {
-    image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&q=80&fit=crop',
-    title: 'FITHIVE PORTO',
-    subtitle: 'PORTO',
-    label: "IT'S OPEN!",
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=1920&q=80&fit=crop',
-    title: 'FITHIVE LISBON',
-    subtitle: 'LISBON',
-    label: 'NOW OPEN',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1920&q=80&fit=crop',
-    title: 'TRAIN EVERYDAY',
-    subtitle: 'FITNESS',
-    label: 'JOIN NOW',
-  },
-];
-
-const MarqueeText = ({ text, direction = 1 }) => {
-  return (
-    <div className="overflow-hidden whitespace-nowrap">
-      <div className="flex animate-marquee">
-        {[...Array(6)].map((_, i) => (
-          <span
-            key={i}
-            className="text-[4vw] md:text-[5vw] font-black tracking-tighter text-black opacity-90 mx-8 inline-block"
-            style={{ 
-              fontFamily: 'system-ui, sans-serif',
-              animation: direction > 0 ? 'marquee 20s linear infinite' : 'marquee-reverse 20s linear infinite'
-            }}
-          >
-            {text}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-};
+import { base44 } from '@/api/base44Client';
 
 export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [slides, setSlides] = useState([]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
-    return () => clearInterval(timer);
+    loadBanners();
   }, []);
+
+  useEffect(() => {
+    if (slides.length > 0) {
+      const timer = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % slides.length);
+      }, 5000);
+      return () => clearInterval(timer);
+    }
+  }, [slides]);
+
+  const loadBanners = async () => {
+    try {
+      const banners = await base44.entities.SiteBanner.filter({ is_active: true }, 'position');
+      setSlides(banners);
+    } catch (error) {
+      console.error('Error loading banners:', error);
+    }
+  };
+
+  const getMediaUrl = (banner) => {
+    const width = window.innerWidth;
+    if (width >= 1920 && banner.desktop_url) return banner.desktop_url;
+    if (width >= 1024 && banner.laptop_url) return banner.laptop_url;
+    if (width >= 768 && banner.tablet_url) return banner.tablet_url;
+    if (banner.mobile_url) return banner.mobile_url;
+    return banner.desktop_url || banner.laptop_url || banner.tablet_url || banner.mobile_url;
+  };
+
+  if (slides.length === 0) {
+    return (
+      <section className="relative h-screen w-full bg-black flex items-center justify-center">
+        <p className="text-white text-xl">Loading...</p>
+      </section>
+    );
+  }
 
   return (
     <section className="relative h-screen w-full overflow-hidden bg-black">
-      {/* Background Images */}
+      {/* Background Media */}
       <AnimatePresence mode="wait">
         <motion.div
           key={currentSlide}
@@ -68,10 +60,21 @@ export default function HeroSection() {
           transition={{ duration: 1 }}
           className="absolute inset-0"
         >
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${slides[currentSlide].image})` }}
-          />
+          {slides[currentSlide].media_type === 'video' ? (
+            <video
+              src={getMediaUrl(slides[currentSlide])}
+              className="absolute inset-0 w-full h-full object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
+          ) : (
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${getMediaUrl(slides[currentSlide])})` }}
+            />
+          )}
           <div className="absolute inset-0 bg-black/40" />
         </motion.div>
       </AnimatePresence>
@@ -89,7 +92,7 @@ export default function HeroSection() {
             transition={{ duration: 0.5 }}
             className="text-yellow-400 text-xs md:text-sm tracking-[0.3em] mb-4 uppercase"
           >
-            {slides[currentSlide].label}
+            {slides[currentSlide].subtitle || 'FITNESS'}
           </motion.div>
         </AnimatePresence>
         
@@ -115,19 +118,21 @@ export default function HeroSection() {
           FIND OUT MORE
         </motion.p>
 
-        <Link to={createPageUrl('Clubs')}>
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 border-2 border-white/50 rounded-full text-white text-sm tracking-wider hover:bg-white hover:text-black transition-all duration-300 flex items-center gap-2 group"
-          >
-            DISCOVER THE CLUB
-            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </motion.button>
-        </Link>
+        {slides[currentSlide].cta_text && slides[currentSlide].cta_link && (
+          <Link to={slides[currentSlide].cta_link}>
+            <motion.button
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-4 border-2 border-white/50 rounded-full text-white text-sm tracking-wider hover:bg-white hover:text-black transition-all duration-300 flex items-center gap-2 group"
+            >
+              {slides[currentSlide].cta_text}
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </motion.button>
+          </Link>
+        )}
       </div>
 
       {/* Slide Indicators */}

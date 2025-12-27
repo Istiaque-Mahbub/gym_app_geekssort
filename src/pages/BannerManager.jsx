@@ -33,12 +33,17 @@ export default function BannerManager() {
   const [formData, setFormData] = useState({
     title: '',
     subtitle: '',
-    image_url: '',
+    media_type: 'image',
+    desktop_url: '',
+    laptop_url: '',
+    tablet_url: '',
+    mobile_url: '',
     cta_text: '',
     cta_link: '',
     position: 0,
     is_active: true
   });
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -75,7 +80,11 @@ export default function BannerManager() {
     setFormData({
       title: '',
       subtitle: '',
-      image_url: '',
+      media_type: 'image',
+      desktop_url: '',
+      laptop_url: '',
+      tablet_url: '',
+      mobile_url: '',
       cta_text: '',
       cta_link: '',
       position: 0,
@@ -139,7 +148,11 @@ export default function BannerManager() {
                 setFormData({
                   title: '',
                   subtitle: '',
-                  image_url: '',
+                  media_type: 'image',
+                  desktop_url: '',
+                  laptop_url: '',
+                  tablet_url: '',
+                  mobile_url: '',
                   cta_text: '',
                   cta_link: '',
                   position: banners.length,
@@ -170,11 +183,21 @@ export default function BannerManager() {
                 <Card className="hover:shadow-xl transition-all">
                   <CardContent className="p-6">
                     <div className="flex gap-6">
-                      <img
-                        src={banner.image_url}
-                        alt={banner.title}
-                        className="w-48 h-32 object-cover rounded-lg"
-                      />
+                      {banner.media_type === 'video' ? (
+                        <video
+                          src={banner.desktop_url || banner.laptop_url || banner.tablet_url || banner.mobile_url}
+                          className="w-48 h-32 object-cover rounded-lg"
+                          muted
+                          loop
+                          autoPlay
+                        />
+                      ) : (
+                        <img
+                          src={banner.desktop_url || banner.laptop_url || banner.tablet_url || banner.mobile_url}
+                          alt={banner.title}
+                          className="w-48 h-32 object-cover rounded-lg"
+                        />
+                      )}
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-2">
                           <div>
@@ -260,12 +283,139 @@ export default function BannerManager() {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold mb-2">Image URL *</label>
-              <Input
-                placeholder="https://..."
-                value={formData.image_url}
-                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-              />
+              <label className="block text-sm font-bold mb-2">Media Type *</label>
+              <select
+                value={formData.media_type}
+                onChange={(e) => setFormData({ ...formData, media_type: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              >
+                <option value="image">Image</option>
+                <option value="video">Video</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-bold mb-2">Desktop (1920x1080) *</label>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="https://..."
+                  value={formData.desktop_url}
+                  onChange={(e) => setFormData({ ...formData, desktop_url: e.target.value })}
+                />
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = formData.media_type === 'video' ? 'video/*' : 'image/*';
+                    input.onchange = async (e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        setUploading(true);
+                        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                        setFormData({ ...formData, desktop_url: file_url });
+                        setUploading(false);
+                      }
+                    };
+                    input.click();
+                  }}
+                  disabled={uploading}
+                >
+                  Upload
+                </Button>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-bold mb-2">Laptop (1366x768)</label>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="https://..."
+                  value={formData.laptop_url}
+                  onChange={(e) => setFormData({ ...formData, laptop_url: e.target.value })}
+                />
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = formData.media_type === 'video' ? 'video/*' : 'image/*';
+                    input.onchange = async (e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        setUploading(true);
+                        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                        setFormData({ ...formData, laptop_url: file_url });
+                        setUploading(false);
+                      }
+                    };
+                    input.click();
+                  }}
+                  disabled={uploading}
+                >
+                  Upload
+                </Button>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-bold mb-2">Tablet (768x1024)</label>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="https://..."
+                  value={formData.tablet_url}
+                  onChange={(e) => setFormData({ ...formData, tablet_url: e.target.value })}
+                />
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = formData.media_type === 'video' ? 'video/*' : 'image/*';
+                    input.onchange = async (e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        setUploading(true);
+                        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                        setFormData({ ...formData, tablet_url: file_url });
+                        setUploading(false);
+                      }
+                    };
+                    input.click();
+                  }}
+                  disabled={uploading}
+                >
+                  Upload
+                </Button>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-bold mb-2">Mobile (375x667)</label>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="https://..."
+                  value={formData.mobile_url}
+                  onChange={(e) => setFormData({ ...formData, mobile_url: e.target.value })}
+                />
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = formData.media_type === 'video' ? 'video/*' : 'image/*';
+                    input.onchange = async (e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        setUploading(true);
+                        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                        setFormData({ ...formData, mobile_url: file_url });
+                        setUploading(false);
+                      }
+                    };
+                    input.click();
+                  }}
+                  disabled={uploading}
+                >
+                  Upload
+                </Button>
+              </div>
             </div>
             <div>
               <label className="block text-sm font-bold mb-2">Call to Action Text</label>
