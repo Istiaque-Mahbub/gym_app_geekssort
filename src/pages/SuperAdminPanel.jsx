@@ -71,82 +71,7 @@ export default function SuperAdminPanel() {
     }
   };
 
-  const sendWelcomeEmail = async (email, role, permissions) => {
-    const loginUrl = window.location.origin;
-    const permissionsList = role === 'super_admin' 
-      ? 'All administrative functions'
-      : permissions.length > 0 
-        ? permissions.map(p => AVAILABLE_PERMISSIONS.find(perm => perm.id === p)?.label).join(', ')
-        : 'No specific permissions assigned yet';
 
-    await base44.integrations.Core.SendEmail({
-      from_name: 'FitHive Admin',
-      to: email,
-      subject: '🎉 Welcome to FitHive Admin Panel',
-      body: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
-            .container { max-width: 600px; margin: 0 auto; padding: 0; }
-            .header { background: linear-gradient(135deg, #9333ea 0%, #4f46e5 100%); color: white; padding: 40px 30px; text-align: center; }
-            .header h1 { margin: 0; font-size: 28px; }
-            .content { background: #f9fafb; padding: 40px 30px; }
-            .role-badge { display: inline-block; background: #fbbf24; color: #000; padding: 10px 20px; border-radius: 25px; font-weight: bold; font-size: 14px; }
-            .button { display: inline-block; background: #9333ea; color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; }
-            .info-box { background: white; padding: 25px; border-left: 4px solid #9333ea; margin: 25px 0; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-            .footer { text-align: center; padding: 30px; color: #666; font-size: 13px; background: #e5e7eb; }
-            ol { padding-left: 20px; }
-            ol li { margin: 10px 0; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>🏋️ Welcome to FitHive Admin</h1>
-              <p style="margin: 10px 0 0 0; font-size: 16px;">You've been granted administrative access!</p>
-            </div>
-            <div class="content">
-              <h2 style="color: #111; margin-top: 0;">Hello!</h2>
-              <p>We're excited to have you join the FitHive admin team. You've been granted access to manage our fitness platform.</p>
-              
-              <div class="info-box">
-                <h3 style="margin-top: 0; color: #9333ea;">Your Role:</h3>
-                <span class="role-badge">${role.replace('_', ' ').toUpperCase()}</span>
-                
-                <h3 style="margin-top: 25px; color: #9333ea;">Your Permissions:</h3>
-                <p style="margin: 10px 0 0 0;">${permissionsList}</p>
-              </div>
-
-              <h3 style="color: #111;">Getting Started:</h3>
-              <ol>
-                <li><strong>Access the Panel:</strong> Click the button below to visit the admin dashboard</li>
-                <li><strong>Login:</strong> Use your email address to sign in</li>
-                <li><strong>Explore:</strong> Familiarize yourself with the management tools available</li>
-              </ol>
-
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${loginUrl}" class="button">Access Admin Panel →</a>
-              </div>
-
-              <div style="background: #fef3c7; padding: 15px; border-radius: 6px; margin-top: 25px;">
-                <p style="margin: 0; font-size: 14px;">
-                  <strong>💡 Need Help?</strong> If you have questions or need assistance, contact your super administrator at the admin panel.
-                </p>
-              </div>
-            </div>
-            <div class="footer">
-              <p style="margin: 0;"><strong>FitHive Fitness Management</strong></p>
-              <p style="margin: 10px 0 0 0;">© ${new Date().getFullYear()} FitHive. All rights reserved.</p>
-              <p style="margin: 10px 0 0 0; color: #999;">This is an automated message, please do not reply.</p>
-            </div>
-          </div>
-        </body>
-        </html>
-      `
-    });
-  };
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
@@ -159,7 +84,17 @@ export default function SuperAdminPanel() {
         });
         alert('User updated successfully!');
       } else {
-        // Step 1: Create role assignment FIRST
+        // Step 1: Invite user first (creates account and sends system email)
+        try {
+          await base44.users.inviteUser(formData.email, 'user');
+        } catch (inviteError) {
+          // User might already exist
+          if (!inviteError.message.includes('already exists')) {
+            throw inviteError;
+          }
+        }
+        
+        // Step 2: Create role assignment
         await base44.entities.UserRole.create({
           user_email: formData.email,
           role: formData.role,
@@ -167,16 +102,8 @@ export default function SuperAdminPanel() {
           created_by_email: currentUser.email,
           is_active: true
         });
-        
-        // Step 2: Invite user (this sends system email and creates user account)
-        try {
-          await base44.users.inviteUser(formData.email, 'user');
-        } catch (inviteError) {
-          // User might already exist, that's okay
-          console.log('Invite note:', inviteError.message);
-        }
 
-        alert('User created successfully! System invitation sent to ' + formData.email);
+        alert('✅ User created successfully! Invitation email sent to ' + formData.email);
       }
 
       setShowUserForm(false);
@@ -185,18 +112,19 @@ export default function SuperAdminPanel() {
       await loadData();
     } catch (error) {
       console.error('Error creating user:', error);
-      alert('Error: ' + error.message);
+      alert('❌ Error: ' + error.message);
     }
   };
 
   const handleResendEmail = async (role) => {
     try {
       setSendingEmail(role.id);
-      await sendWelcomeEmail(role.user_email, role.role, role.permissions || []);
-      alert('Invitation email sent to ' + role.user_email);
+      // Resend system invitation
+      await base44.users.inviteUser(role.user_email, 'user');
+      alert('✅ Invitation email resent to ' + role.user_email);
     } catch (error) {
       console.error('Error sending email:', error);
-      alert('Error sending email: ' + error.message);
+      alert('❌ Error: ' + error.message);
     } finally {
       setSendingEmail(false);
     }
