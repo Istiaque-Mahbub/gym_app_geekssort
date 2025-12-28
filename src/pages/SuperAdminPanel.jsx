@@ -73,9 +73,6 @@ export default function SuperAdminPanel() {
   const handleCreateUser = async (e) => {
     e.preventDefault();
     try {
-      // Invite user through Base44's user system
-      await base44.users.inviteUser(formData.email, 'user');
-
       // Create role assignment
       await base44.entities.UserRole.create({
         user_email: formData.email,
@@ -85,19 +82,77 @@ export default function SuperAdminPanel() {
         is_active: true
       });
 
-      // Send welcome email with password setup
+      // Send professional welcome email
+      const loginUrl = window.location.origin;
+      const permissionsList = formData.role === 'super_admin' 
+        ? 'All administrative functions'
+        : formData.permissions.length > 0 
+          ? formData.permissions.map(p => AVAILABLE_PERMISSIONS.find(perm => perm.id === p)?.label).join(', ')
+          : 'No specific permissions assigned yet';
+
       await base44.integrations.Core.SendEmail({
+        from_name: 'FitHive Admin',
         to: formData.email,
-        subject: 'Welcome to FitHive Admin Panel',
+        subject: '🎉 Welcome to FitHive Admin Panel',
         body: `
-          <h2>Welcome to FitHive Admin Panel</h2>
-          <p>You have been granted <strong>${formData.role.replace('_', ' ')}</strong> access.</p>
-          <p>Please check your email for login credentials and setup your password.</p>
-          <p>Your role: ${formData.role.replace('_', ' ').toUpperCase()}</p>
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .header { background: linear-gradient(135deg, #9333ea 0%, #4f46e5 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+              .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+              .role-badge { display: inline-block; background: #fbbf24; color: #000; padding: 8px 16px; border-radius: 20px; font-weight: bold; margin: 10px 0; }
+              .button { display: inline-block; background: #9333ea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; font-weight: bold; }
+              .info-box { background: white; padding: 20px; border-left: 4px solid #9333ea; margin: 20px 0; border-radius: 4px; }
+              .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1>🏋️ Welcome to FitHive</h1>
+                <p>You've been granted admin access!</p>
+              </div>
+              <div class="content">
+                <h2>Hello!</h2>
+                <p>We're excited to have you join the FitHive admin team. You've been granted access to our administrative panel.</p>
+                
+                <div class="info-box">
+                  <h3>Your Role:</h3>
+                  <span class="role-badge">${formData.role.replace('_', ' ').toUpperCase()}</span>
+                  
+                  <h3 style="margin-top: 20px;">Your Permissions:</h3>
+                  <p>${permissionsList}</p>
+                </div>
+
+                <h3>Getting Started:</h3>
+                <ol>
+                  <li><strong>Login:</strong> Visit the admin panel using the button below</li>
+                  <li><strong>Set Password:</strong> If this is your first time, you'll need to set up your password</li>
+                  <li><strong>Explore:</strong> Familiarize yourself with the tools available to you</li>
+                </ol>
+
+                <div style="text-align: center;">
+                  <a href="${loginUrl}" class="button">Access Admin Panel</a>
+                </div>
+
+                <p style="margin-top: 20px; font-size: 14px; color: #666;">
+                  <strong>Need help?</strong> If you have any questions or need assistance, please contact your super administrator.
+                </p>
+              </div>
+              <div class="footer">
+                <p>© ${new Date().getFullYear()} FitHive. All rights reserved.</p>
+                <p>This is an automated message, please do not reply to this email.</p>
+              </div>
+            </div>
+          </body>
+          </html>
         `
       });
 
-      alert('User invited successfully! They will receive an email with login instructions.');
+      alert('User created successfully! A welcome email has been sent to ' + formData.email);
       setShowUserForm(false);
       setFormData({ email: '', role: 'editor', permissions: [] });
       await loadData();
