@@ -29,6 +29,7 @@ import WorkoutPlanner from './pages/WorkoutPlanner';
 import PackageManager from './pages/PackageManager';
 import ClassManager from './pages/ClassManager';
 import ClubManager from './pages/ClubManager';
+import ClassScheduleManager from './pages/ClassScheduleManager';
 import __Layout from './Layout.jsx';
 
 
@@ -64,6 +65,7 @@ export const PAGES = {
     "PackageManager": PackageManager,
     "ClassManager": ClassManager,
     "ClubManager": ClubManager,
+    "ClassScheduleManager": ClassScheduleManager,
 }
 
 export const pagesConfig = {
