@@ -50,7 +50,7 @@ export default function Layout({ children, currentPageName }) {
   }, [currentPageName]);
 
   // Admin pages - hide header, footer, and chat widget
-  const adminPages = ['AdminDashboard', 'InquiryManager', 'ContentManager', 'BannerManager', 'NotificationSettings', 'UserManager', 'BlogManager', 'VisitorAnalytics', 'SiteSettingsManager'];
+  const adminPages = ['AdminDashboard', 'InquiryManager', 'ContentManager', 'BannerManager', 'NotificationSettings', 'UserManager', 'BlogManager', 'VisitorAnalytics', 'SiteSettingsManager', 'PackageManager', 'ClassManager', 'ClubManager'];
   const isAdminPage = adminPages.includes(currentPageName);
 
   if (isAdminPage) {

@@ -19,13 +19,16 @@ import NotificationSettings from './pages/NotificationSettings';
 import Packages from './pages/Packages';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import ProgressTracker from './pages/ProgressTracker';
-import TermsOfService from './pages/TermsOfService';
-import UserManager from './pages/UserManager';
-import WorkoutPlanner from './pages/WorkoutPlanner';
-import UserDashboard from './pages/UserDashboard';
-import TrainerDetail from './pages/TrainerDetail';
-import VisitorAnalytics from './pages/VisitorAnalytics';
 import SiteSettingsManager from './pages/SiteSettingsManager';
+import TermsOfService from './pages/TermsOfService';
+import TrainerDetail from './pages/TrainerDetail';
+import UserDashboard from './pages/UserDashboard';
+import UserManager from './pages/UserManager';
+import VisitorAnalytics from './pages/VisitorAnalytics';
+import WorkoutPlanner from './pages/WorkoutPlanner';
+import PackageManager from './pages/PackageManager';
+import ClassManager from './pages/ClassManager';
+import ClubManager from './pages/ClubManager';
 import __Layout from './Layout.jsx';
 
 
@@ -51,13 +54,16 @@ export const PAGES = {
     "Packages": Packages,
     "PrivacyPolicy": PrivacyPolicy,
     "ProgressTracker": ProgressTracker,
-    "TermsOfService": TermsOfService,
-    "UserManager": UserManager,
-    "WorkoutPlanner": WorkoutPlanner,
-    "UserDashboard": UserDashboard,
-    "TrainerDetail": TrainerDetail,
-    "VisitorAnalytics": VisitorAnalytics,
     "SiteSettingsManager": SiteSettingsManager,
+    "TermsOfService": TermsOfService,
+    "TrainerDetail": TrainerDetail,
+    "UserDashboard": UserDashboard,
+    "UserManager": UserManager,
+    "VisitorAnalytics": VisitorAnalytics,
+    "WorkoutPlanner": WorkoutPlanner,
+    "PackageManager": PackageManager,
+    "ClassManager": ClassManager,
+    "ClubManager": ClubManager,
 }
 
 export const pagesConfig = {

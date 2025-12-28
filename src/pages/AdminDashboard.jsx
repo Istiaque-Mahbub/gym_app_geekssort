@@ -100,12 +100,15 @@ export default function AdminDashboard() {
   const quickActions = [
     { title: 'Manage Inquiries', icon: MessageSquare, link: 'InquiryManager', color: 'blue' },
     { title: 'Blog Manager', icon: FileText, link: 'BlogManager', color: 'indigo' },
-    { title: 'Content Manager', icon: FileText, link: 'ContentManager', color: 'green' },
-    { title: 'Banner Manager', icon: TrendingUp, link: 'BannerManager', color: 'purple' },
-    { title: 'Site Settings', icon: Settings, link: 'SiteSettingsManager', color: 'cyan' },
-    { title: 'Visitor Analytics', icon: Users, link: 'VisitorAnalytics', color: 'orange' },
-    { title: 'User Management', icon: Users, link: 'UserManager', color: 'red' },
-    { title: 'Notification Settings', icon: Settings, link: 'NotificationSettings', color: 'gray' }
+    { title: 'Package Manager', icon: TrendingUp, link: 'PackageManager', color: 'green' },
+    { title: 'Class Manager', icon: TrendingUp, link: 'ClassManager', color: 'purple' },
+    { title: 'Club Manager', icon: TrendingUp, link: 'ClubManager', color: 'cyan' },
+    { title: 'Content Manager', icon: FileText, link: 'ContentManager', color: 'orange' },
+    { title: 'Banner Manager', icon: TrendingUp, link: 'BannerManager', color: 'red' },
+    { title: 'Site Settings', icon: Settings, link: 'SiteSettingsManager', color: 'gray' },
+    { title: 'Visitor Analytics', icon: Users, link: 'VisitorAnalytics', color: 'pink' },
+    { title: 'User Management', icon: Users, link: 'UserManager', color: 'teal' },
+    { title: 'Notification Settings', icon: Settings, link: 'NotificationSettings', color: 'slate' }
   ];
 
   return (
@@ -183,6 +186,9 @@ export default function AdminDashboard() {
                     action.color === 'cyan' ? 'bg-cyan-500' :
                     action.color === 'orange' ? 'bg-orange-500' :
                     action.color === 'red' ? 'bg-red-500' :
+                    action.color === 'pink' ? 'bg-pink-500' :
+                    action.color === 'teal' ? 'bg-teal-500' :
+                    action.color === 'slate' ? 'bg-slate-500' :
                     'bg-gray-800'
                   }`}>
                     <action.icon className="w-7 h-7 text-white" />
