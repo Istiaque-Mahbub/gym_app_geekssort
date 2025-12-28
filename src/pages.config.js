@@ -5,6 +5,7 @@ import BannerManager from './pages/BannerManager';
 import BlogManager from './pages/BlogManager';
 import BlogPost from './pages/BlogPost';
 import Blogs from './pages/Blogs';
+import BookingManager from './pages/BookingManager';
 import Challenges from './pages/Challenges';
 import ClassManager from './pages/ClassManager';
 import ClassSchedule from './pages/ClassSchedule';
@@ -18,6 +19,7 @@ import FAQs from './pages/FAQs';
 import Home from './pages/Home';
 import InquiryManager from './pages/InquiryManager';
 import MealPlanner from './pages/MealPlanner';
+import MyBookings from './pages/MyBookings';
 import NotificationSettings from './pages/NotificationSettings';
 import PackageManager from './pages/PackageManager';
 import Packages from './pages/Packages';
@@ -30,8 +32,7 @@ import UserDashboard from './pages/UserDashboard';
 import UserManager from './pages/UserManager';
 import VisitorAnalytics from './pages/VisitorAnalytics';
 import WorkoutPlanner from './pages/WorkoutPlanner';
-import MyBookings from './pages/MyBookings';
-import BookingManager from './pages/BookingManager';
+import SuperAdminPanel from './pages/SuperAdminPanel';
 import __Layout from './Layout.jsx';
 
 
@@ -43,6 +44,7 @@ export const PAGES = {
     "BlogManager": BlogManager,
     "BlogPost": BlogPost,
     "Blogs": Blogs,
+    "BookingManager": BookingManager,
     "Challenges": Challenges,
     "ClassManager": ClassManager,
     "ClassSchedule": ClassSchedule,
@@ -56,6 +58,7 @@ export const PAGES = {
     "Home": Home,
     "InquiryManager": InquiryManager,
     "MealPlanner": MealPlanner,
+    "MyBookings": MyBookings,
     "NotificationSettings": NotificationSettings,
     "PackageManager": PackageManager,
     "Packages": Packages,
@@ -68,8 +71,7 @@ export const PAGES = {
     "UserManager": UserManager,
     "VisitorAnalytics": VisitorAnalytics,
     "WorkoutPlanner": WorkoutPlanner,
-    "MyBookings": MyBookings,
-    "BookingManager": BookingManager,
+    "SuperAdminPanel": SuperAdminPanel,
 }
 
 export const pagesConfig = {

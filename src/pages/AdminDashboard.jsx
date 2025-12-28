@@ -9,11 +9,13 @@ import {
   Settings, 
   TrendingUp,
   AlertCircle,
-  Users
+  Users,
+  Shield
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import GymLoader from '@/components/GymLoader';
+import { usePermissions } from '@/components/PermissionCheck';
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
@@ -24,6 +26,7 @@ export default function AdminDashboard() {
     totalPages: 0,
     activeBanners: 0
   });
+  const { userRole, hasPermission, isSuperAdmin } = usePermissions();
 
   useEffect(() => {
     loadData();
@@ -33,7 +36,13 @@ export default function AdminDashboard() {
     try {
       const currentUser = await base44.auth.me();
       
-      if (currentUser.role !== 'admin') {
+      // Check if user has admin role in UserRole entity
+      const roles = await base44.entities.UserRole.filter({ 
+        user_email: currentUser.email,
+        is_active: true 
+      });
+      
+      if (!roles[0]) {
         window.location.href = createPageUrl('Home');
         return;
       }
@@ -97,21 +106,23 @@ export default function AdminDashboard() {
     }
   ];
 
-  const quickActions = [
-    { title: 'Manage Inquiries', icon: MessageSquare, link: 'InquiryManager', color: 'blue' },
-    { title: 'Booking Manager', icon: MessageSquare, link: 'BookingManager', color: 'emerald' },
-    { title: 'Blog Manager', icon: FileText, link: 'BlogManager', color: 'indigo' },
-    { title: 'Package Manager', icon: TrendingUp, link: 'PackageManager', color: 'green' },
-    { title: 'Class Manager', icon: TrendingUp, link: 'ClassManager', color: 'purple' },
-    { title: 'Club Manager', icon: TrendingUp, link: 'ClubManager', color: 'cyan' },
-    { title: 'Schedule Manager', icon: TrendingUp, link: 'ClassScheduleManager', color: 'amber' },
-    { title: 'Content Manager', icon: FileText, link: 'ContentManager', color: 'orange' },
-    { title: 'Banner Manager', icon: TrendingUp, link: 'BannerManager', color: 'red' },
-    { title: 'Site Settings', icon: Settings, link: 'SiteSettingsManager', color: 'gray' },
-    { title: 'Visitor Analytics', icon: Users, link: 'VisitorAnalytics', color: 'pink' },
-    { title: 'User Management', icon: Users, link: 'UserManager', color: 'teal' },
-    { title: 'Notification Settings', icon: Settings, link: 'NotificationSettings', color: 'slate' }
+  const allActions = [
+    { title: 'Manage Inquiries', icon: MessageSquare, link: 'InquiryManager', color: 'blue', permission: 'InquiryManager' },
+    { title: 'Booking Manager', icon: MessageSquare, link: 'BookingManager', color: 'emerald', permission: 'BookingManager' },
+    { title: 'Blog Manager', icon: FileText, link: 'BlogManager', color: 'indigo', permission: 'BlogManager' },
+    { title: 'Package Manager', icon: TrendingUp, link: 'PackageManager', color: 'green', permission: 'PackageManager' },
+    { title: 'Class Manager', icon: TrendingUp, link: 'ClassManager', color: 'purple', permission: 'ClassManager' },
+    { title: 'Club Manager', icon: TrendingUp, link: 'ClubManager', color: 'cyan', permission: 'ClubManager' },
+    { title: 'Schedule Manager', icon: TrendingUp, link: 'ClassScheduleManager', color: 'amber', permission: 'ClassScheduleManager' },
+    { title: 'Content Manager', icon: FileText, link: 'ContentManager', color: 'orange', permission: 'ContentManager' },
+    { title: 'Banner Manager', icon: TrendingUp, link: 'BannerManager', color: 'red', permission: 'BannerManager' },
+    { title: 'Site Settings', icon: Settings, link: 'SiteSettingsManager', color: 'gray', permission: 'SiteSettingsManager' },
+    { title: 'Visitor Analytics', icon: Users, link: 'VisitorAnalytics', color: 'pink', permission: 'VisitorAnalytics' },
+    { title: 'Notification Settings', icon: Settings, link: 'NotificationSettings', color: 'slate', permission: 'NotificationSettings' }
   ];
+
+  // Filter actions based on permissions
+  const quickActions = allActions.filter(action => hasPermission(action.permission));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -121,12 +132,27 @@ export default function AdminDashboard() {
             <div>
               <h1 className="text-4xl font-black mb-2">Admin Dashboard</h1>
               <p className="text-gray-400">Welcome back, {user?.full_name}</p>
+              {userRole && (
+                <p className="text-yellow-400 text-sm font-semibold">
+                  {userRole.role.replace('_', ' ').toUpperCase()}
+                </p>
+              )}
             </div>
-            <Link to={createPageUrl('Home')}>
-              <Button variant="outline" className="bg-white text-black hover:bg-gray-200">
-                Back to Website
-              </Button>
-            </Link>
+            <div className="flex gap-2">
+              {isSuperAdmin() && (
+                <Link to={createPageUrl('SuperAdminPanel')}>
+                  <Button className="bg-purple-600 hover:bg-purple-700">
+                    <Shield className="w-4 h-4 mr-2" />
+                    Super Admin Panel
+                  </Button>
+                </Link>
+              )}
+              <Link to={createPageUrl('Home')}>
+                <Button variant="outline" className="bg-white text-black hover:bg-gray-200">
+                  Back to Website
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -173,8 +199,13 @@ export default function AdminDashboard() {
           transition={{ delay: 0.4 }}
         >
           <h2 className="text-2xl font-black mb-6">Quick Actions</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {quickActions.map((action, index) => (
+          {quickActions.length === 0 ? (
+            <Card className="p-8 text-center">
+              <p className="text-gray-500">No permissions assigned. Contact your super admin.</p>
+            </Card>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {quickActions.map((action, index) => (
               <Link key={index} to={createPageUrl(action.link)}>
                 <motion.div
                   whileHover={{ y: -5 }}
@@ -199,10 +230,11 @@ export default function AdminDashboard() {
                   </div>
                   <h3 className="text-lg font-bold">{action.title}</h3>
                 </motion.div>
-              </Link>
-            ))}
-          </div>
-        </motion.div>
+                </Link>
+                ))}
+                </div>
+                )}
+                </motion.div>
       </div>
     </div>
   );
