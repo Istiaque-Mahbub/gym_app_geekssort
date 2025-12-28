@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { ArrowLeft, Plus, Edit2, Trash2, Shield, Lock } from 'lucide-react';
+import { ArrowLeft, Plus, Edit2, Trash2, Shield, Lock, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,6 +34,7 @@ export default function SuperAdminPanel() {
   const [loading, setLoading] = useState(true);
   const [showUserForm, setShowUserForm] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [sendingEmail, setSendingEmail] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     role: 'editor',
@@ -70,99 +71,139 @@ export default function SuperAdminPanel() {
     }
   };
 
+  const sendWelcomeEmail = async (email, role, permissions) => {
+    const loginUrl = window.location.origin;
+    const permissionsList = role === 'super_admin' 
+      ? 'All administrative functions'
+      : permissions.length > 0 
+        ? permissions.map(p => AVAILABLE_PERMISSIONS.find(perm => perm.id === p)?.label).join(', ')
+        : 'No specific permissions assigned yet';
+
+    await base44.integrations.Core.SendEmail({
+      from_name: 'FitHive Admin',
+      to: email,
+      subject: '🎉 Welcome to FitHive Admin Panel',
+      body: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+            .container { max-width: 600px; margin: 0 auto; padding: 0; }
+            .header { background: linear-gradient(135deg, #9333ea 0%, #4f46e5 100%); color: white; padding: 40px 30px; text-align: center; }
+            .header h1 { margin: 0; font-size: 28px; }
+            .content { background: #f9fafb; padding: 40px 30px; }
+            .role-badge { display: inline-block; background: #fbbf24; color: #000; padding: 10px 20px; border-radius: 25px; font-weight: bold; font-size: 14px; }
+            .button { display: inline-block; background: #9333ea; color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; }
+            .info-box { background: white; padding: 25px; border-left: 4px solid #9333ea; margin: 25px 0; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+            .footer { text-align: center; padding: 30px; color: #666; font-size: 13px; background: #e5e7eb; }
+            ol { padding-left: 20px; }
+            ol li { margin: 10px 0; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🏋️ Welcome to FitHive Admin</h1>
+              <p style="margin: 10px 0 0 0; font-size: 16px;">You've been granted administrative access!</p>
+            </div>
+            <div class="content">
+              <h2 style="color: #111; margin-top: 0;">Hello!</h2>
+              <p>We're excited to have you join the FitHive admin team. You've been granted access to manage our fitness platform.</p>
+              
+              <div class="info-box">
+                <h3 style="margin-top: 0; color: #9333ea;">Your Role:</h3>
+                <span class="role-badge">${role.replace('_', ' ').toUpperCase()}</span>
+                
+                <h3 style="margin-top: 25px; color: #9333ea;">Your Permissions:</h3>
+                <p style="margin: 10px 0 0 0;">${permissionsList}</p>
+              </div>
+
+              <h3 style="color: #111;">Getting Started:</h3>
+              <ol>
+                <li><strong>Access the Panel:</strong> Click the button below to visit the admin dashboard</li>
+                <li><strong>Login:</strong> Use your email address to sign in</li>
+                <li><strong>Explore:</strong> Familiarize yourself with the management tools available</li>
+              </ol>
+
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${loginUrl}" class="button">Access Admin Panel →</a>
+              </div>
+
+              <div style="background: #fef3c7; padding: 15px; border-radius: 6px; margin-top: 25px;">
+                <p style="margin: 0; font-size: 14px;">
+                  <strong>💡 Need Help?</strong> If you have questions or need assistance, contact your super administrator at the admin panel.
+                </p>
+              </div>
+            </div>
+            <div class="footer">
+              <p style="margin: 0;"><strong>FitHive Fitness Management</strong></p>
+              <p style="margin: 10px 0 0 0;">© ${new Date().getFullYear()} FitHive. All rights reserved.</p>
+              <p style="margin: 10px 0 0 0; color: #999;">This is an automated message, please do not reply.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    });
+  };
+
   const handleCreateUser = async (e) => {
     e.preventDefault();
     try {
-      // First, invite the user to create their account
-      await base44.users.inviteUser(formData.email, 'user');
+      if (editingUser) {
+        // Update existing user
+        await base44.entities.UserRole.update(editingUser.id, {
+          role: formData.role,
+          permissions: formData.permissions
+        });
+        alert('User updated successfully!');
+      } else {
+        // Create new role assignment
+        await base44.entities.UserRole.create({
+          user_email: formData.email,
+          role: formData.role,
+          permissions: formData.permissions,
+          created_by_email: currentUser.email,
+          is_active: true
+        });
 
-      // Create role assignment
-      await base44.entities.UserRole.create({
-        user_email: formData.email,
-        role: formData.role,
-        permissions: formData.permissions,
-        created_by_email: currentUser.email,
-        is_active: true
-      });
+        // Send welcome email
+        await sendWelcomeEmail(formData.email, formData.role, formData.permissions);
+        alert('User created successfully! A welcome email has been sent to ' + formData.email);
+      }
 
-      // Send professional welcome email
-      const loginUrl = window.location.origin;
-      const permissionsList = formData.role === 'super_admin' 
-        ? 'All administrative functions'
-        : formData.permissions.length > 0 
-          ? formData.permissions.map(p => AVAILABLE_PERMISSIONS.find(perm => perm.id === p)?.label).join(', ')
-          : 'No specific permissions assigned yet';
-
-      await base44.integrations.Core.SendEmail({
-        from_name: 'FitHive Admin',
-        to: formData.email,
-        subject: '🎉 Welcome to FitHive Admin Panel',
-        body: `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <style>
-              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .header { background: linear-gradient(135deg, #9333ea 0%, #4f46e5 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-              .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
-              .role-badge { display: inline-block; background: #fbbf24; color: #000; padding: 8px 16px; border-radius: 20px; font-weight: bold; margin: 10px 0; }
-              .button { display: inline-block; background: #9333ea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; font-weight: bold; }
-              .info-box { background: white; padding: 20px; border-left: 4px solid #9333ea; margin: 20px 0; border-radius: 4px; }
-              .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <div class="header">
-                <h1>🏋️ Welcome to FitHive</h1>
-                <p>You've been granted admin access!</p>
-              </div>
-              <div class="content">
-                <h2>Hello!</h2>
-                <p>We're excited to have you join the FitHive admin team. You've been granted access to our administrative panel.</p>
-                
-                <div class="info-box">
-                  <h3>Your Role:</h3>
-                  <span class="role-badge">${formData.role.replace('_', ' ').toUpperCase()}</span>
-                  
-                  <h3 style="margin-top: 20px;">Your Permissions:</h3>
-                  <p>${permissionsList}</p>
-                </div>
-
-                <h3>Getting Started:</h3>
-                <ol>
-                  <li><strong>Login:</strong> Visit the admin panel using the button below</li>
-                  <li><strong>Set Password:</strong> If this is your first time, you'll need to set up your password</li>
-                  <li><strong>Explore:</strong> Familiarize yourself with the tools available to you</li>
-                </ol>
-
-                <div style="text-align: center;">
-                  <a href="${loginUrl}" class="button">Access Admin Panel</a>
-                </div>
-
-                <p style="margin-top: 20px; font-size: 14px; color: #666;">
-                  <strong>Need help?</strong> If you have any questions or need assistance, please contact your super administrator.
-                </p>
-              </div>
-              <div class="footer">
-                <p>© ${new Date().getFullYear()} FitHive. All rights reserved.</p>
-                <p>This is an automated message, please do not reply to this email.</p>
-              </div>
-            </div>
-          </body>
-          </html>
-        `
-      });
-
-      alert('User created successfully! A welcome email has been sent to ' + formData.email);
       setShowUserForm(false);
+      setEditingUser(null);
       setFormData({ email: '', role: 'editor', permissions: [] });
       await loadData();
     } catch (error) {
       console.error('Error creating user:', error);
-      alert('Error creating user: ' + error.message);
+      alert('Error: ' + error.message);
     }
+  };
+
+  const handleResendEmail = async (role) => {
+    try {
+      setSendingEmail(role.id);
+      await sendWelcomeEmail(role.user_email, role.role, role.permissions || []);
+      alert('Invitation email sent to ' + role.user_email);
+    } catch (error) {
+      console.error('Error sending email:', error);
+      alert('Error sending email: ' + error.message);
+    } finally {
+      setSendingEmail(false);
+    }
+  };
+
+  const handleEditUser = (role) => {
+    setEditingUser(role);
+    setFormData({
+      email: role.user_email,
+      role: role.role,
+      permissions: role.permissions || []
+    });
+    setShowUserForm(true);
   };
 
   const handleUpdateRole = async (roleId, updates) => {
@@ -295,6 +336,23 @@ export default function SuperAdminPanel() {
                         <p className="text-sm text-gray-600">{role.user_email}</p>
                       </div>
                       <div className="flex items-center gap-2">
+                        <Button
+                          size="icon"
+                          variant="outline"
+                          onClick={() => handleResendEmail(role)}
+                          disabled={sendingEmail === role.id}
+                          title="Resend invitation email"
+                        >
+                          <Mail className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="outline"
+                          onClick={() => handleEditUser(role)}
+                          title="Edit permissions"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
                         <Switch
                           checked={role.is_active}
                           onCheckedChange={(checked) => handleUpdateRole(role.id, { is_active: checked })}
@@ -343,10 +401,16 @@ export default function SuperAdminPanel() {
       </div>
 
       {/* Add User Dialog */}
-      <Dialog open={showUserForm} onOpenChange={setShowUserForm}>
+      <Dialog open={showUserForm} onOpenChange={(open) => {
+        setShowUserForm(open);
+        if (!open) {
+          setEditingUser(null);
+          setFormData({ email: '', role: 'editor', permissions: [] });
+        }
+      }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Add New Admin User</DialogTitle>
+            <DialogTitle>{editingUser ? 'Edit User' : 'Add New Admin User'}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreateUser} className="space-y-6">
             <div>
@@ -356,6 +420,7 @@ export default function SuperAdminPanel() {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
+                disabled={editingUser}
                 placeholder="user@example.com"
               />
             </div>
@@ -393,9 +458,13 @@ export default function SuperAdminPanel() {
 
             <div className="flex gap-3">
               <Button type="submit" className="flex-1 bg-purple-600 hover:bg-purple-700">
-                Create User
+                {editingUser ? 'Update User' : 'Create User'}
               </Button>
-              <Button type="button" variant="outline" onClick={() => setShowUserForm(false)}>
+              <Button type="button" variant="outline" onClick={() => {
+                setShowUserForm(false);
+                setEditingUser(null);
+                setFormData({ email: '', role: 'editor', permissions: [] });
+              }}>
                 Cancel
               </Button>
             </div>
