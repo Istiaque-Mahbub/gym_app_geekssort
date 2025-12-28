@@ -73,6 +73,9 @@ export default function SuperAdminPanel() {
   const handleCreateUser = async (e) => {
     e.preventDefault();
     try {
+      // First, invite the user to create their account
+      await base44.users.inviteUser(formData.email, 'user');
+
       // Create role assignment
       await base44.entities.UserRole.create({
         user_email: formData.email,
