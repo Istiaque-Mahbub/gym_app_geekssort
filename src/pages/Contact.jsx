@@ -45,6 +45,25 @@ export default function Contact() {
       source: 'contact_page',
       status: 'new'
     });
+
+    // Send email notification
+    await base44.integrations.Core.SendEmail({
+      from_name: 'FitHive',
+      to: 'baizidikhan@gmail.com',
+      subject: '📩 New Contact Form Submission - FitHive',
+      body: `
+        <h2>New Contact Form Submission</h2>
+        <p><strong>Name:</strong> ${formData.name}</p>
+        <p><strong>Email:</strong> ${formData.email}</p>
+        <p><strong>Phone:</strong> ${formData.phone || 'Not provided'}</p>
+        <p><strong>Preferred Club:</strong> ${formData.club || 'Not specified'}</p>
+        <p><strong>Subject:</strong> ${formData.subject}</p>
+        <p><strong>Message:</strong></p>
+        <p>${formData.message}</p>
+        <hr>
+        <p><small>Source: Contact Page | Time: ${new Date().toLocaleString()}</small></p>
+      `
+    });
     
     setIsSubmitted(true);
     setTimeout(() => {

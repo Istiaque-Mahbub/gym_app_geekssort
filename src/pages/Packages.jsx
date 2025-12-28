@@ -144,15 +144,32 @@ export default function Packages() {
                     </div>
                   </div>
 
-                  <Link to={createPageUrl('Contact')}>
-                    <Button className={`w-full py-6 text-lg font-bold ${
+                  <Button 
+                    onClick={async () => {
+                      await base44.integrations.Core.SendEmail({
+                        from_name: 'FitHive',
+                        to: 'baizidikhan@gmail.com',
+                        subject: '💪 Package Interest - FitHive',
+                        body: `
+                          <h2>New Package Interest</h2>
+                          <p>A user showed interest in the following package:</p>
+                          <p><strong>Package:</strong> ${pkg.name}</p>
+                          <p><strong>Price:</strong> €${pkg.price}/${pkg.duration}</p>
+                          <p><strong>Description:</strong> ${pkg.description || 'N/A'}</p>
+                          <hr>
+                          <p><small>Time: ${new Date().toLocaleString()}</small></p>
+                          <p><small>Note: User will be redirected to Contact page</small></p>
+                        `
+                      });
+                      window.location.href = createPageUrl('Contact');
+                    }}
+                    className={`w-full py-6 text-lg font-bold ${
                       pkg.is_popular 
                         ? 'bg-yellow-400 text-black hover:bg-yellow-500' 
                         : 'bg-black text-white hover:bg-gray-800'
                     }`}>
                       Get Started
                     </Button>
-                  </Link>
                 </motion.div>
               ))}
             </div>
