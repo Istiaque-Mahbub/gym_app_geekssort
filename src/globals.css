@@ -168,3 +168,8 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* Hide Base44 badge */
+#base44-badge {
+  display: none !important;
+}
