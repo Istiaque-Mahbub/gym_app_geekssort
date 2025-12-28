@@ -67,6 +67,23 @@ export default function ChatWidget({ currentPageName }) {
       source: 'chat_widget',
       status: 'new'
     });
+
+    // Send email notification
+    await base44.integrations.Core.SendEmail({
+      from_name: 'FitHive',
+      to: 'baizidikhan@gmail.com',
+      subject: '🔔 New Chat Widget Inquiry - FitHive',
+      body: `
+        <h2>New Inquiry from Chat Widget</h2>
+        <p><strong>Name:</strong> ${formData.name}</p>
+        <p><strong>Email:</strong> ${formData.email}</p>
+        <p><strong>Phone:</strong> ${formData.phone || 'Not provided'}</p>
+        <p><strong>Message:</strong></p>
+        <p>${formData.message}</p>
+        <hr>
+        <p><small>Source: Chat Widget | Time: ${new Date().toLocaleString()}</small></p>
+      `
+    });
     
     setView('success');
     setTimeout(() => {
