@@ -17,7 +17,19 @@ export default function InitializeSuperAdmin() {
 
   const checkStatus = async () => {
     try {
+      // Check if user is authenticated
+      const isAuth = await base44.auth.isAuthenticated();
+      if (!isAuth) {
+        base44.auth.redirectToLogin(window.location.pathname);
+        return;
+      }
+
       const currentUser = await base44.auth.me();
+      if (!currentUser || !currentUser.email) {
+        base44.auth.redirectToLogin(window.location.pathname);
+        return;
+      }
+      
       setUser(currentUser);
 
       // Check if user already has a role
@@ -29,11 +41,16 @@ export default function InitializeSuperAdmin() {
       setLoading(false);
     } catch (error) {
       console.error('Error:', error);
-      setLoading(false);
+      base44.auth.redirectToLogin(window.location.pathname);
     }
   };
 
   const createSuperAdmin = async () => {
+    if (!user || !user.email) {
+      alert('User not authenticated. Please refresh the page.');
+      return;
+    }
+
     try {
       setCreating(true);
       
@@ -117,7 +134,7 @@ export default function InitializeSuperAdmin() {
 
               <Button
                 onClick={createSuperAdmin}
-                disabled={creating}
+                disabled={creating || !user}
                 className="w-full bg-purple-600 hover:bg-purple-700"
               >
                 {creating ? 'Creating...' : 'Make Me Super Admin'}
