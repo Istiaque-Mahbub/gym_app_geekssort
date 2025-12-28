@@ -159,7 +159,10 @@ export default function SuperAdminPanel() {
         });
         alert('User updated successfully!');
       } else {
-        // Create new role assignment
+        // Step 1: Invite user to create their account in the system
+        await base44.users.inviteUser(formData.email, 'user');
+        
+        // Step 2: Create role assignment
         await base44.entities.UserRole.create({
           user_email: formData.email,
           role: formData.role,
@@ -168,9 +171,9 @@ export default function SuperAdminPanel() {
           is_active: true
         });
 
-        // Send welcome email
+        // Step 3: Send professional welcome email (now user exists in system)
         await sendWelcomeEmail(formData.email, formData.role, formData.permissions);
-        alert('User created successfully! A welcome email has been sent to ' + formData.email);
+        alert('User created successfully! Welcome email sent to ' + formData.email);
       }
 
       setShowUserForm(false);
