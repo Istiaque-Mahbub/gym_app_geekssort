@@ -28,7 +28,9 @@ export default function ClassManager() {
     schedule: [{ day: '', time: '' }],
     capacity: '',
     image: '',
+    website_image: '',
     category: '',
+    show_on_homepage: false,
     is_active: true,
     order: 0
   });
@@ -116,7 +118,9 @@ export default function ClassManager() {
       schedule: cls.schedule?.length ? cls.schedule : [{ day: '', time: '' }],
       capacity: cls.capacity || '',
       image: cls.image || '',
+      website_image: cls.website_image || '',
       category: cls.category || '',
+      show_on_homepage: cls.show_on_homepage || false,
       is_active: cls.is_active !== false,
       order: cls.order || 0
     });
@@ -133,7 +137,9 @@ export default function ClassManager() {
       schedule: [{ day: '', time: '' }],
       capacity: '',
       image: '',
+      website_image: '',
       category: '',
+      show_on_homepage: false,
       is_active: true,
       order: 0
     });
@@ -325,6 +331,44 @@ export default function ClassManager() {
               </div>
 
               <div>
+                <label className="block text-sm font-semibold mb-2">Website Homepage Image</label>
+                <p className="text-xs text-gray-500 mb-2">Recommended size: 600x900px (Portrait)</p>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    try {
+                      setUploading(true);
+                      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                      setFormData({ ...formData, website_image: file_url });
+                    } catch (error) {
+                      console.error('Error uploading image:', error);
+                      alert('Error uploading image');
+                    } finally {
+                      setUploading(false);
+                    }
+                  }}
+                  className="mb-3"
+                />
+                {formData.website_image && (
+                  <div className="relative w-32">
+                    <img src={formData.website_image} alt="" className="w-full h-40 object-cover rounded-lg" />
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="destructive"
+                      className="absolute top-1 right-1 h-6 w-6"
+                      onClick={() => setFormData({ ...formData, website_image: '' })}
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              <div>
                 <label className="block text-sm font-semibold mb-2">Schedule</label>
                 {formData.schedule.map((sched, index) => (
                   <div key={index} className="flex gap-2 mb-2">
@@ -356,12 +400,21 @@ export default function ClassManager() {
                 </Button>
               </div>
 
-              <div className="flex items-center gap-2">
-                <Switch
-                  checked={formData.is_active}
-                  onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-                />
-                <label className="text-sm font-semibold">Active</label>
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={formData.show_on_homepage}
+                    onCheckedChange={(checked) => setFormData({ ...formData, show_on_homepage: checked })}
+                  />
+                  <label className="text-sm font-semibold">Show on Homepage</label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={formData.is_active}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                  />
+                  <label className="text-sm font-semibold">Active</label>
+                </div>
               </div>
 
               <div className="flex gap-3">

@@ -1,33 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
-
-const classes = [
-  {
-    id: 1,
-    name: 'TRX',
-    category: 'Power',
-    image: 'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=600&h=900&q=80&fit=crop',
-  },
-  {
-    id: 2,
-    name: 'Yoga',
-    category: 'Flow',
-    image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&h=900&q=80&fit=crop',
-  },
-  {
-    id: 3,
-    name: 'Yoguitos Kids',
-    category: 'Kids',
-    image: 'https://images.unsplash.com/photo-1588286840104-8957b019727f?w=600&h=900&q=80&fit=crop',
-  },
-  {
-    id: 4,
-    name: 'Zumba',
-    category: 'Moves',
-    image: 'https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?w=600&h=900&q=80&fit=crop',
-  },
-];
 
 const MarqueeText = () => {
   return (
@@ -47,6 +21,26 @@ const MarqueeText = () => {
 };
 
 export default function ClassesSection() {
+  const [classes, setClasses] = useState([]);
+
+  useEffect(() => {
+    loadClasses();
+  }, []);
+
+  const loadClasses = async () => {
+    try {
+      const classesData = await base44.entities.Class.filter({ 
+        is_active: true, 
+        show_on_homepage: true 
+      });
+      setClasses(classesData.sort((a, b) => (a.order || 0) - (b.order || 0)).slice(0, 4));
+    } catch (error) {
+      console.error('Error loading classes:', error);
+    }
+  };
+
+  if (classes.length === 0) return null;
+
   return (
     <section className="bg-white">
       {/* Marquee Header */}
@@ -77,7 +71,7 @@ export default function ClassesSection() {
             >
               <div className="relative aspect-[2/3] rounded-2xl overflow-hidden mb-4 shadow-xl">
                 <img
-                  src={classItem.image}
+                  src={classItem.website_image || classItem.image || 'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=600&h=900&q=80&fit=crop'}
                   alt={classItem.name}
                   className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
                 />

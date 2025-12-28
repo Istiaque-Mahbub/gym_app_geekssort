@@ -27,9 +27,11 @@ export default function ClubManager() {
     facilities: [''],
     operating_hours: { weekdays: '', weekends: '' },
     images: [],
+    website_image: '',
     map_lat: '',
     map_lng: '',
     description: '',
+    show_on_homepage: false,
     is_active: true,
     order: 0
   });
@@ -127,9 +129,11 @@ export default function ClubManager() {
       facilities: club.facilities?.length ? club.facilities : [''],
       operating_hours: club.operating_hours || { weekdays: '', weekends: '' },
       images: club.images || [],
+      website_image: club.website_image || '',
       map_lat: club.map_lat || '',
       map_lng: club.map_lng || '',
       description: club.description || '',
+      show_on_homepage: club.show_on_homepage || false,
       is_active: club.is_active !== false,
       order: club.order || 0
     });
@@ -146,9 +150,11 @@ export default function ClubManager() {
       facilities: [''],
       operating_hours: { weekdays: '', weekends: '' },
       images: [],
+      website_image: '',
       map_lat: '',
       map_lng: '',
       description: '',
+      show_on_homepage: false,
       is_active: true,
       order: 0
     });
@@ -392,7 +398,45 @@ export default function ClubManager() {
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold mb-2">Website Homepage Image</label>
+                <p className="text-xs text-gray-500 mb-2">Recommended size: 600x800px (Portrait)</p>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    try {
+                      setUploading(true);
+                      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                      setFormData({ ...formData, website_image: file_url });
+                    } catch (error) {
+                      console.error('Error uploading image:', error);
+                      alert('Error uploading image');
+                    } finally {
+                      setUploading(false);
+                    }
+                  }}
+                  className="mb-3"
+                />
+                {formData.website_image && (
+                  <div className="relative w-32">
+                    <img src={formData.website_image} alt="" className="w-full h-40 object-cover rounded-lg" />
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="destructive"
+                      className="absolute top-1 right-1 h-6 w-6"
+                      onClick={() => setFormData({ ...formData, website_image: '' })}
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-semibold mb-2">Display Order</label>
                   <Input
@@ -401,6 +445,15 @@ export default function ClubManager() {
                     onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
                     placeholder="0"
                   />
+                </div>
+                <div className="flex items-end">
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={formData.show_on_homepage}
+                      onCheckedChange={(checked) => setFormData({ ...formData, show_on_homepage: checked })}
+                    />
+                    <label className="text-sm font-semibold">Show on Homepage</label>
+                  </div>
                 </div>
                 <div className="flex items-end">
                   <div className="flex items-center gap-2">
