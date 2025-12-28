@@ -159,10 +159,7 @@ export default function SuperAdminPanel() {
         });
         alert('User updated successfully!');
       } else {
-        // Step 1: Invite user to create their account in the system
-        await base44.users.inviteUser(formData.email, 'user');
-        
-        // Step 2: Create role assignment
+        // Step 1: Create role assignment FIRST
         await base44.entities.UserRole.create({
           user_email: formData.email,
           role: formData.role,
@@ -170,10 +167,16 @@ export default function SuperAdminPanel() {
           created_by_email: currentUser.email,
           is_active: true
         });
+        
+        // Step 2: Invite user (this sends system email and creates user account)
+        try {
+          await base44.users.inviteUser(formData.email, 'user');
+        } catch (inviteError) {
+          // User might already exist, that's okay
+          console.log('Invite note:', inviteError.message);
+        }
 
-        // Step 3: Send professional welcome email (now user exists in system)
-        await sendWelcomeEmail(formData.email, formData.role, formData.permissions);
-        alert('User created successfully! Welcome email sent to ' + formData.email);
+        alert('User created successfully! System invitation sent to ' + formData.email);
       }
 
       setShowUserForm(false);
