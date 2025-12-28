@@ -31,6 +31,7 @@ import UserManager from './pages/UserManager';
 import VisitorAnalytics from './pages/VisitorAnalytics';
 import WorkoutPlanner from './pages/WorkoutPlanner';
 import MyBookings from './pages/MyBookings';
+import BookingManager from './pages/BookingManager';
 import __Layout from './Layout.jsx';
 
 
@@ -68,6 +69,7 @@ export const PAGES = {
     "VisitorAnalytics": VisitorAnalytics,
     "WorkoutPlanner": WorkoutPlanner,
     "MyBookings": MyBookings,
+    "BookingManager": BookingManager,
 }
 
 export const pagesConfig = {
