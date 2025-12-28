@@ -35,6 +35,7 @@ export default function AdminDashboard() {
   const loadData = async () => {
     try {
       const currentUser = await base44.auth.me();
+      setUser(currentUser);
       
       // Check if user has admin role in UserRole entity
       const roles = await base44.entities.UserRole.filter({ 
@@ -43,11 +44,20 @@ export default function AdminDashboard() {
       });
       
       if (!roles[0]) {
+        // Check if ANY super admin exists
+        const allRoles = await base44.entities.UserRole.list();
+        const hasSuperAdmin = allRoles.some(r => r.role === 'super_admin');
+        
+        if (!hasSuperAdmin) {
+          // No super admin exists, show initialization
+          setLoading(false);
+          return;
+        }
+        
+        // Super admin exists but current user has no role
         window.location.href = createPageUrl('Home');
         return;
       }
-
-      setUser(currentUser);
 
       const inquiries = await base44.entities.Inquiry.list();
       const pages = await base44.entities.PageContent.list();
@@ -67,10 +77,59 @@ export default function AdminDashboard() {
     }
   };
 
+  const initializeSuperAdmin = async () => {
+    try {
+      await base44.entities.UserRole.create({
+        user_email: user.email,
+        role: 'super_admin',
+        permissions: [],
+        created_by_email: user.email,
+        is_active: true
+      });
+      
+      await loadData();
+    } catch (error) {
+      console.error('Error creating super admin:', error);
+      alert('Error: ' + error.message);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <GymLoader message="Loading admin panel..." />
+      </div>
+    );
+  }
+
+  // Show initialization if no role
+  if (!userRole && user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center p-6">
+        <Card className="max-w-md w-full">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="w-6 h-6 text-purple-600" />
+              Initialize Super Admin
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+              <p className="text-sm text-gray-700">
+                <strong>Your Email:</strong> {user.email}
+              </p>
+              <p className="text-sm text-gray-700 mt-2">
+                No super admin exists. Click below to become the first super admin.
+              </p>
+            </div>
+            <Button
+              onClick={initializeSuperAdmin}
+              className="w-full bg-purple-600 hover:bg-purple-700"
+            >
+              Make Me Super Admin
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
