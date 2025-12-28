@@ -172,14 +172,20 @@ body {
 /* Hide Base44 badge */
 #base44-badge,
 [id="base44-badge"],
+[id*="base44-badge"],
+[class*="base44-badge"],
 div[id*="base44"],
-iframe[id*="base44"] {
+iframe[id*="base44"],
+a[href*="base44.com"] {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
   pointer-events: none !important;
-  position: absolute !important;
+  position: fixed !important;
+  top: -9999px !important;
+  left: -9999px !important;
   width: 0 !important;
   height: 0 !important;
   overflow: hidden !important;
+  z-index: -9999 !important;
 }

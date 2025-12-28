@@ -6,6 +6,21 @@ import VisitorTracker from '@/components/VisitorTracker';
 
 export default function Layout({ children, currentPageName }) {
   useEffect(() => {
+    // Hide Base44 badge
+    const hideBadge = () => {
+      const badges = document.querySelectorAll('#base44-badge, [id*="base44-badge"], [class*="base44"]');
+      badges.forEach(el => {
+        el.style.display = 'none';
+        el.style.visibility = 'hidden';
+        el.style.opacity = '0';
+        el.remove();
+      });
+    };
+    
+    hideBadge();
+    const interval = setInterval(hideBadge, 100);
+    setTimeout(() => clearInterval(interval), 3000);
+    
     // Scroll to top on page change
     window.scrollTo(0, 0);
     
