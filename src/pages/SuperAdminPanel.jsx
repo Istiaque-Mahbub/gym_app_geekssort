@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { ArrowLeft, Plus, Edit2, Trash2, Shield, Lock, Mail } from 'lucide-react';
+import { ArrowLeft, Plus, Edit2, Trash2, Shield, Lock, Mail, ExternalLink, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -150,13 +150,46 @@ export default function SuperAdminPanel() {
     }
   };
 
-  const handleDeleteRole = async (roleId) => {
+  const handleDeleteRole = async (roleId, userEmail) => {
+    if (userEmail === currentUser.email) {
+      alert('You cannot delete your own role');
+      return;
+    }
     if (!confirm('Are you sure you want to remove this user\'s admin access?')) return;
     try {
       await base44.entities.UserRole.delete(roleId);
       await loadData();
     } catch (error) {
       console.error('Error deleting role:', error);
+    }
+  };
+
+  const downloadPageAsPDF = async (pageName, role) => {
+    try {
+      const { jsPDF } = await import('jspdf');
+      const html2canvas = (await import('html2canvas')).default;
+      
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      pdf.setFontSize(16);
+      pdf.text(`${pageName} - Access Report`, 20, 20);
+      pdf.setFontSize(12);
+      pdf.text(`Role: ${role.role.replace('_', ' ').toUpperCase()}`, 20, 30);
+      pdf.text(`User: ${role.user_email}`, 20, 40);
+      pdf.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 50);
+      
+      if (role.permissions?.length > 0) {
+        pdf.text('Assigned Pages:', 20, 65);
+        let yPos = 75;
+        role.permissions.forEach((perm, idx) => {
+          pdf.text(`${idx + 1}. ${perm}`, 25, yPos);
+          yPos += 10;
+        });
+      }
+      
+      pdf.save(`${pageName}-${role.user_email}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Error generating PDF');
     }
   };
 
@@ -209,6 +242,28 @@ export default function SuperAdminPanel() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* All Pages Navigation */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ExternalLink className="w-5 h-5" />
+              Quick Access - All Website Pages
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-4 gap-3">
+              {['Home', 'Clubs', 'Classes', 'ClassSchedule', 'Packages', 'Contact', 'About', 'Blogs', 'WorkoutPlanner', 'MealPlanner', 'ProgressTracker', 'Challenges', 'App', 'FAQs', 'PrivacyPolicy', 'TermsOfService'].map(page => (
+                <Link key={page} to={createPageUrl(page)}>
+                  <Button variant="outline" className="w-full justify-start">
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    {page}
+                  </Button>
+                </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Stats */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <Card>
@@ -291,15 +346,22 @@ export default function SuperAdminPanel() {
                           checked={role.is_active}
                           onCheckedChange={(checked) => handleUpdateRole(role.id, { is_active: checked })}
                         />
-                        {role.user_email !== currentUser.email && (
-                          <Button
-                            size="icon"
-                            variant="destructive"
-                            onClick={() => handleDeleteRole(role.id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        )}
+                        <Button
+                          size="icon"
+                          variant="outline"
+                          onClick={() => downloadPageAsPDF('UserRole', role)}
+                          title="Download as PDF"
+                        >
+                          <Download className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="destructive"
+                          onClick={() => handleDeleteRole(role.id, role.user_email)}
+                          disabled={role.user_email === currentUser.email}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
                   </CardHeader>
