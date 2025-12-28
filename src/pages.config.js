@@ -6,8 +6,11 @@ import BlogManager from './pages/BlogManager';
 import BlogPost from './pages/BlogPost';
 import Blogs from './pages/Blogs';
 import Challenges from './pages/Challenges';
+import ClassManager from './pages/ClassManager';
 import ClassSchedule from './pages/ClassSchedule';
+import ClassScheduleManager from './pages/ClassScheduleManager';
 import Classes from './pages/Classes';
+import ClubManager from './pages/ClubManager';
 import Clubs from './pages/Clubs';
 import Contact from './pages/Contact';
 import ContentManager from './pages/ContentManager';
@@ -16,6 +19,7 @@ import Home from './pages/Home';
 import InquiryManager from './pages/InquiryManager';
 import MealPlanner from './pages/MealPlanner';
 import NotificationSettings from './pages/NotificationSettings';
+import PackageManager from './pages/PackageManager';
 import Packages from './pages/Packages';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import ProgressTracker from './pages/ProgressTracker';
@@ -26,10 +30,6 @@ import UserDashboard from './pages/UserDashboard';
 import UserManager from './pages/UserManager';
 import VisitorAnalytics from './pages/VisitorAnalytics';
 import WorkoutPlanner from './pages/WorkoutPlanner';
-import PackageManager from './pages/PackageManager';
-import ClassManager from './pages/ClassManager';
-import ClubManager from './pages/ClubManager';
-import ClassScheduleManager from './pages/ClassScheduleManager';
 import __Layout from './Layout.jsx';
 
 
@@ -42,8 +42,11 @@ export const PAGES = {
     "BlogPost": BlogPost,
     "Blogs": Blogs,
     "Challenges": Challenges,
+    "ClassManager": ClassManager,
     "ClassSchedule": ClassSchedule,
+    "ClassScheduleManager": ClassScheduleManager,
     "Classes": Classes,
+    "ClubManager": ClubManager,
     "Clubs": Clubs,
     "Contact": Contact,
     "ContentManager": ContentManager,
@@ -52,6 +55,7 @@ export const PAGES = {
     "InquiryManager": InquiryManager,
     "MealPlanner": MealPlanner,
     "NotificationSettings": NotificationSettings,
+    "PackageManager": PackageManager,
     "Packages": Packages,
     "PrivacyPolicy": PrivacyPolicy,
     "ProgressTracker": ProgressTracker,
@@ -62,10 +66,6 @@ export const PAGES = {
     "UserManager": UserManager,
     "VisitorAnalytics": VisitorAnalytics,
     "WorkoutPlanner": WorkoutPlanner,
-    "PackageManager": PackageManager,
-    "ClassManager": ClassManager,
-    "ClubManager": ClubManager,
-    "ClassScheduleManager": ClassScheduleManager,
 }
 
 export const pagesConfig = {

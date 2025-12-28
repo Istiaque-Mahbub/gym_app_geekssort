@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Plus, Edit2, Trash2, ArrowLeft, Save, X, Calendar, Clock } from 'lucide-react';
+import { Plus, Edit2, Trash2, ArrowLeft, Save, X, Clock, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -330,7 +330,7 @@ export default function ClassScheduleManager() {
         )}
 
         <div className="mb-6">
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             <Button
               variant={selectedDay === 'All' ? 'default' : 'outline'}
               onClick={() => setSelectedDay('All')}
@@ -355,7 +355,10 @@ export default function ClassScheduleManager() {
           <div className="space-y-8">
             {days.map(day => (
               <div key={day}>
-                <h2 className="text-2xl font-black mb-4">{day}</h2>
+                <h2 className="text-2xl font-black mb-4 flex items-center gap-2">
+                  <Calendar className="w-6 h-6" />
+                  {day}
+                </h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {schedulesByDay[day].map((schedule, index) => (
                     <motion.div
@@ -364,11 +367,11 @@ export default function ClassScheduleManager() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
                     >
-                      <Card>
+                      <Card className="hover:shadow-lg transition-shadow">
                         <CardHeader>
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2 flex-wrap">
                                 <CardTitle className="text-lg">{schedule.class_name}</CardTitle>
                                 {!schedule.is_active && (
                                   <span className="bg-gray-300 text-gray-700 px-2 py-1 rounded text-xs font-bold">
@@ -376,7 +379,7 @@ export default function ClassScheduleManager() {
                                   </span>
                                 )}
                               </div>
-                              <p className="text-sm text-gray-600">with {schedule.instructor}</p>
+                              <p className="text-sm text-gray-600 mt-1">with {schedule.instructor}</p>
                             </div>
                             <div className="flex gap-1">
                               <Button size="icon" variant="outline" onClick={() => handleEdit(schedule)}>
@@ -399,94 +402,118 @@ export default function ClassScheduleManager() {
                           {schedule.location && (
                             <p className="text-sm text-gray-600">📍 {schedule.location}</p>
                           )}
+                          {schedule.capacity && (
+                            <p className="text-sm text-gray-600">👥 Capacity: {schedule.capacity}</p>
+                          )}
                           {schedule.category && (
                             <span className="inline-block bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-semibold">
                               {schedule.category}
                             </span>
                           )}
-                          <div className="flex items-center justify-between pt-2">
+                          {schedule.description && (
+                            <p className="text-sm text-gray-600 pt-2">{schedule.description}</p>
+                          )}
+                          <div className="flex items-center justify-between pt-2 border-t">
                             <span className="text-xs text-gray-500">{schedule.difficulty_level}</span>
-                            <Switch
-                              checked={schedule.is_active}
-                              onCheckedChange={() => toggleActive(schedule)}
-                            />
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500">Active</span>
+                              <Switch
+                                checked={schedule.is_active}
+                                onCheckedChange={() => toggleActive(schedule)}
+                              />
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
                     </motion.div>
                   ))}
                   {schedulesByDay[day].length === 0 && (
-                    <p className="text-gray-500 col-span-full">No classes scheduled</p>
+                    <p className="text-gray-500 col-span-full py-8 text-center">No classes scheduled</p>
                   )}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredSchedules.map((schedule, index) => (
-              <motion.div
-                key={schedule.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-              >
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <CardTitle className="text-lg">{schedule.class_name}</CardTitle>
-                          {!schedule.is_active && (
-                            <span className="bg-gray-300 text-gray-700 px-2 py-1 rounded text-xs font-bold">
-                              Inactive
-                            </span>
-                          )}
+          <div>
+            <h2 className="text-2xl font-black mb-4 flex items-center gap-2">
+              <Calendar className="w-6 h-6" />
+              {selectedDay}
+            </h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredSchedules.map((schedule, index) => (
+                <motion.div
+                  key={schedule.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <Card className="hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <CardTitle className="text-lg">{schedule.class_name}</CardTitle>
+                            {!schedule.is_active && (
+                              <span className="bg-gray-300 text-gray-700 px-2 py-1 rounded text-xs font-bold">
+                                Inactive
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-600 mt-1">with {schedule.instructor}</p>
                         </div>
-                        <p className="text-sm text-gray-600">with {schedule.instructor}</p>
+                        <div className="flex gap-1">
+                          <Button size="icon" variant="outline" onClick={() => handleEdit(schedule)}>
+                            <Edit2 className="w-4 h-4" />
+                          </Button>
+                          <Button size="icon" variant="destructive" onClick={() => handleDelete(schedule.id)}>
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex gap-1">
-                        <Button size="icon" variant="outline" onClick={() => handleEdit(schedule)}>
-                          <Edit2 className="w-4 h-4" />
-                        </Button>
-                        <Button size="icon" variant="destructive" onClick={() => handleDelete(schedule.id)}>
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Clock className="w-4 h-4 text-gray-500" />
+                        <span className="font-semibold">{schedule.time}</span>
+                        {schedule.duration_minutes && (
+                          <span className="text-gray-600">({schedule.duration_minutes} min)</span>
+                        )}
                       </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Clock className="w-4 h-4 text-gray-500" />
-                      <span className="font-semibold">{schedule.time}</span>
-                      {schedule.duration_minutes && (
-                        <span className="text-gray-600">({schedule.duration_minutes} min)</span>
+                      {schedule.location && (
+                        <p className="text-sm text-gray-600">📍 {schedule.location}</p>
                       )}
-                    </div>
-                    {schedule.location && (
-                      <p className="text-sm text-gray-600">📍 {schedule.location}</p>
-                    )}
-                    {schedule.category && (
-                      <span className="inline-block bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-semibold">
-                        {schedule.category}
-                      </span>
-                    )}
-                    <div className="flex items-center justify-between pt-2">
-                      <span className="text-xs text-gray-500">{schedule.difficulty_level}</span>
-                      <Switch
-                        checked={schedule.is_active}
-                        onCheckedChange={() => toggleActive(schedule)}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-            {filteredSchedules.length === 0 && (
-              <p className="text-gray-500 col-span-full text-center py-12">
-                No classes scheduled for {selectedDay}
-              </p>
-            )}
+                      {schedule.capacity && (
+                        <p className="text-sm text-gray-600">👥 Capacity: {schedule.capacity}</p>
+                      )}
+                      {schedule.category && (
+                        <span className="inline-block bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-semibold">
+                          {schedule.category}
+                        </span>
+                      )}
+                      {schedule.description && (
+                        <p className="text-sm text-gray-600 pt-2">{schedule.description}</p>
+                      )}
+                      <div className="flex items-center justify-between pt-2 border-t">
+                        <span className="text-xs text-gray-500">{schedule.difficulty_level}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-500">Active</span>
+                          <Switch
+                            checked={schedule.is_active}
+                            onCheckedChange={() => toggleActive(schedule)}
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+              {filteredSchedules.length === 0 && (
+                <p className="text-gray-500 col-span-full text-center py-12">
+                  No classes scheduled for {selectedDay}
+                </p>
+              )}
+            </div>
           </div>
         )}
       </div>
