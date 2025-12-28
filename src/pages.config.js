@@ -17,6 +17,7 @@ import Contact from './pages/Contact';
 import ContentManager from './pages/ContentManager';
 import FAQs from './pages/FAQs';
 import Home from './pages/Home';
+import InitializeSuperAdmin from './pages/InitializeSuperAdmin';
 import InquiryManager from './pages/InquiryManager';
 import MealPlanner from './pages/MealPlanner';
 import MyBookings from './pages/MyBookings';
@@ -33,7 +34,6 @@ import UserDashboard from './pages/UserDashboard';
 import UserManager from './pages/UserManager';
 import VisitorAnalytics from './pages/VisitorAnalytics';
 import WorkoutPlanner from './pages/WorkoutPlanner';
-import InitializeSuperAdmin from './pages/InitializeSuperAdmin';
 import __Layout from './Layout.jsx';
 
 
@@ -57,6 +57,7 @@ export const PAGES = {
     "ContentManager": ContentManager,
     "FAQs": FAQs,
     "Home": Home,
+    "InitializeSuperAdmin": InitializeSuperAdmin,
     "InquiryManager": InquiryManager,
     "MealPlanner": MealPlanner,
     "MyBookings": MyBookings,
@@ -73,7 +74,6 @@ export const PAGES = {
     "UserManager": UserManager,
     "VisitorAnalytics": VisitorAnalytics,
     "WorkoutPlanner": WorkoutPlanner,
-    "InitializeSuperAdmin": InitializeSuperAdmin,
 }
 
 export const pagesConfig = {

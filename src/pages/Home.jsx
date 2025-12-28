@@ -6,10 +6,12 @@ import AmenitiesSection from '@/components/home/AmenitiesSection';
 import ClassesSection from '@/components/home/ClassesSection';
 import AppSection from '@/components/home/AppSection';
 import BlogsSection from '@/components/home/BlogsSection';
+import RoleRedirect from '@/components/RoleRedirect';
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-black">
+      <RoleRedirect />
       <main>
         <HeroSection />
         <section id="clubs">
