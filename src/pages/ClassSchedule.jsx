@@ -1,58 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 
-const scheduleData = {
-  Saturday: [
-    { class: 'Aerobics', time: '06 PM - 06:40 PM', type: 'Female Only' },
-    { class: 'Zumba', time: '07 PM - 08 PM', type: 'Female Only' },
-  ],
-  Sunday: [
-    { class: 'Aerobics', time: '09 AM - 10 AM', type: '' },
-    { class: 'Zumba', time: '05 PM - 06 PM', type: '' },
-    { class: 'Yoga', time: '06 PM - 07 PM', type: 'Female Only' },
-    { class: 'HIIT', time: '07 PM - 07:40 PM', type: 'Female Only' },
-  ],
-  Monday: [
-    { class: 'Yoga', time: '09 AM - 10 AM', type: '' },
-    { class: 'Yoga', time: '04 PM - 05 PM', type: '' },
-    { class: 'HIIT', time: '05 PM - 05:40 PM', type: 'Female Only' },
-    { class: 'Aerobics', time: '06:40 PM - 07:20 PM', type: 'Female Only' },
-  ],
-  Tuesday: [
-    { class: 'Aerobics', time: '04 PM - 04:40 PM', type: '' },
-    { class: 'Aerobics', time: '06:20 PM - 07 PM', type: 'Female Only' },
-    { class: 'Yoga', time: '07 PM - 08 PM', type: 'Female Only' },
-  ],
-  Wednesday: [
-    { class: 'Aerobics', time: '09 AM - 10 AM', type: '' },
-    { class: 'Zumba', time: '04 AM - 05 AM', type: '' },
-    { class: 'Yoga', time: '05 PM - 06 PM', type: '' },
-  ],
-  Thursday: [
-    { class: 'Yoga', time: '09 AM - 10 AM', type: '' },
-    { class: 'Aerobics', time: '04 PM - 04:40 PM', type: '' },
-    { class: 'Zumba', time: '06 PM - 07 PM', type: '' },
-    { class: 'Aerobics', time: '07:20 PM - 08 PM', type: '' },
-  ],
-  Friday: [
-    { class: 'Rest Day', time: '', type: '' },
-  ],
-};
-
-const days = ['All', 'Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-
-const getClassColor = (className) => {
-  const colors = {
-    'Aerobics': 'bg-pink-100 border-pink-400 text-pink-900',
-    'Zumba': 'bg-green-100 border-green-400 text-green-900',
-    'Yoga': 'bg-teal-100 border-teal-400 text-teal-900',
-    'HIIT': 'bg-gray-100 border-gray-400 text-gray-900',
-  };
-  return colors[className] || 'bg-gray-100 border-gray-400 text-gray-900';
-};
-
 export default function ClassSchedule() {
+  const [schedules, setSchedules] = useState([]);
   const [selectedDay, setSelectedDay] = useState('All');
+  const [loading, setLoading] = useState(true);
+
+  const days = ['All', 'Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+  useEffect(() => {
+    loadSchedules();
+  }, []);
+
+  const loadSchedules = async () => {
+    try {
+      const schedulesData = await base44.entities.ClassSchedule.filter({ is_active: true });
+      
+      // Group by day
+      const grouped = {};
+      days.slice(1).forEach(day => {
+        grouped[day] = schedulesData.filter(s => s.day === day).sort((a, b) => {
+          const timeA = a.time.replace(/[^0-9]/g, '');
+          const timeB = b.time.replace(/[^0-9]/g, '');
+          return timeA.localeCompare(timeB);
+        });
+      });
+      
+      setSchedules(grouped);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error loading schedules:', error);
+      setLoading(false);
+    }
+  };
+
+  const getClassColor = (className) => {
+    const colors = {
+      'Aerobics': 'bg-pink-100 border-pink-400 text-pink-900',
+      'Zumba': 'bg-green-100 border-green-400 text-green-900',
+      'Yoga': 'bg-teal-100 border-teal-400 text-teal-900',
+      'HIIT': 'bg-gray-100 border-gray-400 text-gray-900',
+    };
+    return colors[className] || 'bg-gray-100 border-gray-400 text-gray-900';
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <p>Loading schedule...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -102,7 +101,7 @@ export default function ClassSchedule() {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gray-50">
-                  {Object.keys(scheduleData).map((day) => (
+                  {days.slice(1).map((day) => (
                     <th 
                       key={day}
                       className={`p-4 text-left border-2 font-black text-xl ${
@@ -118,7 +117,7 @@ export default function ClassSchedule() {
               </thead>
               <tbody>
                 <tr>
-                  {Object.entries(scheduleData).map(([day, classes]) => (
+                  {days.slice(1).map((day) => (
                     <td 
                       key={day}
                       className={`p-4 border-2 align-top ${
@@ -127,26 +126,29 @@ export default function ClassSchedule() {
                           : 'border-gray-200 bg-white'
                       }`}
                     >
-                      {classes[0]?.class === 'Rest Day' ? (
+                      {schedules[day]?.length === 0 ? (
                         <div className="text-center py-8">
-                          <p className="text-xl font-bold text-gray-400">Rest Day</p>
+                          <p className="text-xl font-bold text-gray-400">No Classes</p>
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          {classes.map((item, index) => (
+                          {schedules[day]?.map((item, index) => (
                             <div
                               key={index}
                               className={`p-4 rounded-xl border-2 transition-all ${
                                 selectedDay === day || selectedDay === 'All'
-                                  ? `${getClassColor(item.class)} shadow-md`
+                                  ? `${getClassColor(item.class_name)} shadow-md`
                                   : 'bg-gray-50 border-gray-200 opacity-60'
                               }`}
                             >
-                              <h3 className="font-black text-lg mb-1">{item.class}</h3>
+                              <h3 className="font-black text-lg mb-1">{item.class_name}</h3>
                               <p className="text-sm font-semibold mb-2">{item.time}</p>
-                              {item.type && (
-                                <span className="inline-block px-3 py-1 bg-red-100 text-red-800 text-xs font-bold rounded-full">
-                                  {item.type}
+                              {item.instructor && (
+                                <p className="text-xs mb-2">with {item.instructor}</p>
+                              )}
+                              {item.location && (
+                                <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">
+                                  {item.location}
                                 </span>
                               )}
                             </div>
@@ -159,17 +161,6 @@ export default function ClassSchedule() {
               </tbody>
             </table>
           </div>
-
-          {/* Note */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mt-12 text-center p-6 bg-yellow-50 rounded-xl border-2 border-yellow-400"
-          >
-            <p className="text-gray-900 font-bold text-lg">
-              ⭐ Zumba & HIIT classes are for premium members only
-            </p>
-          </motion.div>
         </div>
       </section>
     </div>
