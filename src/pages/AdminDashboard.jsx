@@ -10,8 +10,13 @@ import {
   TrendingUp,
   AlertCircle,
   Users,
-  Shield
+  Shield,
+  Zap
 } from 'lucide-react';
+import BasicCalculator from '@/components/admin/BasicCalculator';
+import InvestmentCalculator from '@/components/admin/InvestmentCalculator';
+import BMRCalculator from '@/components/admin/BMRCalculator';
+import QuickNotes from '@/components/admin/QuickNotes';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import GymLoader from '@/components/GymLoader';
@@ -306,6 +311,24 @@ export default function AdminDashboard() {
                 </div>
                 )}
                 </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mt-12"
+        >
+          <h2 className="text-2xl font-black mb-6 flex items-center gap-2">
+            <Zap className="w-6 h-6 text-yellow-500" />
+            Admin Tools & Utilities
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <BasicCalculator />
+            <InvestmentCalculator />
+            <BMRCalculator />
+            <QuickNotes />
+          </div>
+        </motion.div>
       </div>
     </div>
   );
