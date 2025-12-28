@@ -26,13 +26,14 @@ import Packages from './pages/Packages';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import ProgressTracker from './pages/ProgressTracker';
 import SiteSettingsManager from './pages/SiteSettingsManager';
+import SuperAdminPanel from './pages/SuperAdminPanel';
 import TermsOfService from './pages/TermsOfService';
 import TrainerDetail from './pages/TrainerDetail';
 import UserDashboard from './pages/UserDashboard';
 import UserManager from './pages/UserManager';
 import VisitorAnalytics from './pages/VisitorAnalytics';
 import WorkoutPlanner from './pages/WorkoutPlanner';
-import SuperAdminPanel from './pages/SuperAdminPanel';
+import InitializeSuperAdmin from './pages/InitializeSuperAdmin';
 import __Layout from './Layout.jsx';
 
 
@@ -65,13 +66,14 @@ export const PAGES = {
     "PrivacyPolicy": PrivacyPolicy,
     "ProgressTracker": ProgressTracker,
     "SiteSettingsManager": SiteSettingsManager,
+    "SuperAdminPanel": SuperAdminPanel,
     "TermsOfService": TermsOfService,
     "TrainerDetail": TrainerDetail,
     "UserDashboard": UserDashboard,
     "UserManager": UserManager,
     "VisitorAnalytics": VisitorAnalytics,
     "WorkoutPlanner": WorkoutPlanner,
-    "SuperAdminPanel": SuperAdminPanel,
+    "InitializeSuperAdmin": InitializeSuperAdmin,
 }
 
 export const pagesConfig = {
