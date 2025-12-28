@@ -1,18 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { Clock, Users, Flame } from 'lucide-react';
+import { Clock, Users, Flame, Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import GymLoader from '@/components/GymLoader';
+import BookingModal from '@/components/BookingModal';
 
 export default function Classes() {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [categories, setCategories] = useState(['All']);
+  const [bookingClass, setBookingClass] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     loadClasses();
+    checkAuth();
   }, []);
+
+  const checkAuth = async () => {
+    try {
+      const authenticated = await base44.auth.isAuthenticated();
+      setIsAuthenticated(authenticated);
+    } catch (error) {
+      setIsAuthenticated(false);
+    }
+  };
 
   const loadClasses = async () => {
     try {
@@ -26,6 +42,16 @@ export default function Classes() {
       console.error('Error loading classes:', error);
       setLoading(false);
     }
+  };
+
+  const handleBookClass = (classItem) => {
+    if (!isAuthenticated) {
+      if (confirm('You need to be logged in to book a class. Would you like to login?')) {
+        base44.auth.redirectToLogin(window.location.pathname);
+      }
+      return;
+    }
+    setBookingClass(classItem);
   };
 
   const filteredClasses = selectedCategory === 'All' 
@@ -143,7 +169,7 @@ export default function Classes() {
                     {classItem.schedule?.length > 0 && (
                       <div className="border-t pt-4">
                         <h4 className="font-bold text-sm mb-2">Schedule:</h4>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap gap-2 mb-3">
                           {classItem.schedule.map((time, i) => (
                             <span
                               key={i}
@@ -153,6 +179,13 @@ export default function Classes() {
                             </span>
                           ))}
                         </div>
+                        <Button 
+                          onClick={() => handleBookClass(classItem)}
+                          className="w-full bg-yellow-400 text-black hover:bg-yellow-500"
+                        >
+                          <Calendar className="w-4 h-4 mr-2" />
+                          Book Class
+                        </Button>
                       </div>
                     )}
                   </div>
@@ -162,6 +195,16 @@ export default function Classes() {
           )}
         </div>
       </section>
+
+      {bookingClass && (
+        <BookingModal
+          classItem={bookingClass}
+          onClose={() => setBookingClass(null)}
+          onSuccess={() => {
+            alert('Booking confirmed! Check your bookings page.');
+          }}
+        />
+      )}
     </div>
   );
 }

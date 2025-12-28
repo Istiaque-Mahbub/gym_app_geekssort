@@ -30,6 +30,7 @@ import UserDashboard from './pages/UserDashboard';
 import UserManager from './pages/UserManager';
 import VisitorAnalytics from './pages/VisitorAnalytics';
 import WorkoutPlanner from './pages/WorkoutPlanner';
+import MyBookings from './pages/MyBookings';
 import __Layout from './Layout.jsx';
 
 
@@ -66,6 +67,7 @@ export const PAGES = {
     "UserManager": UserManager,
     "VisitorAnalytics": VisitorAnalytics,
     "WorkoutPlanner": WorkoutPlanner,
+    "MyBookings": MyBookings,
 }
 
 export const pagesConfig = {
