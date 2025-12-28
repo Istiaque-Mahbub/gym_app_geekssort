@@ -23,10 +23,18 @@ export default function BookingManager() {
   const loadData = async () => {
     try {
       const currentUser = await base44.auth.me();
-      if (currentUser.role !== 'admin') {
+      
+      // Check UserRole for permissions
+      const roles = await base44.entities.UserRole.filter({ 
+        user_email: currentUser.email,
+        is_active: true 
+      });
+      
+      if (!roles[0]) {
         window.location.href = createPageUrl('Home');
         return;
       }
+      
       setUser(currentUser);
 
       const bookingsData = await base44.entities.Booking.list();
