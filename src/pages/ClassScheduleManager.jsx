@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import GymLoader from '@/components/GymLoader';
+import { usePermissions } from '@/components/PermissionCheck';
 
 export default function ClassScheduleManager() {
   const [user, setUser] = useState(null);
@@ -19,6 +20,7 @@ export default function ClassScheduleManager() {
   const [showForm, setShowForm] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState(null);
   const [selectedDay, setSelectedDay] = useState('All');
+  const { hasPermission } = usePermissions();
   const [formData, setFormData] = useState({
     class_name: '',
     instructor: '',
@@ -41,11 +43,12 @@ export default function ClassScheduleManager() {
 
   const loadData = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      if (currentUser.role !== 'admin') {
-        window.location.href = createPageUrl('Home');
+      if (!hasPermission('ClassScheduleManager')) {
+        window.location.href = createPageUrl('AdminDashboard');
         return;
       }
+      
+      const currentUser = await base44.auth.me();
       setUser(currentUser);
 
       const schedulesData = await base44.entities.ClassSchedule.list();

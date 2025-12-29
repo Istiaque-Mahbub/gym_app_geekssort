@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import GymLoader from '@/components/GymLoader';
 import { toast } from 'sonner';
+import { usePermissions } from '@/components/PermissionCheck';
 
 const AVAILABLE_PAGES = [
   { name: 'Home', label: 'Home' },
@@ -43,6 +44,7 @@ export default function SiteSettingsManager() {
   const [logoHeight, setLogoHeight] = useState(40);
   const [navbarPages, setNavbarPages] = useState([]);
   const [footerPages, setFooterPages] = useState([]);
+  const { hasPermission } = usePermissions();
 
   useEffect(() => {
     loadData();
@@ -50,11 +52,12 @@ export default function SiteSettingsManager() {
 
   const loadData = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      if (currentUser.role !== 'admin') {
-        window.location.href = createPageUrl('Home');
+      if (!hasPermission('SiteSettingsManager')) {
+        window.location.href = createPageUrl('AdminDashboard');
         return;
       }
+      
+      const currentUser = await base44.auth.me();
       setUser(currentUser);
 
       const existingSettings = await base44.entities.SiteSettings.filter({ setting_key: 'main' });

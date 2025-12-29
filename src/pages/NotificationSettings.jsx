@@ -15,6 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { usePermissions } from '@/components/PermissionCheck';
 
 export default function NotificationSettings() {
   const [user, setUser] = useState(null);
@@ -24,6 +25,7 @@ export default function NotificationSettings() {
   const [whatsappNumbers, setWhatsappNumbers] = useState(['+918557841068']);
   const [newEmail, setNewEmail] = useState('');
   const [newWhatsApp, setNewWhatsApp] = useState('');
+  const { hasPermission } = usePermissions();
 
   useEffect(() => {
     loadData();
@@ -31,13 +33,12 @@ export default function NotificationSettings() {
 
   const loadData = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      
-      if (currentUser.role !== 'admin') {
-        window.location.href = createPageUrl('Home');
+      if (!hasPermission('NotificationSettings')) {
+        window.location.href = createPageUrl('AdminDashboard');
         return;
       }
-
+      
+      const currentUser = await base44.auth.me();
       setUser(currentUser);
       
       const data = await base44.entities.NotificationSettings.list();

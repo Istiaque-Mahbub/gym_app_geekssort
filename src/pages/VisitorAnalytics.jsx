@@ -18,12 +18,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import GymLoader from '@/components/GymLoader';
 import * as XLSX from 'xlsx';
+import { usePermissions } from '@/components/PermissionCheck';
 
 export default function VisitorAnalytics() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [visitors, setVisitors] = useState([]);
   const [filter, setFilter] = useState('all');
+  const { hasPermission } = usePermissions();
   const [stats, setStats] = useState({
     total: 0,
     desktop: 0,
@@ -39,18 +41,18 @@ export default function VisitorAnalytics() {
 
   const loadData = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      
-      if (currentUser.role !== 'admin') {
-        window.location.href = createPageUrl('Home');
+      if (!hasPermission('VisitorAnalytics')) {
+        window.location.href = createPageUrl('AdminDashboard');
         return;
       }
-
+      
+      const currentUser = await base44.auth.me();
       setUser(currentUser);
+      
       await loadVisitors();
     } catch (error) {
       console.error('Error loading data:', error);
-      window.location.href = createPageUrl('Home');
+      setLoading(false);
     }
   };
 

@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/select';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { usePermissions } from '@/components/PermissionCheck';
 
 export default function BlogManager() {
   const [user, setUser] = useState(null);
@@ -44,6 +45,7 @@ export default function BlogManager() {
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [uploading, setUploading] = useState(false);
+  const { hasPermission } = usePermissions();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -66,19 +68,19 @@ export default function BlogManager() {
 
   const loadData = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      
-      if (currentUser.role !== 'admin') {
-        window.location.href = createPageUrl('Home');
+      if (!hasPermission('BlogManager')) {
+        window.location.href = createPageUrl('AdminDashboard');
         return;
       }
-
+      
+      const currentUser = await base44.auth.me();
       setUser(currentUser);
+      
       await loadBlogs();
       setLoading(false);
     } catch (error) {
       console.error('Error loading data:', error);
-      window.location.href = createPageUrl('Home');
+      setLoading(false);
     }
   };
 

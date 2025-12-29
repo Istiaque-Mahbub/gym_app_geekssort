@@ -9,12 +9,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import GymLoader from '@/components/GymLoader';
 import { format } from 'date-fns';
+import { usePermissions } from '@/components/PermissionCheck';
 
 export default function BookingManager() {
   const [user, setUser] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState('all');
+  const { hasPermission } = usePermissions();
 
   useEffect(() => {
     loadData();
@@ -22,19 +24,12 @@ export default function BookingManager() {
 
   const loadData = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      
-      // Check UserRole for permissions
-      const roles = await base44.entities.UserRole.filter({ 
-        user_email: currentUser.email,
-        is_active: true 
-      });
-      
-      if (!roles[0]) {
-        window.location.href = createPageUrl('Home');
+      if (!hasPermission('BookingManager')) {
+        window.location.href = createPageUrl('AdminDashboard');
         return;
       }
       
+      const currentUser = await base44.auth.me();
       setUser(currentUser);
 
       const bookingsData = await base44.entities.Booking.list();

@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import GymLoader from '@/components/GymLoader';
+import { usePermissions } from '@/components/PermissionCheck';
 
 export default function ClubManager() {
   const [user, setUser] = useState(null);
@@ -18,6 +19,7 @@ export default function ClubManager() {
   const [showForm, setShowForm] = useState(false);
   const [editingClub, setEditingClub] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const { hasPermission } = usePermissions();
   const [formData, setFormData] = useState({
     name: '',
     location: '',
@@ -42,19 +44,12 @@ export default function ClubManager() {
 
   const loadData = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      
-      // Check UserRole for permissions
-      const roles = await base44.entities.UserRole.filter({ 
-        user_email: currentUser.email,
-        is_active: true 
-      });
-      
-      if (!roles[0]) {
-        window.location.href = createPageUrl('Home');
+      if (!hasPermission('ClubManager')) {
+        window.location.href = createPageUrl('AdminDashboard');
         return;
       }
       
+      const currentUser = await base44.auth.me();
       setUser(currentUser);
 
       const clubsData = await base44.entities.Club.list();

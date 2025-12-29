@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import GymLoader from '@/components/GymLoader';
+import { usePermissions } from '@/components/PermissionCheck';
 
 export default function ClassManager() {
   const [user, setUser] = useState(null);
@@ -19,6 +20,7 @@ export default function ClassManager() {
   const [showForm, setShowForm] = useState(false);
   const [editingClass, setEditingClass] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const { hasPermission } = usePermissions();
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -41,19 +43,12 @@ export default function ClassManager() {
 
   const loadData = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      
-      // Check UserRole for permissions
-      const roles = await base44.entities.UserRole.filter({ 
-        user_email: currentUser.email,
-        is_active: true 
-      });
-      
-      if (!roles[0]) {
-        window.location.href = createPageUrl('Home');
+      if (!hasPermission('ClassManager')) {
+        window.location.href = createPageUrl('AdminDashboard');
         return;
       }
       
+      const currentUser = await base44.auth.me();
       setUser(currentUser);
 
       const classesData = await base44.entities.Class.list();
