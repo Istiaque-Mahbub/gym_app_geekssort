@@ -54,28 +54,9 @@ export default function AdminDashboard() {
       
       setUser(currentUser);
       
-      // Check if user has admin role in UserRole entity
-      const roles = await base44.entities.UserRole.filter({ 
-        user_email: currentUser.email,
-        is_active: true 
-      });
+      // Wait for permissions to load
+      await new Promise(resolve => setTimeout(resolve, 100));
       
-      if (!roles[0]) {
-        // Check if ANY super admin exists
-        const allRoles = await base44.entities.UserRole.list();
-        const hasSuperAdmin = allRoles.some(r => r.role === 'super_admin');
-        
-        if (!hasSuperAdmin) {
-          // No super admin exists, show initialization
-          setLoading(false);
-          return;
-        }
-        
-        // Super admin exists but current user has no role
-        window.location.href = createPageUrl('Home');
-        return;
-      }
-
       const inquiries = await base44.entities.Inquiry.list();
       const pages = await base44.entities.PageContent.list();
       const banners = await base44.entities.SiteBanner.list();
@@ -90,7 +71,7 @@ export default function AdminDashboard() {
       setLoading(false);
     } catch (error) {
       console.error('Error loading admin data:', error);
-      base44.auth.redirectToLogin(window.location.pathname);
+      setLoading(false);
     }
   };
 
@@ -119,36 +100,10 @@ export default function AdminDashboard() {
     );
   }
 
-  // Show initialization if no role
+  // Check if user has no role - redirect to home
   if (!userRole && user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center p-6">
-        <Card className="max-w-md w-full">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="w-6 h-6 text-purple-600" />
-              Initialize Super Admin
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-              <p className="text-sm text-gray-700">
-                <strong>Your Email:</strong> {user.email}
-              </p>
-              <p className="text-sm text-gray-700 mt-2">
-                No super admin exists. Click below to become the first super admin.
-              </p>
-            </div>
-            <Button
-              onClick={initializeSuperAdmin}
-              className="w-full bg-purple-600 hover:bg-purple-700"
-            >
-              Make Me Super Admin
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    window.location.href = createPageUrl('Home');
+    return null;
   }
 
   const statCards = [

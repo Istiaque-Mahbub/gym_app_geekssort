@@ -12,7 +12,18 @@ export function usePermissions() {
 
   const loadPermissions = async () => {
     try {
+      const isAuth = await base44.auth.isAuthenticated();
+      if (!isAuth) {
+        setLoading(false);
+        return;
+      }
+
       const user = await base44.auth.me();
+      if (!user || !user.email) {
+        setLoading(false);
+        return;
+      }
+
       const roles = await base44.entities.UserRole.filter({ 
         user_email: user.email,
         is_active: true 
