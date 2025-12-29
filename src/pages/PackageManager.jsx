@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import GymLoader from '@/components/GymLoader';
+import { usePermissions } from '@/components/PermissionCheck';
 
 export default function PackageManager() {
   const [user, setUser] = useState(null);
@@ -28,6 +29,7 @@ export default function PackageManager() {
     is_active: true,
     order: 0
   });
+  const { hasPermission } = usePermissions();
 
   useEffect(() => {
     loadData();
@@ -35,11 +37,12 @@ export default function PackageManager() {
 
   const loadData = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      if (currentUser.role !== 'admin') {
-        window.location.href = createPageUrl('Home');
+      if (!hasPermission('PackageManager')) {
+        window.location.href = createPageUrl('AdminDashboard');
         return;
       }
+
+      const currentUser = await base44.auth.me();
       setUser(currentUser);
 
       const packagesData = await base44.entities.Package.list();
@@ -47,7 +50,7 @@ export default function PackageManager() {
       setLoading(false);
     } catch (error) {
       console.error('Error loading data:', error);
-      window.location.href = createPageUrl('Home');
+      setLoading(false);
     }
   };
 

@@ -17,6 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import { usePermissions } from '@/components/PermissionCheck';
 
 export default function InquiryManager() {
   const [user, setUser] = useState(null);
@@ -24,6 +25,7 @@ export default function InquiryManager() {
   const [inquiries, setInquiries] = useState([]);
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const { hasPermission } = usePermissions();
 
   useEffect(() => {
     loadData();
@@ -31,20 +33,20 @@ export default function InquiryManager() {
 
   const loadData = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      
-      if (currentUser.role !== 'admin') {
-        window.location.href = createPageUrl('Home');
+      if (!hasPermission('InquiryManager')) {
+        window.location.href = createPageUrl('AdminDashboard');
         return;
       }
 
+      const currentUser = await base44.auth.me();
       setUser(currentUser);
+      
       const data = await base44.entities.Inquiry.list('-created_date');
       setInquiries(data);
       setLoading(false);
     } catch (error) {
       console.error('Error loading inquiries:', error);
-      window.location.href = createPageUrl('Home');
+      setLoading(false);
     }
   };
 

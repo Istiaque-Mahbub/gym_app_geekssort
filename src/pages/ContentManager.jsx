@@ -22,6 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { usePermissions } from '@/components/PermissionCheck';
 
 export default function ContentManager() {
   const [user, setUser] = useState(null);
@@ -38,6 +39,7 @@ export default function ContentManager() {
     meta_description: '',
     is_active: true
   });
+  const { hasPermission } = usePermissions();
 
   useEffect(() => {
     loadData();
@@ -45,20 +47,20 @@ export default function ContentManager() {
 
   const loadData = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      
-      if (currentUser.role !== 'admin') {
-        window.location.href = createPageUrl('Home');
+      if (!hasPermission('ContentManager')) {
+        window.location.href = createPageUrl('AdminDashboard');
         return;
       }
 
+      const currentUser = await base44.auth.me();
       setUser(currentUser);
+      
       const data = await base44.entities.PageContent.list('-created_date');
       setPages(data);
       setLoading(false);
     } catch (error) {
       console.error('Error loading pages:', error);
-      window.location.href = createPageUrl('Home');
+      setLoading(false);
     }
   };
 

@@ -22,6 +22,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import { usePermissions } from '@/components/PermissionCheck';
 
 export default function BannerManager() {
   const [user, setUser] = useState(null);
@@ -48,6 +49,7 @@ export default function BannerManager() {
     tablet: false,
     mobile: false
   });
+  const { hasPermission } = usePermissions();
 
   useEffect(() => {
     loadData();
@@ -55,20 +57,20 @@ export default function BannerManager() {
 
   const loadData = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      
-      if (currentUser.role !== 'admin') {
-        window.location.href = createPageUrl('Home');
+      if (!hasPermission('BannerManager')) {
+        window.location.href = createPageUrl('AdminDashboard');
         return;
       }
 
+      const currentUser = await base44.auth.me();
       setUser(currentUser);
+      
       const data = await base44.entities.SiteBanner.list('position');
       setBanners(data);
       setLoading(false);
     } catch (error) {
       console.error('Error loading banners:', error);
-      window.location.href = createPageUrl('Home');
+      setLoading(false);
     }
   };
 
