@@ -16,19 +16,20 @@ export default function BookingManager() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState('all');
-  const { hasPermission } = usePermissions();
+  const { hasPermission, loading: permissionsLoading } = usePermissions();
 
   useEffect(() => {
     loadData();
   }, []);
 
+  useEffect(() => {
+    if (!permissionsLoading && !hasPermission('BookingManager')) {
+      window.location.href = createPageUrl('AdminDashboard');
+    }
+  }, [permissionsLoading, hasPermission]);
+
   const loadData = async () => {
     try {
-      if (!hasPermission('BookingManager')) {
-        window.location.href = createPageUrl('AdminDashboard');
-        return;
-      }
-      
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
@@ -39,7 +40,7 @@ export default function BookingManager() {
       setLoading(false);
     } catch (error) {
       console.error('Error loading data:', error);
-      window.location.href = createPageUrl('Home');
+      setLoading(false);
     }
   };
 
@@ -64,7 +65,7 @@ export default function BookingManager() {
     completed: bookings.filter(b => b.status === 'completed').length
   };
 
-  if (loading) {
+  if (loading || permissionsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <GymLoader message="Loading bookings..." />

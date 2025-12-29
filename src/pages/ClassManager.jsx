@@ -20,7 +20,7 @@ export default function ClassManager() {
   const [showForm, setShowForm] = useState(false);
   const [editingClass, setEditingClass] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const { hasPermission } = usePermissions();
+  const { hasPermission, loading: permissionsLoading } = usePermissions();
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -43,11 +43,6 @@ export default function ClassManager() {
 
   const loadData = async () => {
     try {
-      if (!hasPermission('ClassManager')) {
-        window.location.href = createPageUrl('AdminDashboard');
-        return;
-      }
-      
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
@@ -56,9 +51,15 @@ export default function ClassManager() {
       setLoading(false);
     } catch (error) {
       console.error('Error loading data:', error);
-      window.location.href = createPageUrl('Home');
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!permissionsLoading && !hasPermission('ClassManager')) {
+      window.location.href = createPageUrl('AdminDashboard');
+    }
+  }, [permissionsLoading, hasPermission]);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -184,7 +185,7 @@ export default function ClassManager() {
     await loadData();
   };
 
-  if (loading) {
+  if (loading || permissionsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <GymLoader message="Loading classes..." />

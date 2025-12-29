@@ -25,19 +25,20 @@ export default function InquiryManager() {
   const [inquiries, setInquiries] = useState([]);
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
-  const { hasPermission } = usePermissions();
+  const { hasPermission, loading: permissionsLoading } = usePermissions();
 
   useEffect(() => {
     loadData();
   }, []);
 
+  useEffect(() => {
+    if (!permissionsLoading && !hasPermission('InquiryManager')) {
+      window.location.href = createPageUrl('AdminDashboard');
+    }
+  }, [permissionsLoading, hasPermission]);
+
   const loadData = async () => {
     try {
-      if (!hasPermission('InquiryManager')) {
-        window.location.href = createPageUrl('AdminDashboard');
-        return;
-      }
-
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       
@@ -64,7 +65,7 @@ export default function InquiryManager() {
     return matchesFilter && matchesSearch;
   });
 
-  if (loading) {
+  if (loading || permissionsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

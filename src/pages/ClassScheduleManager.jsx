@@ -20,7 +20,7 @@ export default function ClassScheduleManager() {
   const [showForm, setShowForm] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState(null);
   const [selectedDay, setSelectedDay] = useState('All');
-  const { hasPermission } = usePermissions();
+  const { hasPermission, loading: permissionsLoading } = usePermissions();
   const [formData, setFormData] = useState({
     class_name: '',
     instructor: '',
@@ -43,11 +43,6 @@ export default function ClassScheduleManager() {
 
   const loadData = async () => {
     try {
-      if (!hasPermission('ClassScheduleManager')) {
-        window.location.href = createPageUrl('AdminDashboard');
-        return;
-      }
-      
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
@@ -56,9 +51,15 @@ export default function ClassScheduleManager() {
       setLoading(false);
     } catch (error) {
       console.error('Error loading data:', error);
-      window.location.href = createPageUrl('Home');
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!permissionsLoading && !hasPermission('ClassScheduleManager')) {
+      window.location.href = createPageUrl('AdminDashboard');
+    }
+  }, [permissionsLoading, hasPermission]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -153,7 +154,7 @@ export default function ClassScheduleManager() {
     return acc;
   }, {});
 
-  if (loading) {
+  if (loading || permissionsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <GymLoader message="Loading schedules..." />

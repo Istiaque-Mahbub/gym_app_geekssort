@@ -29,19 +29,20 @@ export default function PackageManager() {
     is_active: true,
     order: 0
   });
-  const { hasPermission } = usePermissions();
+  const { hasPermission, loading: permissionsLoading } = usePermissions();
 
   useEffect(() => {
     loadData();
   }, []);
 
+  useEffect(() => {
+    if (!permissionsLoading && !hasPermission('PackageManager')) {
+      window.location.href = createPageUrl('AdminDashboard');
+    }
+  }, [permissionsLoading, hasPermission]);
+
   const loadData = async () => {
     try {
-      if (!hasPermission('PackageManager')) {
-        window.location.href = createPageUrl('AdminDashboard');
-        return;
-      }
-
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
@@ -173,7 +174,7 @@ export default function PackageManager() {
     await loadData();
   };
 
-  if (loading) {
+  if (loading || permissionsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <GymLoader message="Loading packages..." />

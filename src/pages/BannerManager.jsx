@@ -49,19 +49,20 @@ export default function BannerManager() {
     tablet: false,
     mobile: false
   });
-  const { hasPermission } = usePermissions();
+  const { hasPermission, loading: permissionsLoading } = usePermissions();
 
   useEffect(() => {
     loadData();
   }, []);
 
+  useEffect(() => {
+    if (!permissionsLoading && !hasPermission('BannerManager')) {
+      window.location.href = createPageUrl('AdminDashboard');
+    }
+  }, [permissionsLoading, hasPermission]);
+
   const loadData = async () => {
     try {
-      if (!hasPermission('BannerManager')) {
-        window.location.href = createPageUrl('AdminDashboard');
-        return;
-      }
-
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       
@@ -149,7 +150,7 @@ export default function BannerManager() {
     loadData();
   };
 
-  if (loading) {
+  if (loading || permissionsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

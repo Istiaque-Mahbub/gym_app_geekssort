@@ -25,19 +25,20 @@ export default function NotificationSettings() {
   const [whatsappNumbers, setWhatsappNumbers] = useState(['+918557841068']);
   const [newEmail, setNewEmail] = useState('');
   const [newWhatsApp, setNewWhatsApp] = useState('');
-  const { hasPermission } = usePermissions();
+  const { hasPermission, loading: permissionsLoading } = usePermissions();
 
   useEffect(() => {
     loadData();
   }, []);
 
+  useEffect(() => {
+    if (!permissionsLoading && !hasPermission('NotificationSettings')) {
+      window.location.href = createPageUrl('AdminDashboard');
+    }
+  }, [permissionsLoading, hasPermission]);
+
   const loadData = async () => {
     try {
-      if (!hasPermission('NotificationSettings')) {
-        window.location.href = createPageUrl('AdminDashboard');
-        return;
-      }
-      
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       
@@ -94,7 +95,7 @@ export default function NotificationSettings() {
     alert('Settings saved successfully!');
   };
 
-  if (loading) {
+  if (loading || permissionsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

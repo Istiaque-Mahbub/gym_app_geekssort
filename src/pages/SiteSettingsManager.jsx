@@ -44,19 +44,20 @@ export default function SiteSettingsManager() {
   const [logoHeight, setLogoHeight] = useState(40);
   const [navbarPages, setNavbarPages] = useState([]);
   const [footerPages, setFooterPages] = useState([]);
-  const { hasPermission } = usePermissions();
+  const { hasPermission, loading: permissionsLoading } = usePermissions();
 
   useEffect(() => {
     loadData();
   }, []);
 
+  useEffect(() => {
+    if (!permissionsLoading && !hasPermission('SiteSettingsManager')) {
+      window.location.href = createPageUrl('AdminDashboard');
+    }
+  }, [permissionsLoading, hasPermission]);
+
   const loadData = async () => {
     try {
-      if (!hasPermission('SiteSettingsManager')) {
-        window.location.href = createPageUrl('AdminDashboard');
-        return;
-      }
-      
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
@@ -171,7 +172,7 @@ export default function SiteSettingsManager() {
     setList(newList);
   };
 
-  if (loading) {
+  if (loading || permissionsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <GymLoader message="Loading settings..." />

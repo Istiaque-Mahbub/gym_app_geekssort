@@ -19,7 +19,7 @@ export default function ClubManager() {
   const [showForm, setShowForm] = useState(false);
   const [editingClub, setEditingClub] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const { hasPermission } = usePermissions();
+  const { hasPermission, loading: permissionsLoading } = usePermissions();
   const [formData, setFormData] = useState({
     name: '',
     location: '',
@@ -44,11 +44,6 @@ export default function ClubManager() {
 
   const loadData = async () => {
     try {
-      if (!hasPermission('ClubManager')) {
-        window.location.href = createPageUrl('AdminDashboard');
-        return;
-      }
-      
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
@@ -57,9 +52,15 @@ export default function ClubManager() {
       setLoading(false);
     } catch (error) {
       console.error('Error loading data:', error);
-      window.location.href = createPageUrl('Home');
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!permissionsLoading && !hasPermission('ClubManager')) {
+      window.location.href = createPageUrl('AdminDashboard');
+    }
+  }, [permissionsLoading, hasPermission]);
 
   const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
@@ -196,7 +197,7 @@ export default function ClubManager() {
     await loadData();
   };
 
-  if (loading) {
+  if (loading || permissionsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <GymLoader message="Loading clubs..." />

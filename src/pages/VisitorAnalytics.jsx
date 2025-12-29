@@ -25,7 +25,7 @@ export default function VisitorAnalytics() {
   const [loading, setLoading] = useState(true);
   const [visitors, setVisitors] = useState([]);
   const [filter, setFilter] = useState('all');
-  const { hasPermission } = usePermissions();
+  const { hasPermission, loading: permissionsLoading } = usePermissions();
   const [stats, setStats] = useState({
     total: 0,
     desktop: 0,
@@ -41,11 +41,6 @@ export default function VisitorAnalytics() {
 
   const loadData = async () => {
     try {
-      if (!hasPermission('VisitorAnalytics')) {
-        window.location.href = createPageUrl('AdminDashboard');
-        return;
-      }
-      
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       
@@ -55,6 +50,12 @@ export default function VisitorAnalytics() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!permissionsLoading && !hasPermission('VisitorAnalytics')) {
+      window.location.href = createPageUrl('AdminDashboard');
+    }
+  }, [permissionsLoading, hasPermission]);
 
   const loadVisitors = async () => {
     try {
@@ -155,7 +156,7 @@ export default function VisitorAnalytics() {
     a.click();
   };
 
-  if (loading) {
+  if (loading || permissionsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <GymLoader message="Loading analytics..." />

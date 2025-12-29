@@ -39,19 +39,20 @@ export default function ContentManager() {
     meta_description: '',
     is_active: true
   });
-  const { hasPermission } = usePermissions();
+  const { hasPermission, loading: permissionsLoading } = usePermissions();
 
   useEffect(() => {
     loadData();
   }, []);
 
+  useEffect(() => {
+    if (!permissionsLoading && !hasPermission('ContentManager')) {
+      window.location.href = createPageUrl('AdminDashboard');
+    }
+  }, [permissionsLoading, hasPermission]);
+
   const loadData = async () => {
     try {
-      if (!hasPermission('ContentManager')) {
-        window.location.href = createPageUrl('AdminDashboard');
-        return;
-      }
-
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       

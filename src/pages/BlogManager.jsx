@@ -45,7 +45,7 @@ export default function BlogManager() {
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [uploading, setUploading] = useState(false);
-  const { hasPermission } = usePermissions();
+  const { hasPermission, loading: permissionsLoading } = usePermissions();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -68,11 +68,6 @@ export default function BlogManager() {
 
   const loadData = async () => {
     try {
-      if (!hasPermission('BlogManager')) {
-        window.location.href = createPageUrl('AdminDashboard');
-        return;
-      }
-      
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       
@@ -83,6 +78,12 @@ export default function BlogManager() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!permissionsLoading && !hasPermission('BlogManager')) {
+      window.location.href = createPageUrl('AdminDashboard');
+    }
+  }, [permissionsLoading, hasPermission]);
 
   const loadBlogs = async () => {
     const allBlogs = await base44.entities.Blog.list('-created_date');
@@ -188,7 +189,7 @@ export default function BlogManager() {
     return categoryMatch && statusMatch;
   });
 
-  if (loading) {
+  if (loading || permissionsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
