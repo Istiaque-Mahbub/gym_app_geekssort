@@ -49,35 +49,24 @@ export default function PromoTopBar() {
     <motion.div
       initial={{ height: 0, opacity: 0 }}
       animate={{ height: 'auto', opacity: 1 }}
-      className="w-full bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400"
+      className="w-full bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 relative z-50"
     >
       <div className="w-full">
-        {/* Desktop/Tablet Image */}
-        <img
-          src={banner.image_url}
-          alt="Promo"
-          className={`w-full object-cover hidden md:block ${banner.link_url ? 'cursor-pointer' : ''}`}
-          style={{ maxHeight: '120px' }}
-          onClick={handleClick}
-        />
-        {/* Tablet Image */}
-        {banner.tablet_image_url && (
+        <picture>
+          {banner.mobile_image_url && (
+            <source media="(max-width: 640px)" srcSet={banner.mobile_image_url} />
+          )}
+          {banner.tablet_image_url && (
+            <source media="(max-width: 1024px)" srcSet={banner.tablet_image_url} />
+          )}
           <img
-            src={banner.tablet_image_url}
+            src={banner.image_url}
             alt="Promo"
-            className={`w-full object-cover hidden sm:block md:hidden ${banner.link_url ? 'cursor-pointer' : ''}`}
-            style={{ maxHeight: '100px' }}
+            className={`w-full h-auto object-cover ${banner.link_url ? 'cursor-pointer' : ''}`}
+            style={{ maxHeight: '120px' }}
             onClick={handleClick}
           />
-        )}
-        {/* Mobile Image */}
-        <img
-          src={banner.mobile_image_url || banner.image_url}
-          alt="Promo"
-          className={`w-full object-cover block ${banner.tablet_image_url ? 'sm:hidden' : 'md:hidden'} ${banner.link_url ? 'cursor-pointer' : ''}`}
-          style={{ maxHeight: '80px' }}
-          onClick={handleClick}
-        />
+        </picture>
       </div>
     </motion.div>
   );

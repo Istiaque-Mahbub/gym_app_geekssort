@@ -80,29 +80,20 @@ export default function PromoPopup() {
           >
             <X className="w-6 h-6" />
           </button>
-          {/* Desktop Image */}
-          <img
-            src={banner.image_url}
-            alt="Promo"
-            className={`w-full rounded-lg hidden md:block ${banner.link_url ? 'cursor-pointer' : ''}`}
-            onClick={handleClick}
-          />
-          {/* Tablet Image */}
-          {banner.tablet_image_url && (
+          <picture>
+            {banner.mobile_image_url && (
+              <source media="(max-width: 640px)" srcSet={banner.mobile_image_url} />
+            )}
+            {banner.tablet_image_url && (
+              <source media="(max-width: 1024px)" srcSet={banner.tablet_image_url} />
+            )}
             <img
-              src={banner.tablet_image_url}
+              src={banner.image_url}
               alt="Promo"
-              className={`w-full rounded-lg hidden sm:block md:hidden ${banner.link_url ? 'cursor-pointer' : ''}`}
+              className={`w-full h-auto rounded-lg ${banner.link_url ? 'cursor-pointer' : ''}`}
               onClick={handleClick}
             />
-          )}
-          {/* Mobile Image */}
-          <img
-            src={banner.mobile_image_url || banner.image_url}
-            alt="Promo"
-            className={`w-full rounded-lg block ${banner.tablet_image_url ? 'sm:hidden' : 'md:hidden'} ${banner.link_url ? 'cursor-pointer' : ''}`}
-            onClick={handleClick}
-          />
+          </picture>
         </motion.div>
       </DialogContent>
     </Dialog>
