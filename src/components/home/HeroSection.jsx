@@ -89,10 +89,22 @@ export default function HeroSection() {
               playsInline
             />
           ) : (
-            <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${getMediaUrl(slides[currentSlide])})` }}
-            />
+            <picture>
+              {slides[currentSlide].mobile_url && (
+                <source media="(max-width: 640px)" srcSet={slides[currentSlide].mobile_url} />
+              )}
+              {slides[currentSlide].tablet_url && (
+                <source media="(min-width: 641px) and (max-width: 1024px)" srcSet={slides[currentSlide].tablet_url} />
+              )}
+              {slides[currentSlide].desktop_url && (
+                <source media="(min-width: 1920px)" srcSet={slides[currentSlide].desktop_url} />
+              )}
+              <img
+                src={slides[currentSlide].desktop_url || slides[currentSlide].laptop_url || slides[currentSlide].tablet_url || slides[currentSlide].mobile_url}
+                alt={slides[currentSlide].title}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </picture>
           )}
           <div className="absolute inset-0 bg-black/40" />
         </motion.div>
