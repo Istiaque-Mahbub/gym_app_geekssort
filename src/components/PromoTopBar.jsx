@@ -43,42 +43,48 @@ export default function PromoTopBar() {
     }
   };
 
-  if (!banner) return null;
-
-  const handleDismiss = () => {
+  const handleDismiss = (e) => {
+    e.stopPropagation();
     setBanner(null);
   };
 
+  if (!banner) return null;
+
   return (
-    <motion.div
-      initial={{ height: 0, opacity: 0 }}
-      animate={{ height: 'auto', opacity: 1 }}
-      exit={{ height: 0, opacity: 0 }}
-      className="w-full bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 relative"
-    >
-      <div className="w-full relative">
-        <picture>
-          {banner.mobile_image_url && (
-            <source media="(max-width: 640px)" srcSet={banner.mobile_image_url} />
-          )}
-          {banner.tablet_image_url && (
-            <source media="(max-width: 1024px)" srcSet={banner.tablet_image_url} />
-          )}
-          <img
-            src={banner.image_url}
-            alt="Promo"
-            className={`w-full h-auto object-cover ${banner.link_url ? 'cursor-pointer' : ''}`}
-            style={{ maxHeight: '120px' }}
-            onClick={handleClick}
-          />
-        </picture>
-        <button
-          onClick={handleDismiss}
-          className="absolute top-2 right-2 bg-black/70 hover:bg-black text-white rounded-full p-1.5 transition-all z-10"
+    <AnimatePresence>
+      {banner && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          className="w-full bg-black relative z-50 shadow-lg"
         >
-          <X className="w-5 h-5" />
-        </button>
-      </div>
-    </motion.div>
+          <div className="w-full relative">
+            <picture>
+              {banner.mobile_image_url && (
+                <source media="(max-width: 640px)" srcSet={banner.mobile_image_url} />
+              )}
+              {banner.tablet_image_url && (
+                <source media="(max-width: 1024px)" srcSet={banner.tablet_image_url} />
+              )}
+              <img
+                src={banner.image_url}
+                alt="Promo"
+                className={`w-full h-auto object-cover ${banner.link_url ? 'cursor-pointer' : ''}`}
+                style={{ maxHeight: '120px' }}
+                onClick={handleClick}
+              />
+            </picture>
+            <button
+              onClick={handleDismiss}
+              className="absolute top-2 right-2 bg-black hover:bg-red-600 text-white rounded-full p-1.5 transition-all z-20 shadow-lg"
+              aria-label="Close banner"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

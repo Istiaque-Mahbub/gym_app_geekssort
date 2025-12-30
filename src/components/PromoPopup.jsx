@@ -60,20 +60,21 @@ export default function PromoPopup() {
 
   return (
     <Dialog open={showPopup} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl p-0 bg-transparent border-none overflow-hidden">
+      <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 bg-transparent border-none overflow-hidden">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="relative"
+          className="relative w-full h-full flex items-center justify-center"
         >
           <button
             onClick={handleClose}
-            className="absolute top-2 right-2 bg-black/80 hover:bg-black text-white rounded-full p-2 z-10 transition-all"
+            className="absolute top-2 right-2 bg-black hover:bg-red-600 text-white rounded-full p-2 z-20 transition-all shadow-xl"
+            aria-label="Close popup"
           >
             <X className="w-6 h-6" />
           </button>
-          <picture>
+          <picture className="w-full h-full flex items-center justify-center">
             {banner.mobile_image_url && (
               <source media="(max-width: 640px)" srcSet={banner.mobile_image_url} />
             )}
@@ -83,7 +84,7 @@ export default function PromoPopup() {
             <img
               src={banner.image_url}
               alt="Promo"
-              className={`w-full h-auto rounded-lg ${banner.link_url ? 'cursor-pointer' : ''}`}
+              className={`max-w-full max-h-[85vh] w-auto h-auto object-contain rounded-lg ${banner.link_url ? 'cursor-pointer' : ''}`}
               onClick={handleClick}
             />
           </picture>

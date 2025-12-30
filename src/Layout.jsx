@@ -66,8 +66,12 @@ export default function Layout({ children, currentPageName }) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <PromoTopBar />
-      <Header currentPageName={currentPageName} />
+      <div className="sticky top-0 z-50">
+        <PromoTopBar />
+      </div>
+      <div className="sticky top-0 z-40 bg-white">
+        <Header currentPageName={currentPageName} />
+      </div>
       <main className="flex-grow">
         {children}
       </main>
