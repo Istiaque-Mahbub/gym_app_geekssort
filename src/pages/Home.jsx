@@ -11,7 +11,6 @@ import RoleRedirect from '@/components/RoleRedirect';
 export default function Home() {
   return (
     <div className="min-h-screen bg-black">
-      <RoleRedirect />
       <main>
         <HeroSection />
         <section id="clubs">
