@@ -26,6 +26,7 @@ import PackageManager from './pages/PackageManager';
 import Packages from './pages/Packages';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import ProgressTracker from './pages/ProgressTracker';
+import PromoBannerManager from './pages/PromoBannerManager';
 import SiteSettingsManager from './pages/SiteSettingsManager';
 import SuperAdminPanel from './pages/SuperAdminPanel';
 import TermsOfService from './pages/TermsOfService';
@@ -34,7 +35,6 @@ import UserDashboard from './pages/UserDashboard';
 import UserManager from './pages/UserManager';
 import VisitorAnalytics from './pages/VisitorAnalytics';
 import WorkoutPlanner from './pages/WorkoutPlanner';
-import PromoBannerManager from './pages/PromoBannerManager';
 import __Layout from './Layout.jsx';
 
 
@@ -67,6 +67,7 @@ export const PAGES = {
     "Packages": Packages,
     "PrivacyPolicy": PrivacyPolicy,
     "ProgressTracker": ProgressTracker,
+    "PromoBannerManager": PromoBannerManager,
     "SiteSettingsManager": SiteSettingsManager,
     "SuperAdminPanel": SuperAdminPanel,
     "TermsOfService": TermsOfService,
@@ -75,7 +76,6 @@ export const PAGES = {
     "UserManager": UserManager,
     "VisitorAnalytics": VisitorAnalytics,
     "WorkoutPlanner": WorkoutPlanner,
-    "PromoBannerManager": PromoBannerManager,
 }
 
 export const pagesConfig = {

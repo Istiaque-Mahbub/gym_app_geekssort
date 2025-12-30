@@ -81,7 +81,10 @@ export default function PromoPopup() {
                 <source media="(max-width: 640px)" srcSet={banner.mobile_image_url} />
               )}
               {banner.tablet_image_url && (
-                <source media="(max-width: 1024px)" srcSet={banner.tablet_image_url} />
+                <source media="(min-width: 641px) and (max-width: 1024px)" srcSet={banner.tablet_image_url} />
+              )}
+              {banner.desktop_image_url && (
+                <source media="(min-width: 1920px)" srcSet={banner.desktop_image_url} />
               )}
               <img
                 src={banner.image_url}

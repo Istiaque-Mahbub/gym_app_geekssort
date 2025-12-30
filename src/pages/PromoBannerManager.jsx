@@ -23,8 +23,9 @@ export default function PromoBannerManager() {
   const [formData, setFormData] = useState({
     banner_type: 'top_bar',
     image_url: '',
-    mobile_image_url: '',
+    desktop_image_url: '',
     tablet_image_url: '',
+    mobile_image_url: '',
     link_url: '',
     is_active: true,
     start_date: '',
@@ -110,8 +111,9 @@ export default function PromoBannerManager() {
     setFormData({
       banner_type: 'top_bar',
       image_url: '',
-      mobile_image_url: '',
+      desktop_image_url: '',
       tablet_image_url: '',
+      mobile_image_url: '',
       link_url: '',
       is_active: true,
       start_date: '',
@@ -266,7 +268,7 @@ export default function PromoBannerManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-2">Desktop Image * {uploading && '(Uploading...)'}</label>
+              <label className="block text-sm font-bold mb-2">Default Image * {uploading && '(Uploading...)'}</label>
               <Input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'image_url')} disabled={uploading} />
               {formData.image_url && (
                 <img src={formData.image_url} alt="Preview" className="mt-2 w-full h-32 object-cover rounded-lg" />
@@ -274,18 +276,26 @@ export default function PromoBannerManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-2">Mobile Image {uploading && '(Uploading...)'}</label>
-              <Input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'mobile_image_url')} disabled={uploading} />
-              {formData.mobile_image_url && (
-                <img src={formData.mobile_image_url} alt="Mobile Preview" className="mt-2 w-40 h-24 object-cover rounded-lg" />
+              <label className="block text-sm font-bold mb-2">Desktop Image (1920px+) {uploading && '(Uploading...)'}</label>
+              <Input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'desktop_image_url')} disabled={uploading} />
+              {formData.desktop_image_url && (
+                <img src={formData.desktop_image_url} alt="Desktop Preview" className="mt-2 w-full h-32 object-cover rounded-lg" />
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-2">Tablet Image {uploading && '(Uploading...)'}</label>
+              <label className="block text-sm font-bold mb-2">Tablet Image (768px-1024px) {uploading && '(Uploading...)'}</label>
               <Input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'tablet_image_url')} disabled={uploading} />
               {formData.tablet_image_url && (
                 <img src={formData.tablet_image_url} alt="Tablet Preview" className="mt-2 w-48 h-28 object-cover rounded-lg" />
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold mb-2">Mobile Image (640px) {uploading && '(Uploading...)'}</label>
+              <Input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'mobile_image_url')} disabled={uploading} />
+              {formData.mobile_image_url && (
+                <img src={formData.mobile_image_url} alt="Mobile Preview" className="mt-2 w-40 h-24 object-cover rounded-lg" />
               )}
             </div>
 
