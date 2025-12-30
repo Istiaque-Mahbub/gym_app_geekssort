@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export default function PromoTopBar() {
   const [banner, setBanner] = useState(null);
-  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     loadBanner();
@@ -13,13 +12,6 @@ export default function PromoTopBar() {
 
   const loadBanner = async () => {
     try {
-      // Check if user dismissed it in this session
-      const dismissedSession = sessionStorage.getItem('promo_topbar_dismissed');
-      if (dismissedSession) {
-        setDismissed(true);
-        return;
-      }
-
       const banners = await base44.entities.PromoBanner.filter({ 
         banner_type: 'top_bar',
         is_active: true 
@@ -51,7 +43,7 @@ export default function PromoTopBar() {
     }
   };
 
-  if (!banner || dismissed) return null;
+  if (!banner) return null;
 
   return (
     <motion.div
