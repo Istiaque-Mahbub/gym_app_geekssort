@@ -22,6 +22,7 @@ const AVAILABLE_PERMISSIONS = [
   { id: 'ClassScheduleManager', label: 'Schedule Manager' },
   { id: 'ContentManager', label: 'Content Manager' },
   { id: 'BannerManager', label: 'Banner Manager' },
+  { id: 'PromoBannerManager', label: 'Promo Banners' },
   { id: 'SiteSettingsManager', label: 'Site Settings' },
   { id: 'VisitorAnalytics', label: 'Visitor Analytics' },
   { id: 'NotificationSettings', label: 'Notification Settings' }
