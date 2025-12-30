@@ -63,17 +63,6 @@ export default function PromoPopup() {
     }
   };
 
-  // Determine which image to show based on screen size
-  const getImageUrl = () => {
-    if (window.innerWidth < 768 && banner?.mobile_image_url) {
-      return banner.mobile_image_url;
-    }
-    if (window.innerWidth >= 768 && window.innerWidth < 1024 && banner?.tablet_image_url) {
-      return banner.tablet_image_url;
-    }
-    return banner?.image_url;
-  };
-
   if (!banner) return null;
 
   return (
@@ -91,10 +80,27 @@ export default function PromoPopup() {
           >
             <X className="w-6 h-6" />
           </button>
+          {/* Desktop Image */}
           <img
-            src={getImageUrl()}
+            src={banner.image_url}
             alt="Promo"
-            className={`w-full rounded-lg ${banner.link_url ? 'cursor-pointer' : ''}`}
+            className={`w-full rounded-lg hidden md:block ${banner.link_url ? 'cursor-pointer' : ''}`}
+            onClick={handleClick}
+          />
+          {/* Tablet Image */}
+          {banner.tablet_image_url && (
+            <img
+              src={banner.tablet_image_url}
+              alt="Promo"
+              className={`w-full rounded-lg hidden sm:block md:hidden ${banner.link_url ? 'cursor-pointer' : ''}`}
+              onClick={handleClick}
+            />
+          )}
+          {/* Mobile Image */}
+          <img
+            src={banner.mobile_image_url || banner.image_url}
+            alt="Promo"
+            className={`w-full rounded-lg block ${banner.tablet_image_url ? 'sm:hidden' : 'md:hidden'} ${banner.link_url ? 'cursor-pointer' : ''}`}
             onClick={handleClick}
           />
         </motion.div>

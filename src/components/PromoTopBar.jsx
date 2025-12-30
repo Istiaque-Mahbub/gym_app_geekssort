@@ -45,11 +45,6 @@ export default function PromoTopBar() {
     }
   };
 
-  const handleDismiss = () => {
-    sessionStorage.setItem('promo_topbar_dismissed', 'true');
-    setDismissed(true);
-  };
-
   const handleClick = () => {
     if (banner?.link_url) {
       window.open(banner.link_url, '_blank');
@@ -58,41 +53,40 @@ export default function PromoTopBar() {
 
   if (!banner || dismissed) return null;
 
-  // Determine which image to show based on screen size
-  const getImageUrl = () => {
-    if (window.innerWidth < 768 && banner.mobile_image_url) {
-      return banner.mobile_image_url;
-    }
-    if (window.innerWidth >= 768 && window.innerWidth < 1024 && banner.tablet_image_url) {
-      return banner.tablet_image_url;
-    }
-    return banner.image_url;
-  };
-
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ height: 0, opacity: 0 }}
-        animate={{ height: 'auto', opacity: 1 }}
-        exit={{ height: 0, opacity: 0 }}
-        className="relative w-full bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400"
-      >
-        <div className="relative w-full">
+    <motion.div
+      initial={{ height: 0, opacity: 0 }}
+      animate={{ height: 'auto', opacity: 1 }}
+      className="w-full bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400"
+    >
+      <div className="w-full">
+        {/* Desktop/Tablet Image */}
+        <img
+          src={banner.image_url}
+          alt="Promo"
+          className={`w-full object-cover hidden md:block ${banner.link_url ? 'cursor-pointer' : ''}`}
+          style={{ maxHeight: '120px' }}
+          onClick={handleClick}
+        />
+        {/* Tablet Image */}
+        {banner.tablet_image_url && (
           <img
-            src={getImageUrl()}
+            src={banner.tablet_image_url}
             alt="Promo"
-            className={`w-full object-cover ${banner.link_url ? 'cursor-pointer' : ''}`}
-            style={{ maxHeight: '120px' }}
+            className={`w-full object-cover hidden sm:block md:hidden ${banner.link_url ? 'cursor-pointer' : ''}`}
+            style={{ maxHeight: '100px' }}
             onClick={handleClick}
           />
-          <button
-            onClick={handleDismiss}
-            className="absolute top-2 right-2 bg-black/70 hover:bg-black text-white rounded-full p-1 transition-all"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-      </motion.div>
-    </AnimatePresence>
+        )}
+        {/* Mobile Image */}
+        <img
+          src={banner.mobile_image_url || banner.image_url}
+          alt="Promo"
+          className={`w-full object-cover block ${banner.tablet_image_url ? 'sm:hidden' : 'md:hidden'} ${banner.link_url ? 'cursor-pointer' : ''}`}
+          style={{ maxHeight: '80px' }}
+          onClick={handleClick}
+        />
+      </div>
+    </motion.div>
   );
 }
