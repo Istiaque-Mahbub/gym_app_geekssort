@@ -45,13 +45,18 @@ export default function PromoTopBar() {
 
   if (!banner) return null;
 
+  const handleDismiss = () => {
+    setBanner(null);
+  };
+
   return (
     <motion.div
       initial={{ height: 0, opacity: 0 }}
       animate={{ height: 'auto', opacity: 1 }}
-      className="w-full bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 relative z-50"
+      exit={{ height: 0, opacity: 0 }}
+      className="w-full bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 relative"
     >
-      <div className="w-full">
+      <div className="w-full relative">
         <picture>
           {banner.mobile_image_url && (
             <source media="(max-width: 640px)" srcSet={banner.mobile_image_url} />
@@ -67,6 +72,12 @@ export default function PromoTopBar() {
             onClick={handleClick}
           />
         </picture>
+        <button
+          onClick={handleDismiss}
+          className="absolute top-2 right-2 bg-black/70 hover:bg-black text-white rounded-full p-1.5 transition-all z-10"
+        >
+          <X className="w-5 h-5" />
+        </button>
       </div>
     </motion.div>
   );

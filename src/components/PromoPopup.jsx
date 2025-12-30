@@ -19,12 +19,6 @@ export default function PromoPopup() {
 
   const loadBanner = async () => {
     try {
-      // Check if user dismissed it in this session
-      const dismissedSession = sessionStorage.getItem('promo_popup_dismissed');
-      if (dismissedSession) {
-        return;
-      }
-
       const banners = await base44.entities.PromoBanner.filter({ 
         banner_type: 'popup_modal',
         is_active: true 
@@ -52,7 +46,6 @@ export default function PromoPopup() {
   };
 
   const handleClose = () => {
-    sessionStorage.setItem('promo_popup_dismissed', 'true');
     setShowPopup(false);
   };
 
