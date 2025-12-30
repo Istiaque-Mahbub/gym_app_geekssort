@@ -23,21 +23,7 @@ export default function RoleRedirect() {
         return;
       }
 
-      // Check if user has a role
-      const roles = await base44.entities.UserRole.filter({ 
-        user_email: user.email,
-        is_active: true 
-      });
-
-      if (roles.length > 0) {
-        const userRole = roles[0];
-        // Redirect based on role
-        if (userRole.role === 'super_admin' || userRole.role === 'admin' || userRole.role === 'editor') {
-          window.location.href = createPageUrl('AdminDashboard');
-          return;
-        }
-      }
-
+      // Don't redirect - admins can visit website
       setChecking(false);
     } catch (error) {
       console.error('Error checking role:', error);
