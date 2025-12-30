@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export default function PromoTopBar() {
   const [banner, setBanner] = useState(null);
+  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     loadBanner();
@@ -44,20 +45,26 @@ export default function PromoTopBar() {
   };
 
   const handleDismiss = (e) => {
-    e.stopPropagation();
-    setBanner(null);
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setDismissed(true);
+    setTimeout(() => setBanner(null), 300);
   };
 
-  if (!banner) return null;
+  if (!banner || dismissed) return null;
 
   return (
     <AnimatePresence>
-      {banner && (
+      {banner && !dismissed && (
         <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          className="w-full bg-black relative z-50 shadow-lg"
+          initial={{ y: -100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -100, opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="w-full bg-gradient-to-r from-gray-900 via-black to-gray-900 relative shadow-xl"
+          style={{ willChange: 'transform' }}
         >
           <div className="w-full relative">
             <picture>
@@ -70,17 +77,19 @@ export default function PromoTopBar() {
               <img
                 src={banner.image_url}
                 alt="Promo"
-                className={`w-full h-auto object-cover ${banner.link_url ? 'cursor-pointer' : ''}`}
-                style={{ maxHeight: '120px' }}
+                className={`w-full h-auto object-contain ${banner.link_url ? 'cursor-pointer' : ''}`}
+                style={{ maxHeight: '100px', display: 'block' }}
                 onClick={handleClick}
               />
             </picture>
             <button
               onClick={handleDismiss}
-              className="absolute top-2 right-2 bg-black hover:bg-red-600 text-white rounded-full p-1.5 transition-all z-20 shadow-lg"
+              type="button"
+              className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-2 transition-all shadow-2xl"
               aria-label="Close banner"
+              style={{ zIndex: 100 }}
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </motion.div>

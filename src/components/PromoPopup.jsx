@@ -60,34 +60,37 @@ export default function PromoPopup() {
 
   return (
     <Dialog open={showPopup} onOpenChange={handleClose}>
-      <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 bg-transparent border-none overflow-hidden">
+      <DialogContent className="max-w-[95vw] sm:max-w-4xl p-0 bg-transparent border-none">
         <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
+          initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          className="relative w-full h-full flex items-center justify-center"
+          exit={{ scale: 0.8, opacity: 0 }}
+          className="relative"
         >
           <button
             onClick={handleClose}
-            className="absolute top-2 right-2 bg-black hover:bg-red-600 text-white rounded-full p-2 z-20 transition-all shadow-xl"
+            type="button"
+            className="absolute -top-3 -right-3 bg-red-600 hover:bg-red-700 text-white rounded-full p-3 z-50 transition-all shadow-2xl"
             aria-label="Close popup"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
-          <picture className="w-full h-full flex items-center justify-center">
-            {banner.mobile_image_url && (
-              <source media="(max-width: 640px)" srcSet={banner.mobile_image_url} />
-            )}
-            {banner.tablet_image_url && (
-              <source media="(max-width: 1024px)" srcSet={banner.tablet_image_url} />
-            )}
-            <img
-              src={banner.image_url}
-              alt="Promo"
-              className={`max-w-full max-h-[85vh] w-auto h-auto object-contain rounded-lg ${banner.link_url ? 'cursor-pointer' : ''}`}
-              onClick={handleClick}
-            />
-          </picture>
+          <div className="w-full flex items-center justify-center bg-white rounded-lg overflow-hidden">
+            <picture>
+              {banner.mobile_image_url && (
+                <source media="(max-width: 640px)" srcSet={banner.mobile_image_url} />
+              )}
+              {banner.tablet_image_url && (
+                <source media="(max-width: 1024px)" srcSet={banner.tablet_image_url} />
+              )}
+              <img
+                src={banner.image_url}
+                alt="Promo"
+                className={`w-full h-auto max-h-[80vh] object-contain ${banner.link_url ? 'cursor-pointer' : ''}`}
+                onClick={handleClick}
+              />
+            </picture>
+          </div>
         </motion.div>
       </DialogContent>
     </Dialog>
