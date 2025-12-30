@@ -3,6 +3,8 @@ import Header from '@/components/home/Header';
 import Footer from '@/components/home/Footer';
 import ChatWidget from '@/components/ChatWidget';
 import VisitorTracker from '@/components/VisitorTracker';
+import PromoTopBar from '@/components/PromoTopBar';
+import PromoPopup from '@/components/PromoPopup';
 
 export default function Layout({ children, currentPageName }) {
   useEffect(() => {
@@ -50,7 +52,7 @@ export default function Layout({ children, currentPageName }) {
   }, [currentPageName]);
 
   // Admin pages - hide header, footer, and chat widget
-  const adminPages = ['AdminDashboard', 'InquiryManager', 'ContentManager', 'BannerManager', 'NotificationSettings', 'UserManager', 'BlogManager', 'VisitorAnalytics', 'SiteSettingsManager', 'PackageManager', 'ClassManager', 'ClubManager', 'ClassScheduleManager', 'BookingManager', 'SuperAdminPanel'];
+  const adminPages = ['AdminDashboard', 'InquiryManager', 'ContentManager', 'BannerManager', 'NotificationSettings', 'UserManager', 'BlogManager', 'VisitorAnalytics', 'SiteSettingsManager', 'PackageManager', 'ClassManager', 'ClubManager', 'ClassScheduleManager', 'BookingManager', 'SuperAdminPanel', 'PromoBannerManager'];
   const isAdminPage = adminPages.includes(currentPageName);
 
   if (isAdminPage) {
@@ -64,12 +66,14 @@ export default function Layout({ children, currentPageName }) {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <PromoTopBar />
       <Header currentPageName={currentPageName} />
       <main className="flex-grow">
         {children}
       </main>
       <Footer />
       <ChatWidget currentPageName={currentPageName} />
+      <PromoPopup />
       <VisitorTracker currentPageName={currentPageName} />
     </div>
   );

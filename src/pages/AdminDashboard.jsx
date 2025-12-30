@@ -147,6 +147,7 @@ export default function AdminDashboard() {
     { title: 'Schedule Manager', icon: TrendingUp, link: 'ClassScheduleManager', color: 'amber', permission: 'ClassScheduleManager' },
     { title: 'Content Manager', icon: FileText, link: 'ContentManager', color: 'orange', permission: 'ContentManager' },
     { title: 'Banner Manager', icon: TrendingUp, link: 'BannerManager', color: 'red', permission: 'BannerManager' },
+    { title: 'Promo Banners', icon: Zap, link: 'PromoBannerManager', color: 'rose', permission: 'PromoBannerManager' },
     { title: 'Site Settings', icon: Settings, link: 'SiteSettingsManager', color: 'gray', permission: 'SiteSettingsManager' },
     { title: 'Visitor Analytics', icon: Users, link: 'VisitorAnalytics', color: 'pink', permission: 'VisitorAnalytics' },
     { title: 'Notification Settings', icon: Settings, link: 'NotificationSettings', color: 'slate', permission: 'NotificationSettings' }
@@ -253,6 +254,7 @@ export default function AdminDashboard() {
                     action.color === 'orange' ? 'bg-orange-500' :
                     action.color === 'red' ? 'bg-red-500' :
                     action.color === 'pink' ? 'bg-pink-500' :
+                    action.color === 'rose' ? 'bg-rose-500' :
                     action.color === 'teal' ? 'bg-teal-500' :
                     action.color === 'slate' ? 'bg-slate-500' :
                     'bg-gray-800'
