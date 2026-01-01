@@ -28,8 +28,8 @@ export default function Clubs() {
 
   const loadClubs = async () => {
     try {
-      const clubsData = await base44.entities.Club.filter({ is_active: true });
-      setClubs(clubsData.sort((a, b) => (a.order || 0) - (b.order || 0)));
+      const clubsData = await base44.entities.Club.filter({ is_active: true }, 'order', 20);
+      setClubs(clubsData);
       setLoading(false);
     } catch (error) {
       console.error('Error loading clubs:', error);
@@ -118,7 +118,8 @@ export default function Clubs() {
                       <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
                         <img 
                           src={club.images?.[0] || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&q=80&fit=crop'} 
-                          alt={club.name} 
+                          alt={club.name}
+                          loading="lazy"
                           className="w-full h-full object-cover" 
                         />
                       </div>
@@ -234,7 +235,8 @@ export default function Clubs() {
                       <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
                         <img 
                           src={club.images?.[0] || 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=800&h=600&q=80&fit=crop'} 
-                          alt={club.name} 
+                          alt={club.name}
+                          loading="lazy"
                           className="w-full h-full object-cover" 
                         />
                       </div>

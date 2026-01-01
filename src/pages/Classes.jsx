@@ -32,8 +32,8 @@ export default function Classes() {
 
   const loadClasses = async () => {
     try {
-      const classesData = await base44.entities.Class.filter({ is_active: true });
-      setClasses(classesData.sort((a, b) => (a.order || 0) - (b.order || 0)));
+      const classesData = await base44.entities.Class.filter({ is_active: true }, 'order', 50);
+      setClasses(classesData);
       
       const uniqueCategories = ['All', ...new Set(classesData.map(c => c.category).filter(Boolean))];
       setCategories(uniqueCategories);
@@ -131,6 +131,7 @@ export default function Classes() {
                     <img
                       src={classItem.image || 'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=800&h=600&q=80&fit=crop'}
                       alt={classItem.name}
+                      loading="lazy"
                       className="w-full h-full object-cover"
                     />
                     {classItem.category && (
