@@ -86,7 +86,7 @@ export default function BlogManager() {
   }, [permissionsLoading, hasPermission]);
 
   const loadBlogs = async () => {
-    const allBlogs = await base44.entities.Blog.list('-created_date');
+    const allBlogs = await base44.entities.Blog.list('-created_date', 100);
     setBlogs(allBlogs);
   };
 
@@ -316,6 +316,7 @@ export default function BlogManager() {
                     <img 
                       src={blog.image} 
                       alt={blog.title}
+                      loading="lazy"
                       className="w-24 h-24 object-cover rounded-lg"
                     />
                   )}
