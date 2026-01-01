@@ -8,7 +8,8 @@ export default function PromoTopBar() {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    loadBanner();
+    const timer = setTimeout(loadBanner, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const loadBanner = async () => {

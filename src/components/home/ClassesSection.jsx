@@ -32,8 +32,8 @@ export default function ClassesSection() {
       const classesData = await base44.entities.Class.filter({ 
         is_active: true, 
         show_on_homepage: true 
-      });
-      setClasses(classesData.sort((a, b) => (a.order || 0) - (b.order || 0)).slice(0, 4));
+      }, 'order', 4);
+      setClasses(classesData);
     } catch (error) {
       console.error('Error loading classes:', error);
     }
@@ -73,6 +73,7 @@ export default function ClassesSection() {
                 <img
                   src={classItem.website_image || classItem.image || 'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=600&h=900&q=80&fit=crop'}
                   alt={classItem.name}
+                  loading="lazy"
                   className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />

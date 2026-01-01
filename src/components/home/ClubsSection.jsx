@@ -38,8 +38,8 @@ export default function ClubsSection() {
       const clubsData = await base44.entities.Club.filter({ 
         is_active: true, 
         show_on_homepage: true 
-      });
-      setClubs(clubsData.sort((a, b) => (a.order || 0) - (b.order || 0)));
+      }, 'order', 6);
+      setClubs(clubsData);
     } catch (error) {
       console.error('Error loading clubs:', error);
     }
@@ -81,6 +81,7 @@ export default function ClubsSection() {
                 <img
                   src={club.website_image || club.images?.[0] || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=800&q=80&fit=crop'}
                   alt={club.name}
+                  loading="lazy"
                   className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
