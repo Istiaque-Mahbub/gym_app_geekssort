@@ -24,7 +24,8 @@ export default function Blogs() {
     try {
       const allBlogs = await base44.entities.Blog.filter(
         { status: 'published' },
-        '-created_date'
+        '-created_date',
+        100
       );
       setBlogs(allBlogs);
       setLoading(false);
@@ -118,6 +119,7 @@ export default function Blogs() {
                       <img
                         src={blog.image}
                         alt={blog.title}
+                        loading="lazy"
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                       <div className="absolute top-4 left-4">

@@ -17,8 +17,8 @@ export default function Packages() {
 
   const loadPackages = async () => {
     try {
-      const packagesData = await base44.entities.Package.filter({ is_active: true });
-      setPackages(packagesData.sort((a, b) => (a.order || 0) - (b.order || 0)));
+      const packagesData = await base44.entities.Package.filter({ is_active: true }, 'order', 20);
+      setPackages(packagesData);
       setLoading(false);
     } catch (error) {
       console.error('Error loading packages:', error);
