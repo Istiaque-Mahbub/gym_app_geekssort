@@ -57,9 +57,11 @@ export default function AdminDashboard() {
       // Wait for permissions to load
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      const inquiries = await base44.entities.Inquiry.list();
-      const pages = await base44.entities.PageContent.list();
-      const banners = await base44.entities.SiteBanner.list();
+      const [inquiries, pages, banners] = await Promise.all([
+        base44.entities.Inquiry.list('-created_date', 100),
+        base44.entities.PageContent.list('-updated_date', 50),
+        base44.entities.SiteBanner.list('position', 20)
+      ]);
 
       setStats({
         totalInquiries: inquiries.length,
