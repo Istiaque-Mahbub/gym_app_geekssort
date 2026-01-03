@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Calculator } from 'lucide-react';
+import { Menu, X, Calculator, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import BMICalculator from '@/components/BMICalculator';
@@ -87,6 +87,16 @@ export default function Header({ currentPageName }) {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-2 lg:gap-3">
+            <a href="https://mubafitness.com/" target="_blank" rel="noopener noreferrer">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-4 lg:px-6 py-2 lg:py-3 border border-yellow-400 text-yellow-400 rounded-full text-xs lg:text-sm font-bold tracking-wider hover:bg-yellow-400 hover:text-black transition-colors flex items-center gap-2"
+              >
+                <ShoppingBag className="w-4 h-4" />
+                SHOP
+              </motion.button>
+            </a>
             <Link to={createPageUrl('MyBookings')}>
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -155,11 +165,23 @@ export default function Header({ currentPageName }) {
               >
                 BMI CALCULATOR
               </motion.button>
-              <Link to={createPageUrl('MyBookings')}>
+              <a href="https://mubafitness.com/" target="_blank" rel="noopener noreferrer">
                 <motion.button
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
+                  onClick={() => setIsOpen(false)}
+                  className="px-8 py-4 border-2 border-yellow-400 text-yellow-400 rounded-full text-lg font-bold tracking-wider flex items-center gap-2"
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  SHOP
+                </motion.button>
+              </a>
+              <Link to={createPageUrl('MyBookings')}>
+                <motion.button
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
                   onClick={() => setIsOpen(false)}
                   className="px-8 py-4 border-2 border-white text-white rounded-full text-lg font-bold tracking-wider"
                 >
@@ -170,7 +192,7 @@ export default function Header({ currentPageName }) {
                 <motion.button
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
+                  transition={{ delay: 0.6 }}
                   onClick={() => setIsOpen(false)}
                   className="px-8 py-4 bg-yellow-400 text-black rounded-full text-lg font-bold tracking-wider"
                 >
