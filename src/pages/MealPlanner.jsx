@@ -136,13 +136,13 @@ For each day, include: breakfast, lunch, dinner, and 2 snacks (morning snack and
     return <Icon className="w-5 h-5" />;
   };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <GymLoader message="Loading..." />
-      </div>
-    );
-  }
+  // if (!user) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <GymLoader message="Loading..." />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">

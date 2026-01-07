@@ -126,13 +126,13 @@ Create a structured 4-week progressive workout plan with specific exercises, set
     setLoading(false);
   };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-yellow-400" />
-      </div>
-    );
-  }
+  // if (!user) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <Loader2 className="w-8 h-8 animate-spin text-yellow-400" />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
@@ -176,6 +176,8 @@ Create a structured 4-week progressive workout plan with specific exercises, set
                     <option value="endurance">Endurance</option>
                     <option value="flexibility">Flexibility</option>
                     <option value="general_fitness">General Fitness</option>
+                    
+                    
                   </select>
                 </div>
 

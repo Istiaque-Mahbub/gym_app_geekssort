@@ -32,7 +32,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+// import 'react-quill/dist/quill.snow.css';
+import "quill/dist/quill.snow.css";
+
 import { usePermissions } from '@/components/PermissionCheck';
 
 export default function BlogManager() {

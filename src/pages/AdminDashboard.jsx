@@ -41,10 +41,10 @@ export default function AdminDashboard() {
     try {
       // Check if user is authenticated
       const isAuth = await base44.auth.isAuthenticated();
-      if (!isAuth) {
-        base44.auth.redirectToLogin(window.location.pathname);
-        return;
-      }
+      // if (!isAuth) {
+      //   base44.auth.redirectToLogin(window.location.pathname);
+      //   return;
+      // }
 
       const currentUser = await base44.auth.me();
       if (!currentUser || !currentUser.email) {
@@ -165,7 +165,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-black mb-2">Admin Dashboard</h1>
-              <p className="text-gray-400">Welcome back, {user?.full_name}</p>
+              <p className="text-gray-400">Welcome back, Shahadat Hossen {user?.full_name}</p>
               {userRole && (
                 <p className="text-yellow-400 text-sm font-semibold">
                   {userRole.role.replace('_', ' ').toUpperCase()}
