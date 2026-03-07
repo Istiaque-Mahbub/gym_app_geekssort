@@ -1,45 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import axios from 'axios';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { UserPlus, Trash2, Shield, User, Mail, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { 
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle 
 } from '@/components/ui/alert-dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 export default function UserManager() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
   const [showInviteDialog, setShowInviteDialog] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState('user');
   const [deleteUserId, setDeleteUserId] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
+
+  const apiClient = axios.create({
+    baseURL: '/api',
+    withCredentials: true
+  });
 
   useEffect(() => {
     loadData();
@@ -47,14 +31,16 @@ export default function UserManager() {
 
   const loadData = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      
-      if (currentUser.role !== 'admin') {
+      // Load current logged-in user
+      const res = await apiClient.get('/me/');
+      setUser(res.data);
+
+      // Only admin can access
+      if (res.data.role !== 'admin') {
         window.location.href = createPageUrl('Home');
         return;
       }
 
-      setUser(currentUser);
       await loadUsers();
       setLoading(false);
     } catch (error) {
@@ -64,28 +50,20 @@ export default function UserManager() {
   };
 
   const loadUsers = async () => {
-    const allUsers = await base44.entities.User.list();
-    setUsers(allUsers);
-  };
-
-  const handleInviteUser = async (e) => {
-    e.preventDefault();
-    
-    // Note: Base44 doesn't have a direct invite API through the SDK
-    // This would need to be done through the Base44 dashboard
-    alert('To invite new users:\n\n1. Go to your Base44 Dashboard\n2. Navigate to Users section\n3. Click "Invite User"\n4. Enter email and select role (admin/user)\n\nThe user will receive an invitation email.');
-    
-    setShowInviteDialog(false);
-    setInviteEmail('');
+    try {
+      const res = await apiClient.get('/users/');
+      setUsers(res.data);
+    } catch (error) {
+      console.error('Error loading users:', error);
+    }
   };
 
   const handleDeleteUser = async () => {
     if (!deleteUserId) return;
-    
     try {
-      await base44.entities.User.delete(deleteUserId);
-      await loadUsers();
+      await apiClient.delete(`/users/${deleteUserId}/`);
       setDeleteUserId(null);
+      await loadUsers();
     } catch (error) {
       alert('Error deleting user: ' + error.message);
     }
@@ -93,106 +71,91 @@ export default function UserManager() {
 
   const handleChangeRole = async (userId, newRole) => {
     try {
-      await base44.entities.User.update(userId, { role: newRole });
-      await loadUsers();
+      await apiClient.patch(`/users/${userId}/`, { role: newRole });
       setEditingUser(null);
+      await loadUsers();
     } catch (error) {
       alert('Error changing role: ' + error.message);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading users...</p>
-        </div>
+  if (loading) return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading users...</p>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
       <div className="bg-black text-white py-8 px-6 shadow-lg">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link to={createPageUrl('AdminDashboard')}>
-                <Button variant="ghost" className="text-white hover:text-yellow-400">
-                  <ArrowLeft className="w-5 h-5 mr-2" />
-                  Back to Dashboard
-                </Button>
-              </Link>
-              <div>
-                <h1 className="text-4xl font-black">User Management</h1>
-                <p className="text-gray-400">Manage admin and user accounts</p>
-              </div>
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link to={createPageUrl('AdminDashboard')}>
+              <Button variant="ghost" className="text-white hover:text-yellow-400">
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                Back to Dashboard
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-4xl font-black">User Management</h1>
+              <p className="text-gray-400">Manage admin and user accounts</p>
             </div>
-            <Button 
-              onClick={() => setShowInviteDialog(true)}
-              className="bg-yellow-400 text-black hover:bg-yellow-500 font-bold"
-            >
-              <UserPlus className="w-5 h-5 mr-2" />
-              Invite User
-            </Button>
           </div>
+          <Button 
+            onClick={() => setShowInviteDialog(true)}
+            className="bg-yellow-400 text-black hover:bg-yellow-500 font-bold"
+          >
+            <UserPlus className="w-5 h-5 mr-2" />
+            Invite User
+          </Button>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Stats */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <User className="w-6 h-6 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-gray-600 text-sm">Total Users</p>
-                  <p className="text-3xl font-black">{users.length}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      {/* Stats */}
+      <div className="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-3 gap-6 mb-8">
+        <Card>
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+              <User className="w-6 h-6 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-gray-600 text-sm">Total Users</p>
+              <p className="text-3xl font-black">{users.length}</p>
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-                  <Shield className="w-6 h-6 text-yellow-600" />
-                </div>
-                <div>
-                  <p className="text-gray-600 text-sm">Admins</p>
-                  <p className="text-3xl font-black">
-                    {users.filter(u => u.role === 'admin').length}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <Card>
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+              <Shield className="w-6 h-6 text-yellow-600" />
+            </div>
+            <div>
+              <p className="text-gray-600 text-sm">Admins</p>
+              <p className="text-3xl font-black">{users.filter(u => u.role === 'admin').length}</p>
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                  <User className="w-6 h-6 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-gray-600 text-sm">Regular Users</p>
-                  <p className="text-3xl font-black">
-                    {users.filter(u => u.role !== 'admin').length}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <Card>
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+              <User className="w-6 h-6 text-green-600" />
+            </div>
+            <div>
+              <p className="text-gray-600 text-sm">Regular Users</p>
+              <p className="text-3xl font-black">{users.filter(u => u.role !== 'admin').length}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-        {/* Users List */}
+      {/* Users List */}
+      <div className="max-w-7xl mx-auto px-6">
         <Card>
           <CardHeader>
             <CardTitle>All Users</CardTitle>
@@ -230,7 +193,7 @@ export default function UserManager() {
                       </div>
                     </div>
                   </div>
-                  
+
                   {u.id !== user.id ? (
                     <div className="flex items-center gap-2">
                       <Button
@@ -266,19 +229,9 @@ export default function UserManager() {
           <DialogHeader>
             <DialogTitle>Invite New User</DialogTitle>
           </DialogHeader>
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-            <p className="text-sm text-gray-700">
-              <strong>Note:</strong> User invitations must be sent through the Base44 Dashboard:
-            </p>
-            <ol className="text-sm text-gray-700 mt-2 ml-4 list-decimal space-y-1">
-              <li>Go to your Base44 Dashboard</li>
-              <li>Navigate to the Users section</li>
-              <li>Click "Invite User"</li>
-              <li>Enter email and select role (admin/user)</li>
-            </ol>
-            <p className="text-sm text-gray-700 mt-2">
-              The invited user will receive an email with login instructions.
-            </p>
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4 text-sm text-gray-700">
+            <p><strong>Note:</strong> User invitations should be handled by your backend or admin panel.</p>
+            <p className="mt-2">Ensure the invited user receives login instructions via email.</p>
           </div>
           <Button onClick={() => setShowInviteDialog(false)} className="w-full">
             Got It
@@ -311,9 +264,9 @@ export default function UserManager() {
             <AlertDialogTitle>Change User Role</AlertDialogTitle>
             <AlertDialogDescription>
               {editingUser?.role === 'admin' ? (
-                <>Remove admin privileges from <strong>{editingUser?.full_name}</strong>? They will become a regular user.</>
+                <>Remove admin privileges from <strong>{editingUser?.full_name}</strong>?</>
               ) : (
-                <>Make <strong>{editingUser?.full_name}</strong> an admin? They will have full access to the admin dashboard.</>
+                <>Make <strong>{editingUser?.full_name}</strong> an admin?</>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>

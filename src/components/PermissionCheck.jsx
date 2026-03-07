@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import  apiClient  from '@/lib/apiClient'; // your existing apiClient
 import { createPageUrl } from '@/utils';
 
 export function usePermissions() {
@@ -12,26 +12,27 @@ export function usePermissions() {
 
   const loadPermissions = async () => {
     try {
-      const isAuth = await base44.auth.isAuthenticated();
-      if (!isAuth) {
+      const token = localStorage.getItem('access');
+      if (!token) {
         setLoading(false);
         return;
       }
 
-      const user = await base44.auth.me();
-      if (!user || !user.email) {
+      // Fetch current user info from Django backend
+      const res = await apiClient.get('/accounts/me/');
+      const user = res.data;
+
+      if (!user || !user.role) {
         setLoading(false);
         return;
       }
 
-      const roles = await base44.entities.UserRole.filter({ 
-        user_email: user.email,
-        is_active: true 
+      // Assign user role
+      setUserRole({
+        role: user.role,
+        permissions: user.permissions || [], // optional: include if backend returns permissions
       });
-      
-      if (roles[0]) {
-        setUserRole(roles[0]);
-      }
+
       setLoading(false);
     } catch (error) {
       console.error('Error loading permissions:', error);

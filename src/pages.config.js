@@ -36,11 +36,28 @@ import UserManager from './pages/UserManager';
 import VisitorAnalytics from './pages/VisitorAnalytics';
 import WorkoutPlanner from './pages/WorkoutPlanner';
 import __Layout from './Layout.jsx';
+import Login from './pages/Login.jsx'
+import Register from './pages/Register.jsx'
+import InstructorDashboard from './pages/InstructorDashboard.jsx'
+import ContactManager from "./pages/ContactManager.jsx"
+import PaymentManager from "./pages/PaymentManager"
+import MemberShipManager from "./pages/MemberShipManager"
+import MemberShipPackageManager from "./pages/MemberShipPackageManager"
+import AttendanceManager from "./pages/AttendanceManager"
+import ReportManager from "./pages/ReportManager"
 
 
 export const PAGES = {
+    "Login": Login,
+    "Register": Register,
     "About": About,
+    "ReportManager": ReportManager,
+    "PaymentManager": PaymentManager,
+    "AttendanceManager": AttendanceManager,
+    "MemberShipManager": MemberShipManager,
+    "MemberShipPackageManager": MemberShipPackageManager,
     "AdminDashboard": AdminDashboard,
+    "InstructorDashboard": InstructorDashboard,
     "App": App,
     "BannerManager": BannerManager,
     "BlogManager": BlogManager,
@@ -60,6 +77,7 @@ export const PAGES = {
     "Home": Home,
     "InitializeSuperAdmin": InitializeSuperAdmin,
     "InquiryManager": InquiryManager,
+    "ContactManager": ContactManager,
     "MealPlanner": MealPlanner,
     "MyBookings": MyBookings,
     "NotificationSettings": NotificationSettings,

@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Clock, Users, Flame, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
 import GymLoader from '@/components/GymLoader';
 import BookingModal from '@/components/BookingModal';
+import { GymClassService } from '@/services/GymClassService';
+import apiClient from '@/lib/apiClient';
 
 export default function Classes() {
   const [classes, setClasses] = useState([]);
@@ -15,48 +14,109 @@ export default function Classes() {
   const [categories, setCategories] = useState(['All']);
   const [bookingClass, setBookingClass] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     loadClasses();
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    const pending = localStorage.getItem("pendingBookingClass");
+
+    if (isAuthenticated && pending) {
+      const parsed = JSON.parse(pending);
+      setBookingClass(parsed);
+      localStorage.removeItem("pendingBookingClass");
+      setShowLoginModal(false);
+    }
+  }, [isAuthenticated]);
+
   const checkAuth = async () => {
+    const token = localStorage.getItem("access");
+
+    if (!token) {
+      setIsAuthenticated(false);
+      return;
+    }
+
     try {
-      const authenticated = await base44.auth.isAuthenticated();
-      setIsAuthenticated(authenticated);
+      await apiClient.get("/accounts/me/", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setIsAuthenticated(true);
     } catch (error) {
       setIsAuthenticated(false);
+      if (error.response?.status === 401) {
+        localStorage.removeItem("access");
+      }
     }
   };
 
   const loadClasses = async () => {
     try {
-      const classesData = await base44.entities.Class.filter({ is_active: true }, 'order', 50);
-      setClasses(classesData);
-      
-      const uniqueCategories = ['All', ...new Set(classesData.map(c => c.category).filter(Boolean))];
+      const response = await GymClassService.getAll();
+      const apiClasses = response.results || [];
+
+      const normalizedClasses = apiClasses.map((cls) => ({
+        id: cls.id,
+        name: cls.title,
+        image: cls.image,
+        description: cls.description,
+        duration_minutes: parseInt(cls.class_duration),
+        capacity: cls.people,
+        difficulty_level: cls.level,
+        category: cls.category?.name,
+        schedule: cls.class_schedule || [],
+      }));
+
+      setClasses(normalizedClasses);
+
+      const uniqueCategories = [
+        "All",
+        ...new Set(
+          normalizedClasses.map((c) => c.category).filter(Boolean)
+        ),
+      ];
+
       setCategories(uniqueCategories);
       setLoading(false);
     } catch (error) {
-      console.error('Error loading classes:', error);
+      console.error("Error loading classes:", error);
       setLoading(false);
     }
   };
 
+  const formatScheduleTime = (day, time) => {
+    const date = new Date(`1970-01-01T${time}`);
+    const formattedTime = date.toLocaleTimeString([], {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+
+    return `${day} ${formattedTime}`;
+  };
+
   const handleBookClass = (classItem) => {
-    if (!isAuthenticated) {
-      if (confirm('You need to be logged in to book a class. Would you like to login?')) {
-        base44.auth.redirectToLogin(window.location.pathname);
-      }
+    const token = localStorage.getItem("access");
+
+    if (!token) {
+      localStorage.setItem(
+        "pendingBookingClass",
+        JSON.stringify(classItem)
+      );
+      setShowLoginModal(true);
       return;
     }
+
     setBookingClass(classItem);
   };
 
-  const filteredClasses = selectedCategory === 'All' 
-    ? classes 
-    : classes.filter(c => c.category === selectedCategory);
+  const filteredClasses =
+    selectedCategory === 'All'
+      ? classes
+      : classes.filter(c => c.category === selectedCategory);
 
   if (loading) {
     return (
@@ -68,11 +128,10 @@ export default function Classes() {
 
   return (
     <div className="min-h-screen bg-white">
+
       {/* Hero */}
       <section className="relative bg-black text-white py-32 overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-transparent" />
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-transparent" />
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -115,7 +174,9 @@ export default function Classes() {
         <div className="max-w-7xl mx-auto px-6">
           {filteredClasses.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-gray-500 text-xl">No classes available at the moment.</p>
+              <p className="text-gray-500 text-xl">
+                No classes available at the moment.
+              </p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -127,13 +188,17 @@ export default function Classes() {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
                 >
+                  {/* Image */}
                   <div className="relative aspect-video">
                     <img
-                      src={classItem.image || 'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=800&h=600&q=80&fit=crop'}
+                      src={
+                        classItem.image ||
+                        'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=800&h=600&q=80&fit=crop'
+                      }
                       alt={classItem.name}
-                      loading="lazy"
                       className="w-full h-full object-cover"
                     />
+
                     {classItem.category && (
                       <div className="absolute top-4 right-4">
                         <span className="px-4 py-2 bg-yellow-400 text-black font-bold rounded-full text-sm">
@@ -142,10 +207,17 @@ export default function Classes() {
                       </div>
                     )}
                   </div>
+
+                  {/* Content */}
                   <div className="p-6">
-                    <h3 className="text-2xl font-black mb-3">{classItem.name}</h3>
-                    <p className="text-gray-600 mb-4">{classItem.description}</p>
-                    
+                    <h3 className="text-2xl font-black mb-3">
+                      {classItem.name}
+                    </h3>
+
+                    <p className="text-gray-600 mb-4">
+                      {classItem.description}
+                    </p>
+
                     <div className="flex items-center gap-4 mb-4 text-sm">
                       {classItem.duration_minutes && (
                         <div className="flex items-center gap-2">
@@ -153,12 +225,14 @@ export default function Classes() {
                           <span>{classItem.duration_minutes} min</span>
                         </div>
                       )}
+
                       {classItem.capacity && (
                         <div className="flex items-center gap-2">
                           <Users className="w-4 h-4 text-yellow-400" />
                           <span>{classItem.capacity} max</span>
                         </div>
                       )}
+
                       {classItem.difficulty_level && (
                         <div className="flex items-center gap-2">
                           <Flame className="w-4 h-4 text-yellow-400" />
@@ -169,18 +243,22 @@ export default function Classes() {
 
                     {classItem.schedule?.length > 0 && (
                       <div className="border-t pt-4">
-                        <h4 className="font-bold text-sm mb-2">Schedule:</h4>
+                        <h4 className="font-bold text-sm mb-2">
+                          Schedule:
+                        </h4>
+
                         <div className="flex flex-wrap gap-2 mb-3">
                           {classItem.schedule.map((time, i) => (
                             <span
                               key={i}
                               className="px-3 py-1 bg-gray-100 rounded-full text-xs font-medium"
                             >
-                              {time.day} {time.time}
+                              {formatScheduleTime(time.day, time.time)}
                             </span>
                           ))}
                         </div>
-                        <Button 
+
+                        <Button
                           onClick={() => handleBookClass(classItem)}
                           className="w-full bg-yellow-400 text-black hover:bg-yellow-500"
                         >
@@ -197,6 +275,7 @@ export default function Classes() {
         </div>
       </section>
 
+      {/* Booking Modal */}
       {bookingClass && (
         <BookingModal
           classItem={bookingClass}
@@ -205,6 +284,26 @@ export default function Classes() {
             alert('Booking confirmed! Check your bookings page.');
           }}
         />
+      )}
+
+      {/* Login Required Modal */}
+      {showLoginModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center">
+            <h2 className="text-2xl font-bold mb-4">
+              Login Required
+            </h2>
+            <p className="text-gray-600 mb-6">
+              To book a class, please login from the menu.
+            </p>
+            <Button
+              onClick={() => setShowLoginModal(false)}
+              className="bg-yellow-400 text-black hover:bg-yellow-500"
+            >
+              Close
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   );

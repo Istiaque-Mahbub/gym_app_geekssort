@@ -14,7 +14,7 @@ export default function Home() {
       <main>
         <HeroSection />
         <section id="clubs">
-          <ClubsSection />
+         <ClubsSection />
         </section>
         <ScheduleSection />
         <AmenitiesSection />

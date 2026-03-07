@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, ChevronLeft, Send, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { FitHiveSupportService } from '@/services/FitHiveSupportService';
+
 
 const faqs = [
   {
@@ -58,40 +59,28 @@ export default function ChatWidget({ currentPageName }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    await base44.entities.Inquiry.create({
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone || '',
-      message: formData.message,
-      source: 'chat_widget',
-      status: 'new'
-    });
 
-    // Send email notification
-    await base44.integrations.Core.SendEmail({
-      from_name: 'FitHive',
-      to: 'baizidikhan@gmail.com',
-      subject: '🔔 New Chat Widget Inquiry - FitHive',
-      body: `
-        <h2>New Inquiry from Chat Widget</h2>
-        <p><strong>Name:</strong> ${formData.name}</p>
-        <p><strong>Email:</strong> ${formData.email}</p>
-        <p><strong>Phone:</strong> ${formData.phone || 'Not provided'}</p>
-        <p><strong>Message:</strong></p>
-        <p>${formData.message}</p>
-        <hr>
-        <p><small>Source: Chat Widget | Time: ${new Date().toLocaleString()}</small></p>
-      `
-    });
-    
-    setView('success');
-    setTimeout(() => {
-      setIsOpen(false);
-      setView('menu');
-      setFormData({ name: '', email: '', phone: '', message: '' });
-    }, 4000);
+    try {
+      await FitHiveSupportService.createSupport({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || '',
+        interested_in: formData.message
+      });
+
+      setView('success');
+
+      setTimeout(() => {
+        setIsOpen(false);
+        setView('menu');
+        setFormData({ name: '', email: '', phone: '', message: '' });
+      }, 4000);
+
+    } catch (error) {
+      console.error("Support submission failed:", error);
+    }
   };
+
 
   const resetWidget = () => {
     setView('menu');

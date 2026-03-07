@@ -43,26 +43,39 @@ export default function Layout({ children, currentPageName }) {
       'App': 'Mobile App - FitHive',
       'AdminDashboard': 'Admin Dashboard - FitHive',
       'InquiryManager': 'Inquiry Manager - FitHive',
+      'ContactManager': 'Contact Manager - FitHive',
       'ContentManager': 'Content Manager - FitHive',
       'BannerManager': 'Banner Manager - FitHive',
       'NotificationSettings': 'Notification Settings - FitHive',
+      'MemberShipManager': 'Membership Manager - FitHive',
+      'MemberShipPackageManager': 'MemberShip Package Manager - FitHive',
+      'PaymentManager': 'Payment Manager - FitHive',
+      'AttendanceManager': 'Attendance Manager - FitHive',
+      'ReportManager': 'Report Manager - FitHive',
+      
     };
     
     document.title = pageTitles[currentPageName] || 'FitHive';
   }, [currentPageName]);
 
   // Admin pages - hide header, footer, and chat widget
-  const adminPages = ['AdminDashboard', 'InquiryManager', 'ContentManager', 'BannerManager', 'NotificationSettings', 'UserManager', 'BlogManager', 'VisitorAnalytics', 'SiteSettingsManager', 'PackageManager', 'ClassManager', 'ClubManager', 'ClassScheduleManager', 'BookingManager', 'SuperAdminPanel', 'PromoBannerManager'];
+  const adminPages = ['AdminDashboard','ReportManager','AttendanceManager', 'MemberShipManager','PaymentManager','MemberShipPackageManager','ReportsManager', 'InquiryManager', 'ContactManager', 'ContentManager', 'BannerManager', 'NotificationSettings', 'UserManager', 'BlogManager', 'VisitorAnalytics', 'SiteSettingsManager', 'PackageManager', 'ClassManager', 'ClubManager', 'ClassScheduleManager', 'BookingManager', 'SuperAdminPanel', 'PromoBannerManager'];
   const isAdminPage = adminPages.includes(currentPageName);
 
   if (isAdminPage) {
-    return (
-      <div className="min-h-screen">
-        {children}
-        <VisitorTracker currentPageName={currentPageName} />
+  return (
+    <div className="min-h-screen">
+      {/* Render Header invisibly just to fetch user info */}
+      <div style={{ display: 'none' }}>
+        <Header currentPageName={currentPageName} />
       </div>
-    );
-  }
+
+      {children}
+      <VisitorTracker currentPageName={currentPageName} />
+    </div>
+  );
+}
+
 
   return (
     <div className="min-h-screen flex flex-col">

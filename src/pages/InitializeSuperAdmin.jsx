@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
 import { Shield, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import apiClient from '@/lib/apiClient'; // your backend API client
 
 export default function InitializeSuperAdmin() {
   const [user, setUser] = useState(null);
@@ -17,48 +17,40 @@ export default function InitializeSuperAdmin() {
 
   const checkStatus = async () => {
     try {
-      // Check if user is authenticated
-      const isAuth = await base44.auth.isAuthenticated();
-      if (!isAuth) {
-        base44.auth.redirectToLogin(window.location.pathname);
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        window.location.href = '/login';
         return;
       }
 
-      const currentUser = await base44.auth.me();
-      if (!currentUser || !currentUser.email) {
-        base44.auth.redirectToLogin(window.location.pathname);
-        return;
-      }
-      
-      setUser(currentUser);
+      // Fetch current user
+      const userRes = await apiClient.get('/accounts/me/');
+      setUser(userRes.data);
 
       // Check if user already has a role
-      const roles = await base44.entities.UserRole.filter({ user_email: currentUser.email });
-      if (roles[0]) {
-        setExistingRole(roles[0]);
+      const rolesRes = await apiClient.get(`/user-roles/?user_id=${userRes.data.id}`);
+      if (rolesRes.data.length > 0) {
+        setExistingRole(rolesRes.data[0]);
       }
 
       setLoading(false);
     } catch (error) {
-      console.error('Error:', error);
-      base44.auth.redirectToLogin(window.location.pathname);
+      console.error('Error checking super admin status:', error);
+      window.location.href = '/login';
     }
   };
 
   const createSuperAdmin = async () => {
-    if (!user || !user.email) {
-      alert('User not authenticated. Please refresh the page.');
-      return;
-    }
+    if (!user) return;
 
     try {
       setCreating(true);
-      
-      await base44.entities.UserRole.create({
-        user_email: user.email,
+
+      await apiClient.post('/user-roles/', {
+        user_id: user.id,
         role: 'super_admin',
         permissions: [],
-        created_by_email: user.email,
+        created_by: user.id,
         is_active: true
       });
 
@@ -75,7 +67,7 @@ export default function InitializeSuperAdmin() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-indigo-50">
         <p>Loading...</p>
       </div>
     );
@@ -83,7 +75,7 @@ export default function InitializeSuperAdmin() {
 
   if (existingRole) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center p-6">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-indigo-50 p-6">
         <Card className="max-w-md w-full">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -106,7 +98,7 @@ export default function InitializeSuperAdmin() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-indigo-50 p-6">
       <Card className="max-w-md w-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

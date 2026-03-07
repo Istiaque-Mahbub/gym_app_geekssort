@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { ArrowRight, Calendar, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { BlogService } from '@/services/BlogService';
 
 export default function BlogsSection() {
   const [blogs, setBlogs] = useState([]);
@@ -15,15 +15,17 @@ export default function BlogsSection() {
 
   const loadBlogs = async () => {
     try {
-      const allBlogs = await base44.entities.Blog.filter(
-        { status: 'published', show_on_homepage: true },
-        '-created_date',
-        4
-      );
-      setBlogs(allBlogs);
-      setLoading(false);
+      const data = await BlogService.getBlogsList({
+        status: 'published',
+        show_on_homepage: true,
+        ordering: '-created_date',
+        limit: 4,
+      });
+
+      setBlogs(data.results || data);
     } catch (error) {
       console.error('Error loading blogs:', error);
+    } finally {
       setLoading(false);
     }
   };
@@ -38,7 +40,7 @@ export default function BlogsSection() {
     );
   }
 
-  if (blogs.length === 0) return null;
+  if (!blogs || blogs.length === 0) return null;
 
   return (
     <section className="bg-white py-24">
@@ -50,7 +52,9 @@ export default function BlogsSection() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-6xl font-black mb-4">Latest from Our Blog</h2>
+          <h2 className="text-4xl md:text-6xl font-black mb-4">
+            Latest from Our Blog
+          </h2>
           <p className="text-xl text-gray-600">
             Tips, guides, and inspiration for your fitness journey
           </p>
@@ -68,40 +72,55 @@ export default function BlogsSection() {
             >
               <Link to={createPageUrl('BlogPost') + '?slug=' + blog.slug}>
                 <div className="group cursor-pointer h-full flex flex-col">
+                  {/* Image */}
                   <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4 shadow-lg">
                     <img
-                      src={blog.image}
+                      src={
+                        blog.image ||
+                        'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&h=400&q=80&fit=crop'
+                      }
                       alt={blog.title}
                       loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
+
+                    {/* Category */}
                     <div className="absolute top-4 left-4">
                       <span className="px-4 py-2 bg-yellow-400 text-black font-bold rounded-full text-sm">
-                        {blog.category}
+                        {blog.category?.name || ''}
                       </span>
                     </div>
                   </div>
-                  
+
                   <div className="flex-grow flex flex-col">
+                    {/* Meta */}
                     <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
-                        <span>{new Date(blog.created_date).toLocaleDateString()}</span>
+                        <span>
+                          {blog.published_date
+                            ? new Date(blog.published_date).toLocaleDateString()
+                            : ''}
+                        </span>
                       </div>
+
                       <div className="flex items-center gap-1">
                         <User className="w-4 h-4" />
-                        <span>{blog.author}</span>
+                        <span>{blog.author || 'Shahadat Hossen'}</span>
                       </div>
                     </div>
-                    
+
+                    {/* Title */}
                     <h3 className="text-xl font-black mb-3 group-hover:text-yellow-400 transition-colors">
                       {blog.title}
                     </h3>
-                    
+
+                    {/* Excerpt */}
                     <p className="text-gray-600 mb-4 flex-grow line-clamp-3">
-                      {blog.excerpt}
+                      {blog.excerpt || ''}
                     </p>
-                    
+
+                    {/* Read More */}
                     <div className="flex items-center gap-2 text-black font-bold group-hover:text-yellow-400 transition-colors">
                       Read More
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

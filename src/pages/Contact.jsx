@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import React, { useState,useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle2, MessageSquare, Globe } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -8,19 +7,22 @@ import { Button } from '@/components/ui/button';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { ContactService } from '@/services/ContactService';
 
 export default function Contact() {
+  const [clubs, setClubs] = useState([]);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [selectedMethod, setSelectedMethod] = useState('email');
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    club: '',
+    preferred_club: '',
     subject: '',
     message: '',
   });
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [selectedMethod, setSelectedMethod] = useState('email');
-
+  
   // Fix Leaflet default icon issue
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
@@ -32,44 +34,44 @@ export default function Contact() {
   // Coordinates for Mirpur DOHS, Pallabi, Dhaka
   const position = [23.8223, 90.3654];
 
+  // Fetch clubs from backend
+  useEffect(() => {
+    loadClubs();
+  }, []);
+
+  const loadClubs = async () => {
+    try {
+      const data = await ContactService.getGymClubs();
+      setClubs(data.results || data);
+    } catch (error) {
+      console.error("Failed to load clubs", error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    await base44.entities.Inquiry.create({
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      club: formData.club,
-      subject: formData.subject,
-      message: formData.message,
-      source: 'contact_page',
-      status: 'new'
-    });
+    setLoading(true);
 
-    // Send email notification
-    await base44.integrations.Core.SendEmail({
-      from_name: 'FitHive',
-      to: 'baizidikhan@gmail.com',
-      subject: '📩 New Contact Form Submission - FitHive',
-      body: `
-        <h2>New Contact Form Submission</h2>
-        <p><strong>Name:</strong> ${formData.name}</p>
-        <p><strong>Email:</strong> ${formData.email}</p>
-        <p><strong>Phone:</strong> ${formData.phone || 'Not provided'}</p>
-        <p><strong>Preferred Club:</strong> ${formData.club || 'Not specified'}</p>
-        <p><strong>Subject:</strong> ${formData.subject}</p>
-        <p><strong>Message:</strong></p>
-        <p>${formData.message}</p>
-        <hr>
-        <p><small>Source: Contact Page | Time: ${new Date().toLocaleString()}</small></p>
-      `
-    });
-    
-    setIsSubmitted(true);
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormData({ name: '', email: '', phone: '', club: '', subject: '', message: '' });
-    }, 3000);
+    try {
+      await ContactService.createContact(formData);
+
+      setIsSubmitted(true);
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        preferred_club: '',
+        subject: '',
+        message: '',
+      });
+
+      setTimeout(() => setIsSubmitted(false), 3000);
+    } catch (error) {
+      console.error("Error submitting contact:", error);
+      alert("Something went wrong. Please try again.");
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -208,96 +210,104 @@ export default function Contact() {
               ) : (
                 <>
                   <h2 className="text-3xl font-black mb-8">Send us a Message</h2>
+                  {isSubmitted ? (
+                    <div className="text-center py-20">
+                      <CheckCircle2 className="w-20 h-20 text-green-500 mx-auto mb-6" />
+                      <h3 className="text-3xl font-black">Message Sent!</h3>
+                    </div>
+                    ) : (
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                          <div className="grid md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-bold mb-2">Name *</label>
+                              <Input
+                                required
+                                value={formData.name}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                placeholder="Your name"
+                                className="w-full py-6"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-bold mb-2">Email *</label>
+                              <Input
+                                required
+                                type="email"
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                placeholder="your.email@example.com"
+                                className="w-full py-6"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-bold mb-2">Phone</label>
+                              <Input
+                                value={formData.phone}
+                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                placeholder="+880 XXX XXX XXX"
+                                className="w-full py-6"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-bold mb-2">Preferred Club</label>
+                              <select
+                                value={formData.preferred_club}
+                                onChange={(e) => setFormData({ ...formData, preferred_club: e.target.value })}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 h-[52px]"
+                              >
+                                <option value="">Select a club</option>
+                                {clubs.map((club) => (
+                                  <option key={club.id} value={club.id}>
+                                    {club.name}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-bold mb-2">Subject *</label>
+                            <Input
+                              required
+                              value={formData.subject}
+                              onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                              placeholder="What is this regarding?"
+                              className="w-full py-6"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-bold mb-2">Message *</label>
+                            <Textarea
+                              required
+                              value={formData.message}
+                              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                              placeholder="Tell us how we can help you..."
+                              className="w-full h-40 resize-none"
+                            />
+                          </div>
+
+                          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                            <Button
+                              type="submit"
+                              className="w-full bg-yellow-400 text-black hover:bg-yellow-500 font-bold py-6 text-lg shadow-lg"
+                            >
+                              <Send className="w-5 h-5 mr-2" />
+                              Send Message
+                            </Button>
+                          </motion.div>
+
+                          <p className="text-center text-sm text-gray-500">
+                            We typically respond within 24 hours
+                          </p>
+                        </form>
+                  )}
                   
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-bold mb-2">Name *</label>
-                        <Input
-                          required
-                          value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          placeholder="Your name"
-                          className="w-full py-6"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-bold mb-2">Email *</label>
-                        <Input
-                          required
-                          type="email"
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          placeholder="your.email@example.com"
-                          className="w-full py-6"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-bold mb-2">Phone</label>
-                        <Input
-                          value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          placeholder="+880 XXX XXX XXX"
-                          className="w-full py-6"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-bold mb-2">Preferred Club</label>
-                        <select
-                          value={formData.club}
-                          onChange={(e) => setFormData({ ...formData, club: e.target.value })}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 h-[52px]"
-                        >
-                          <option value="">Select a location</option>
-                          <option value="dhaka">Dhaka</option>
-                          <option value="chittagong">Chittagong</option>
-                          <option value="sylhet">Sylhet</option>
-                          <option value="other">Other Location</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-bold mb-2">Subject *</label>
-                      <Input
-                        required
-                        value={formData.subject}
-                        onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                        placeholder="What is this regarding?"
-                        className="w-full py-6"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-bold mb-2">Message *</label>
-                      <Textarea
-                        required
-                        value={formData.message}
-                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                        placeholder="Tell us how we can help you..."
-                        className="w-full h-40 resize-none"
-                      />
-                    </div>
-
-                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                      <Button
-                        type="submit"
-                        className="w-full bg-yellow-400 text-black hover:bg-yellow-500 font-bold py-6 text-lg shadow-lg"
-                      >
-                        <Send className="w-5 h-5 mr-2" />
-                        Send Message
-                      </Button>
-                    </motion.div>
-
-                    <p className="text-center text-sm text-gray-500">
-                      We typically respond within 24 hours
-                    </p>
-                  </form>
                 </>
               )}
             </motion.div>

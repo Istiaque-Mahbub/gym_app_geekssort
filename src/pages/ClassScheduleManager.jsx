@@ -55,11 +55,11 @@ export default function ClassScheduleManager() {
     }
   };
 
-  useEffect(() => {
-    if (!permissionsLoading && !hasPermission('ClassScheduleManager')) {
-      window.location.href = createPageUrl('AdminDashboard');
-    }
-  }, [permissionsLoading, hasPermission]);
+  // useEffect(() => {
+  //   if (!permissionsLoading && !hasPermission('ClassScheduleManager')) {
+  //     window.location.href = createPageUrl('AdminDashboard');
+  //   }
+  // }, [permissionsLoading, hasPermission]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

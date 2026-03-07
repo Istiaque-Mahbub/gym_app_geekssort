@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
+import { GymClassService } from '@/services/GymClassService';
 
 const MarqueeText = () => {
   return (
@@ -22,6 +22,7 @@ const MarqueeText = () => {
 
 export default function ClassesSection() {
   const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadClasses();
@@ -29,17 +30,23 @@ export default function ClassesSection() {
 
   const loadClasses = async () => {
     try {
-      const classesData = await base44.entities.Class.filter({ 
-        is_active: true, 
-        show_on_homepage: true 
-      }, 'order', 4);
-      setClasses(classesData);
+      const data = await GymClassService.getAll({
+        is_active: true,
+        show_on_homepage: true,
+        ordering: 'order',
+        limit: 4,
+      });
+
+      setClasses(data.results || data);
     } catch (error) {
       console.error('Error loading classes:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (classes.length === 0) return null;
+  if (loading) return null;
+  if (!classes || classes.length === 0) return null;
 
   return (
     <section className="bg-white">
@@ -64,27 +71,33 @@ export default function ClassesSection() {
               key={classItem.id}
               initial={{ opacity: 0, y: 50, scale: 0.9 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.5, delay: index * 0.15 }}
               whileHover={{ y: -10 }}
               className="group cursor-pointer"
             >
               <div className="relative aspect-[2/3] rounded-2xl overflow-hidden mb-4 shadow-xl">
                 <img
-                  src={classItem.website_image || classItem.image || 'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=600&h=900&q=80&fit=crop'}
+                  src={
+                    classItem.website_image ||
+                    classItem.image ||
+                    'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=600&h=900&q=80&fit=crop'
+                  }
                   alt={classItem.name}
                   loading="lazy"
                   className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
                 />
+
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-                
+
                 {/* Content Overlay */}
                 <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                   <span className="text-yellow-400 text-xs md:text-sm tracking-wider mb-1 block uppercase font-bold">
-                    {classItem.category}
+                    {classItem.category?.name || ''}
                   </span>
+
                   <h3 className="text-white text-xl md:text-3xl font-black">
-                    {classItem.name}
+                    {classItem.title}
                   </h3>
                 </div>
 

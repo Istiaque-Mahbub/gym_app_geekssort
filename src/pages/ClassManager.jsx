@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -12,9 +11,14 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import GymLoader from '@/components/GymLoader';
 import { usePermissions } from '@/components/PermissionCheck';
+import { GymClassService } from '@/services/GymClassService';
+
 
 export default function ClassManager() {
   const [user, setUser] = useState(null);
+  const [levels, setLevels] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [instructors, setInstructors] = useState([]);
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -43,58 +47,88 @@ export default function ClassManager() {
 
   const loadData = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
+      setLoading(true);
 
-      const classesData = await base44.entities.Class.list();
-      setClasses(classesData.sort((a, b) => (a.order || 0) - (b.order || 0)));
-      setLoading(false);
+      const classesRes = await GymClassService.getDashboardClasses();
+      const levelsRes = await GymClassService.getLevels();
+      const categoriesRes = await GymClassService.getCategories();
+      const instructorsRes = await GymClassService.getInstructors();
+
+      // For classes: check if paginated
+      const classesArray = Array.isArray(classesRes.results) ? classesRes.results : [];
+      setClasses(classesArray);
+
+      // For levels: API might return array directly
+      setLevels(Array.isArray(levelsRes) ? levelsRes : []);
+
+      // For categories: check if paginated
+      const categoriesArray = Array.isArray(categoriesRes.results) ? categoriesRes.results : [];
+      setCategories(categoriesArray);
+      setInstructors(Array.isArray(instructorsRes) ? instructorsRes : []);
+
     } catch (error) {
       console.error('Error loading data:', error);
+    } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (!permissionsLoading && !hasPermission('ClassManager')) {
-      window.location.href = createPageUrl('AdminDashboard');
-    }
-  }, [permissionsLoading, hasPermission]);
 
-  const handleImageUpload = async (e) => {
+
+
+  // useEffect(() => {
+  //   if (!permissionsLoading && !hasPermission('ClassManager')) {
+  //     window.location.href = createPageUrl('AdminDashboard');
+  //   }
+  // }, [permissionsLoading, hasPermission]);
+
+  const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    try {
-      setUploading(true);
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setFormData({ ...formData, image: file_url });
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      alert('Error uploading image');
-    } finally {
-      setUploading(false);
-    }
+    setFormData({ ...formData, image: file });
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const classData = {
-        ...formData,
-        duration_minutes: formData.duration_minutes ? parseInt(formData.duration_minutes) : null,
-        capacity: formData.capacity ? parseInt(formData.capacity) : null,
-        schedule: formData.schedule.filter(s => s.day && s.time)
-      };
+      const form = new FormData();
+
+      form.append('title', formData.name);
+      form.append('description', formData.description);
+      form.append('class_duration', formData.duration_minutes ? `${formData.duration_minutes} min` : '');
+      form.append('people', formData.capacity || 0);
+      form.append('level', formData.difficulty_level);
+      form.append('category_id', formData.category);
+      form.append('is_show_on_home_page', formData.show_on_homepage);
+      form.append('is_active', formData.is_active);
+      // Instructor ID
+      if (formData.instructor) {
+        form.append('instructor', formData.instructor); // <--- add this
+      }
+      // Image
+      if (formData.image instanceof File) {
+        form.append('image', formData.image);
+      }
+
+      // Schedule IDs (IMPORTANT: backend expects class_schedule_ids)
+      formData.schedule.forEach((sched) => {
+        if (sched.id) {
+          form.append('class_schedule_ids', sched.id);
+        }
+      });
 
       if (editingClass) {
-        await base44.entities.Class.update(editingClass.id, classData);
+        await GymClassService.updateDashboardClass(editingClass.id, form);
       } else {
-        await base44.entities.Class.create(classData);
+        await GymClassService.createDashboardClass(form);
       }
 
       await loadData();
       resetForm();
+
     } catch (error) {
       console.error('Error saving class:', error);
       alert('Error saving class');
@@ -103,33 +137,38 @@ export default function ClassManager() {
 
   const handleDelete = async (id) => {
     if (!confirm('Are you sure you want to delete this class?')) return;
+
     try {
-      await base44.entities.Class.delete(id);
+      await GymClassService.deleteDashboardClass(id);
       await loadData();
     } catch (error) {
       console.error('Error deleting class:', error);
     }
   };
 
+
   const handleEdit = (cls) => {
     setEditingClass(cls);
+
     setFormData({
-      name: cls.name,
+      name: cls.title,
       description: cls.description || '',
-      instructor: cls.instructor,
-      duration_minutes: cls.duration_minutes || '',
-      difficulty_level: cls.difficulty_level || 'All Levels',
-      schedule: cls.schedule?.length ? cls.schedule : [{ day: '', time: '' }],
-      capacity: cls.capacity || '',
+      instructor: cls.instructor || '', // ← set actual ID here
+      duration_minutes: cls.class_duration?.replace(' min', '') || '',
+      difficulty_level: cls.level || 'All Levels',
+      schedule: cls.class_schedule?.length ? cls.class_schedule : [{ day: '', time: '' }],
+      capacity: cls.people || '',
       image: cls.image || '',
-      website_image: cls.website_image || '',
-      category: cls.category || '',
-      show_on_homepage: cls.show_on_homepage || false,
+      website_image: '',
+      category: cls.category?.id || '',
+      show_on_homepage: cls.is_show_on_home_page || false,
       is_active: cls.is_active !== false,
-      order: cls.order || 0
+      order: 0
     });
+
     setShowForm(true);
   };
+
 
   const resetForm = () => {
     setFormData({
@@ -170,20 +209,20 @@ export default function ClassManager() {
     setFormData({ ...formData, schedule });
   };
 
-  const moveClass = async (index, direction) => {
-    const newClasses = [...classes];
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+  // const moveClass = async (index, direction) => {
+  //   const newClasses = [...classes];
+  //   const targetIndex = direction === 'up' ? index - 1 : index + 1;
     
-    if (targetIndex < 0 || targetIndex >= newClasses.length) return;
+  //   if (targetIndex < 0 || targetIndex >= newClasses.length) return;
     
-    [newClasses[index], newClasses[targetIndex]] = [newClasses[targetIndex], newClasses[index]];
+  //   [newClasses[index], newClasses[targetIndex]] = [newClasses[targetIndex], newClasses[index]];
     
-    for (let i = 0; i < newClasses.length; i++) {
-      await base44.entities.Class.update(newClasses[i].id, { order: i });
-    }
+  //   for (let i = 0; i < newClasses.length; i++) {
+  //     await base44.entities.Class.update(newClasses[i].id, { order: i });
+  //   }
     
-    await loadData();
-  };
+  //   await loadData();
+  // };
 
   if (loading || permissionsLoading) {
     return (
@@ -240,13 +279,27 @@ export default function ClassManager() {
                 </div>
                 <div>
                   <label className="block text-sm font-semibold mb-2">Instructor *</label>
-                  <Input
-                    value={formData.instructor}
-                    onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
+                  <Select
+                    value={formData.instructor ? String(formData.instructor) : ''}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, instructor: Number(value) })
+                    }
                     required
-                    placeholder="Instructor name"
-                  />
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select instructor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {instructors.map((inst) => (
+                        <SelectItem key={inst.id} value={String(inst.id)}>
+                          {inst.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
+
+
               </div>
 
               <div className="grid md:grid-cols-3 gap-6">
@@ -269,10 +322,11 @@ export default function ClassManager() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Beginner">Beginner</SelectItem>
-                      <SelectItem value="Intermediate">Intermediate</SelectItem>
-                      <SelectItem value="Advanced">Advanced</SelectItem>
-                      <SelectItem value="All Levels">All Levels</SelectItem>
+                      {levels.map((level) => (
+                        <SelectItem key={level} value={level}>
+                          {level}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -290,13 +344,26 @@ export default function ClassManager() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-semibold mb-2">Category</label>
-                  <Input
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    placeholder="e.g., Cardio, Strength, Yoga"
-                  />
+                  <Select
+                    value={formData.category?.toString()}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, category: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id.toString()}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
                 </div>
-                <div>
+                {/* <div>
                   <label className="block text-sm font-semibold mb-2">Display Order</label>
                   <Input
                     type="number"
@@ -304,7 +371,7 @@ export default function ClassManager() {
                     onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
                     placeholder="0"
                   />
-                </div>
+                </div> */}
               </div>
 
               <div>
@@ -334,7 +401,7 @@ export default function ClassManager() {
                 )}
               </div>
 
-              <div>
+              {/* <div>
                 <label className="block text-sm font-semibold mb-2">Website Homepage Image</label>
                 <p className="text-xs text-gray-500 mb-2">Recommended size: 600x900px (Portrait)</p>
                 <Input
@@ -370,7 +437,7 @@ export default function ClassManager() {
                     </Button>
                   </div>
                 )}
-              </div>
+              </div> */}
 
               <div>
                 <label className="block text-sm font-semibold mb-2">Schedule</label>
@@ -455,10 +522,10 @@ export default function ClassManager() {
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">with {cls.instructor}</p>
+                      <p className="text-sm text-gray-600 mt-1">with {cls.instructor_name || 'N/A'}</p>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Button
+                      {/* <Button
                         size="icon"
                         variant="outline"
                         onClick={() => moveClass(index, 'up')}
@@ -473,7 +540,7 @@ export default function ClassManager() {
                         disabled={index === classes.length - 1}
                       >
                         <MoveDown className="w-4 h-4" />
-                      </Button>
+                      </Button> */}
                       <Button size="icon" variant="outline" onClick={() => handleEdit(cls)}>
                         <Edit2 className="w-4 h-4" />
                       </Button>
@@ -491,19 +558,19 @@ export default function ClassManager() {
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
                       <p className="text-gray-500">Duration</p>
-                      <p className="font-semibold">{cls.duration_minutes ? `${cls.duration_minutes} min` : 'N/A'}</p>
+                      <p className="font-semibold">{cls.class_duration ? `${cls.class_duration}` : 'N/A'}</p>
                     </div>
                     <div>
                       <p className="text-gray-500">Level</p>
-                      <p className="font-semibold">{cls.difficulty_level}</p>
+                      <p className="font-semibold">{cls.level}</p>
                     </div>
                     <div>
                       <p className="text-gray-500">Capacity</p>
-                      <p className="font-semibold">{cls.capacity || 'N/A'}</p>
+                      <p className="font-semibold">{cls.people || 'N/A'}</p>
                     </div>
                     <div>
                       <p className="text-gray-500">Category</p>
-                      <p className="font-semibold">{cls.category || 'N/A'}</p>
+                      <p className="font-semibold">{cls.category?.name || 'N/A'}</p>
                     </div>
                   </div>
                   {cls.schedule?.length > 0 && (

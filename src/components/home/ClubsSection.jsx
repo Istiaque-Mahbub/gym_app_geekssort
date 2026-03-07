@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { GymClubService } from '@/services/GymClubService';
 
 const MarqueeText = () => {
   return (
@@ -13,7 +13,7 @@ const MarqueeText = () => {
           <span
             key={i}
             className="text-[15vw] md:text-[20vw] font-black tracking-tighter text-transparent mx-8 inline-block"
-            style={{ 
+            style={{
               WebkitTextStroke: '2px #000',
               fontFamily: 'system-ui, sans-serif'
             }}
@@ -28,6 +28,7 @@ const MarqueeText = () => {
 
 export default function ClubsSection() {
   const [clubs, setClubs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadClubs();
@@ -35,17 +36,24 @@ export default function ClubsSection() {
 
   const loadClubs = async () => {
     try {
-      const clubsData = await base44.entities.Club.filter({ 
-        is_active: true, 
-        show_on_homepage: true 
-      }, 'order', 6);
-      setClubs(clubsData);
+      const { data } = await GymClubService.getAll({
+        is_active: true,
+        show_on_homepage: true,
+        ordering: 'order',
+        limit: 6,
+      });
+
+      // Adjust depending on backend response format
+      setClubs(data.results || data);
     } catch (error) {
       console.error('Error loading clubs:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (clubs.length === 0) return null;
+  if (loading) return null;
+  if (!clubs || clubs.length === 0) return null;
 
   return (
     <section className="bg-white py-20">
@@ -61,36 +69,44 @@ export default function ClubsSection() {
         </motion.p>
       </div>
 
-      {/* Clubs Grid - Horizontal Scroll on Mobile */}
+      {/* Clubs Grid */}
       <div className="relative">
-        <div className="flex overflow-x-auto pb-8 px-6 gap-4 snap-x snap-mandatory md:grid md:grid-cols-3 lg:grid-cols-6 md:max-w-7xl md:mx-auto md:overflow-visible" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <div
+          className="flex overflow-x-auto pb-8 px-6 gap-4 snap-x snap-mandatory md:grid md:grid-cols-3 lg:grid-cols-6 md:max-w-7xl md:mx-auto md:overflow-visible"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
           {clubs.map((club, index) => (
-            <Link
-              key={club.id}
-              to={createPageUrl('Clubs')}
-            >
+            <Link key={club.id} to={createPageUrl('Clubs')}>
               <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
+                viewport={{ once: true, margin: '-100px' }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 whileHover={{ scale: 1.05 }}
                 className="flex-shrink-0 w-48 md:w-full snap-start group cursor-pointer"
               >
-              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden mb-4 shadow-lg">
-                <img
-                  src={club.website_image || club.images?.[0] || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=800&q=80&fit=crop'}
-                  alt={club.name}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                  <h3 className="text-white text-lg font-bold mb-1">{club.name}</h3>
-                  <span className="text-yellow-400 text-sm font-medium">{club.location}</span>
+                <div className="relative aspect-[3/4] rounded-2xl overflow-hidden mb-4 shadow-lg">
+                  <img
+                    src={
+                      club.website_image ||
+                      club.image ||
+                      'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=800&q=80&fit=crop'
+                    }
+                    alt={club.name}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                    <h3 className="text-white text-lg font-bold mb-1">
+                      {club.name}
+                    </h3>
+                    <span className="text-yellow-400 text-sm font-medium">
+                      {club.location}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
             </Link>
           ))}
         </div>
@@ -109,7 +125,7 @@ export default function ClubsSection() {
         >
           Choose your club
         </motion.h2>
-        
+
         <div className="flex flex-wrap gap-4">
           <Link to={createPageUrl('Clubs')}>
             <motion.button
@@ -121,7 +137,7 @@ export default function ClubsSection() {
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </motion.button>
           </Link>
-          
+
           <Link to={createPageUrl('Contact')}>
             <motion.button
               whileHover={{ scale: 1.02 }}

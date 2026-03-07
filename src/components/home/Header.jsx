@@ -4,46 +4,108 @@ import { Menu, X, Calculator, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import BMICalculator from '@/components/BMICalculator';
-import { base44 } from '@/api/base44Client';
+import { AuthService } from '@/services/AuthService';
 
 export default function Header({ currentPageName }) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showBMI, setShowBMI] = useState(false);
-  const [siteSettings, setSiteSettings] = useState(null);
   const [navLinks, setNavLinks] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [role, setRole] = useState('student');
+  const [userName, setUserName] = useState('');
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 100);
-    };
-    window.addEventListener('scroll', handleScroll);
-    loadSiteSettings();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // ✅ Dashboard URL based on role
+  const dashboardUrl =
+    ['admin', 'superuser', 'staff'].includes(role)
+      ? '/AdminDashboard'
+      : role === 'instructor'
+      ? '/InstructorDashboard'
+      : '/UserDashboard';
 
-  const loadSiteSettings = async () => {
-    try {
-      const settings = await base44.entities.SiteSettings.filter({ setting_key: 'main' });
-      if (settings.length > 0) {
-        setSiteSettings(settings[0]);
-        const sortedNav = (settings[0].navbar_pages || getDefaultNav()).sort((a, b) => a.order - b.order);
-        setNavLinks(sortedNav);
-      } else {
-        setNavLinks(getDefaultNav());
-      }
-    } catch (error) {
-      setNavLinks(getDefaultNav());
-    }
-  };
+  // ✅ Role Label for badge
+  const roleLabel =
+    role === 'superuser'
+      ? 'Superuser'
+      : role === 'admin'
+      ? 'Admin'
+      : role === 'staff'
+      ? 'Staff'
+      : role === 'instructor'
+      ? 'Instructor'
+      : 'Student';
 
+  // ✅ Default navigation links
   const getDefaultNav = () => [
     { page_name: 'Clubs', label: 'Clubs', order: 1 },
     { page_name: 'Classes', label: 'Classes', order: 2 },
     { page_name: 'Packages', label: 'Packages', order: 3 },
     { page_name: 'App', label: 'App', order: 4 },
-    { page_name: 'About', label: 'About', order: 5 }
+    { page_name: 'About', label: 'About', order: 5 },
+    { page_name: 'SCHEDULE', label: 'SCHEDULE', order: 5 }
   ];
+
+
+  // =========================
+  // Check Auth and get current user
+  // =========================
+  const checkAuth = async () => {
+    const token = localStorage.getItem('access');
+    if (!token) {
+      setIsAuthenticated(false);
+      setRole('student');
+      setUserName('');
+      return;
+    }
+
+    try {
+      const user = await AuthService.getCurrentUser();
+      if (!user) throw new Error('User fetch failed');
+
+      setIsAuthenticated(true);
+      setRole(user.role);
+      setUserName(user.full_name);
+
+      // Save in localStorage for consistency
+      localStorage.setItem('role', user.role);
+      localStorage.setItem('full_name', user.full_name);
+    } catch (error) {
+      console.error('Header auth check failed:', error);
+      setIsAuthenticated(false);
+      setRole('student');
+      setUserName('');
+      localStorage.removeItem('role');
+      localStorage.removeItem('full_name');
+    }
+  };
+
+  // =========================
+  // Logout function
+  // =========================
+  const handleLogout = () => {
+    AuthService.logout();
+    window.location.href = '/login';
+  };
+
+  useEffect(() => {
+    // Scroll effect
+    const handleScroll = () => setScrolled(window.scrollY > 100);
+    window.addEventListener('scroll', handleScroll);
+
+    // Set nav links
+    setNavLinks(getDefaultNav());
+
+    // Initial auth check
+    checkAuth();
+
+    // Listen to login/logout events
+    window.addEventListener('authChanged', checkAuth);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('authChanged', checkAuth);
+    };
+  }, []);
 
   return (
     <>
@@ -51,13 +113,16 @@ export default function Header({ currentPageName }) {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          currentPageName === 'UserDashboard' ? 'bg-black py-4' :
-          scrolled ? 'bg-black/90 backdrop-blur-md py-4' : 'bg-transparent py-6'
+          currentPageName?.includes('Dashboard')
+            ? 'bg-black py-4'
+            : scrolled
+            ? 'bg-black/90 backdrop-blur-md py-4'
+            : 'bg-transparent py-6'
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
-          <Link 
+          <Link
             to={createPageUrl('Home')}
             className="text-2xl font-black tracking-tight text-yellow-400"
           >
@@ -65,55 +130,91 @@ export default function Header({ currentPageName }) {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-4 lg:gap-8">
+          <nav className="hidden md:flex items-center gap-6">
             <button
               onClick={() => setShowBMI(true)}
-              className="flex items-center gap-1 lg:gap-2 text-white text-xs lg:text-sm font-medium tracking-wider hover:text-yellow-400 transition-colors"
+              className="flex items-center gap-2 text-white text-sm font-medium tracking-wider hover:text-yellow-400"
             >
-              <Calculator className="w-3 h-3 lg:w-4 lg:h-4" />
-              <span className="hidden lg:inline">BMI CALCULATOR</span>
-              <span className="lg:hidden">BMI</span>
+              <Calculator className="w-4 h-4" />
+              BMI CALCULATOR
             </button>
+
             {navLinks.map((link) => (
               <Link
                 key={link.page_name}
                 to={createPageUrl(link.page_name)}
-                className="text-white text-xs lg:text-sm font-medium tracking-wider hover:text-yellow-400 transition-colors"
+                className="text-white text-sm font-medium tracking-wider hover:text-yellow-400"
               >
                 {link.label.toUpperCase()}
               </Link>
             ))}
           </nav>
 
-          {/* CTA Buttons */}
-          <div className="hidden md:flex items-center gap-2 lg:gap-3">
-            <Link to={createPageUrl('MyBookings')}>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="px-4 lg:px-6 py-2 lg:py-3 border border-white text-white rounded-full text-xs lg:text-sm font-bold tracking-wider hover:bg-white hover:text-black transition-colors"
-              >
-                MY BOOKINGS
-              </motion.button>
-            </Link>
-            <a href="https://mubafitness.com/" target="_blank" rel="noopener noreferrer">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="px-4 lg:px-6 py-2 lg:py-3 bg-yellow-400 text-black rounded-full text-xs lg:text-sm font-bold tracking-wider hover:bg-yellow-500 transition-colors flex items-center gap-2"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                SHOP
-              </motion.button>
-            </a>
+          
+
+          {/* Desktop Auth Buttons */}
+          <div className="hidden md:flex items-center gap-3">
+            {isAuthenticated ? (
+              <>
+                <span className="text-white text-sm font-bold px-3 py-1 border border-white rounded-full">
+                  {roleLabel}
+                </span>
+
+                <Link to={dashboardUrl}>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    className="px-6 py-3 border border-white text-white rounded-full font-bold hover:bg-white hover:text-black"
+                  >
+                    DASHBOARD
+                  </motion.button>
+                </Link>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  onClick={handleLogout}
+                  className="px-6 py-3 bg-yellow-400 text-black rounded-full font-bold"
+                >
+                  LOGOUT
+                </motion.button>
+              </>
+            ) : (
+              <>
+              <div className="hidden md:flex items-center gap-2 lg:gap-3">
+            
+                  <a href="https://mubafitness.com/" target="_blank" rel="noopener noreferrer">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="px-4 lg:px-6 py-2 lg:py-3 bg-yellow-400 text-black rounded-full text-xs lg:text-sm font-bold tracking-wider hover:bg-yellow-500 transition-colors flex items-center gap-2"
+                    >
+                      <ShoppingBag className="w-4 h-4" />
+                      SHOP
+                    </motion.button>
+                  </a>
+                </div>
+                <Link to="/login">
+                  <button className="px-6 py-3 border border-white text-white rounded-full font-bold">
+                    LOGIN
+                  </button>
+                </Link>
+
+                
+
+                <Link to="/register">
+                  <button className="px-6 py-3 bg-yellow-400 text-black rounded-full font-bold">
+                    JOIN NOW
+                  </button>
+                </Link>
+              </>
+            )}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Toggle */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden text-white p-2"
+            className="md:hidden text-white"
           >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </motion.header>
@@ -122,69 +223,73 @@ export default function Header({ currentPageName }) {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black z-40 pt-24"
           >
             <div className="flex flex-col items-center gap-8 p-8">
-              {navLinks.map((link, index) => (
-                <motion.div
+              {navLinks.map((link) => (
+                <Link
                   key={link.page_name}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  to={createPageUrl(link.page_name)}
+                  onClick={() => setIsOpen(false)}
+                  className="text-white text-3xl font-bold"
                 >
-                  <Link
-                    to={createPageUrl(link.page_name)}
-                    onClick={() => setIsOpen(false)}
-                    className="text-white text-3xl font-bold tracking-wider hover:text-yellow-400 transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </motion.div>
+                  {link.label}
+                </Link>
               ))}
-              <motion.button
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                onClick={() => {
-                  setShowBMI(true);
-                  setIsOpen(false);
-                }}
-                className="mt-8 px-8 py-4 border-2 border-white text-white rounded-full text-lg font-bold tracking-wider"
-              >
-                BMI CALCULATOR
-              </motion.button>
-              <Link to={createPageUrl('MyBookings')}>
-                <motion.button
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  onClick={() => setIsOpen(false)}
-                  className="px-8 py-4 border-2 border-white text-white rounded-full text-lg font-bold tracking-wider"
-                >
-                  MY BOOKINGS
-                </motion.button>
-              </Link>
-              <a href="https://mubafitness.com/" target="_blank" rel="noopener noreferrer">
-                <motion.button
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  onClick={() => setIsOpen(false)}
-                  className="px-8 py-4 bg-yellow-400 text-black rounded-full text-lg font-bold tracking-wider flex items-center gap-2 justify-center"
-                >
-                  <ShoppingBag className="w-5 h-5" />
-                  SHOP
-                </motion.button>
-              </a>
+
+              {isAuthenticated ? (
+                <>
+                  <Link to={dashboardUrl}>
+                    <button className="px-8 py-4 border-2 border-white text-white rounded-full text-lg font-bold">
+                      DASHBOARD
+                    </button>
+                  </Link>
+
+                  <button
+                    onClick={handleLogout}
+                    className="px-8 py-4 bg-yellow-400 text-black rounded-full text-lg font-bold"
+                  >
+                    LOGOUT
+                  </button>
+                </>
+              ) : (
+                <>
+                <div className="hidden md:flex items-center gap-2 lg:gap-3">
+            
+                    <a href="https://mubafitness.com/" target="_blank" rel="noopener noreferrer">
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="px-4 lg:px-6 py-2 lg:py-3 bg-yellow-400 text-black rounded-full text-xs lg:text-sm font-bold tracking-wider hover:bg-yellow-500 transition-colors flex items-center gap-2"
+                      >
+                        <ShoppingBag className="w-4 h-4" />
+                        SHOP
+                      </motion.button>
+                    </a>
+                  </div>
+                  <Link to="/login">
+                    <button className="px-8 py-4 border-2 border-white text-white rounded-full text-lg font-bold">
+                      LOGIN
+                    </button>
+                  </Link>
+                  
+
+                  <Link to="/register">
+                    <button className="px-8 py-4 bg-yellow-400 text-black rounded-full text-lg font-bold">
+                      JOIN NOW
+                    </button>
+                  </Link>
+                </>
+              )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* BMI Calculator Modal */}
+      {/* BMI Calculator */}
       <BMICalculator isOpen={showBMI} onClose={() => setShowBMI(false)} />
     </>
   );

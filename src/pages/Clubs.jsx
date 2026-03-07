@@ -8,9 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import GymLoader from '@/components/GymLoader';
+import { GymClubService } from '@/services/GymClubService';
 
 export default function Clubs() {
   const [clubs, setClubs] = useState([]);
+  const [gymClubs, setGymClubs] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [showTrialForm, setShowTrialForm] = useState(false);
   const [selectedClub, setSelectedClub] = useState(null);
@@ -22,20 +25,44 @@ export default function Clubs() {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    loadClubs();
-  }, []);
+  // useEffect(() => {
+  //   loadClubs();
+  // }, []);
 
-  const loadClubs = async () => {
-    try {
-      const clubsData = await base44.entities.Club.filter({ is_active: true }, 'order', 20);
-      setClubs(clubsData);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error loading clubs:', error);
-      setLoading(false);
-    }
-  };
+  // const loadClubs = async () => {
+  //   try {
+  //     const clubsData = await base44.entities.Club.filter({ is_active: true }, 'order', 20);
+  //     setClubs(clubsData);
+  //     setLoading(false);
+  //   } catch (error) {
+  //     console.error('Error loading clubs:', error);
+  //     setLoading(false);
+  //   }
+  // };
+  useEffect(() => {
+  loadClubs();
+}, []);
+
+
+const loadClubs = async () => {
+  try {
+    const response = await GymClubService.getAll();
+
+    // DRF returns array or paginated object
+    const clubsData = response.data.results ?? response.data;
+   
+    
+
+    // If you want only active clubs (frontend filter)
+    // const activeClubs = clubsData.filter(gymClubs => gymClubs.is_active !== false);
+
+    setGymClubs(clubsData);
+  } catch (error) {
+    console.error('Error loading clubs:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleTrialBooking = (club) => {
     setSelectedClub(club);
@@ -67,6 +94,14 @@ export default function Clubs() {
       setSubmitting(false);
     }
   };
+  const formatTime = (timeStr) => {
+  const [hour, minute] = timeStr.split(':');
+    const h = parseInt(hour, 10);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const formattedHour = h % 12 === 0 ? 12 : h % 12;
+    return `${formattedHour}:${minute} ${ampm}`;
+  };
+
 
   if (loading) {
     return (
@@ -98,13 +133,13 @@ export default function Clubs() {
       {/* Clubs List */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
-          {clubs.length === 0 ? (
+          {gymClubs.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-gray-500 text-xl">No clubs available at the moment.</p>
             </div>
           ) : (
             <div className="space-y-16">
-              {clubs.map((club, index) => (
+              {gymClubs.map((club, index) => (
                 <motion.div
                   key={club.id}
                   initial={{ opacity: 0, y: 50 }}
@@ -115,14 +150,24 @@ export default function Clubs() {
                 >
                   {index % 2 === 0 ? (
                     <>
-                      <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
+                      {/* <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
                         <img 
                           src={club.images?.[0] || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&q=80&fit=crop'} 
                           alt={club.name}
                           loading="lazy"
                           className="w-full h-full object-cover" 
                         />
-                      </div>
+                      </div> */}
+                      <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
+                          {club.image && (
+                          <img
+                            src={club.image && club.image}
+                            alt={club.name}
+                            loading="lazy"
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                           )} 
+                        </div>
                       <div>
                         <h2 className="text-3xl md:text-4xl font-black mb-4">{club.name}</h2>
                         <div className="space-y-3 mb-6">
@@ -130,10 +175,10 @@ export default function Clubs() {
                             <MapPin className="w-5 h-5 text-yellow-400 mt-1 flex-shrink-0" />
                             <span className="text-gray-700">{club.address}</span>
                           </div>
-                          {club.phone && (
+                          {club.phone_number && (
                             <div className="flex items-center gap-3">
                               <Phone className="w-5 h-5 text-yellow-400 flex-shrink-0" />
-                              <span className="text-gray-700">{club.phone}</span>
+                              <span className="text-gray-700">{club.phone_number}</span>
                             </div>
                           )}
                           {club.email && (
@@ -142,10 +187,18 @@ export default function Clubs() {
                               <span className="text-gray-700">{club.email}</span>
                             </div>
                           )}
-                          {club.operating_hours?.weekdays && (
+                          {/* {club.operating_hours?.weekdays && (
                             <div className="flex items-center gap-3">
                               <Clock className="w-5 h-5 text-yellow-400 flex-shrink-0" />
                               <span className="text-gray-700">{club.operating_hours.weekdays}</span>
+                            </div>
+                          )} */}
+                           {club.opening_time && club.closing_time && (
+                            <div className="flex items-center gap-3">
+                              <Clock className="w-5 h-5 text-yellow-400 flex-shrink-0" />
+                              <span className="text-gray-700">
+                                {formatTime(club.opening_time)} to {formatTime(club.closing_time)}
+                              </span>
                             </div>
                           )}
                         </div>
@@ -155,7 +208,7 @@ export default function Clubs() {
                             <div className="flex flex-wrap gap-2">
                               {club.facilities.map((facility, i) => (
                                 <span key={i} className="px-4 py-2 bg-gray-100 rounded-full text-sm">
-                                  {facility}
+                                  {facility.name}
                                 </span>
                               ))}
                             </div>
@@ -181,10 +234,10 @@ export default function Clubs() {
                             <MapPin className="w-5 h-5 text-yellow-400 mt-1 flex-shrink-0" />
                             <span className="text-gray-700">{club.address}</span>
                           </div>
-                          {club.phone && (
+                          {club.phone_number && (
                             <div className="flex items-center gap-3">
                               <Phone className="w-5 h-5 text-yellow-400 flex-shrink-0" />
-                              <span className="text-gray-700">{club.phone}</span>
+                              <span className="text-gray-700">{club.phone_number}</span>
                             </div>
                           )}
                           {club.email && (
@@ -193,10 +246,18 @@ export default function Clubs() {
                               <span className="text-gray-700">{club.email}</span>
                             </div>
                           )}
-                          {club.operating_hours?.weekdays && (
+                          {/* {club.operating_hours?.weekdays && (
                             <div className="flex items-center gap-3">
                               <Clock className="w-5 h-5 text-yellow-400 flex-shrink-0" />
                               <span className="text-gray-700">{club.operating_hours.weekdays}</span>
+                            </div>
+                          )} */}
+                          {club.opening_time && club.closing_time && (
+                            <div className="flex items-center gap-3">
+                              <Clock className="w-5 h-5 text-yellow-400 flex-shrink-0" />
+                              <span className="text-gray-700">
+                                {formatTime(club.opening_time)} to {formatTime(club.closing_time)}
+                              </span>
                             </div>
                           )}
                         </div>
@@ -206,7 +267,7 @@ export default function Clubs() {
                             <div className="flex flex-wrap gap-2">
                               {club.facilities.map((facility, i) => (
                                 <span key={i} className="px-4 py-2 bg-gray-100 rounded-full text-sm">
-                                  {facility}
+                                  {facility.name}
                                 </span>
                               ))}
                             </div>
@@ -232,6 +293,19 @@ export default function Clubs() {
                           </Link>
                         </div>
                       </div>
+                      
+                        <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
+                          {club.image && (
+                          <img
+                            src={club.image && club.image}
+                            alt={club.name}
+                            loading="lazy"
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                           )} 
+                        </div>
+                     
+                      {/* {club.image && (
                       <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
                         <img 
                           src={club.images?.[0] || 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=800&h=600&q=80&fit=crop'} 
@@ -240,6 +314,7 @@ export default function Clubs() {
                           className="w-full h-full object-cover" 
                         />
                       </div>
+                       )}  */}
                     </>
                   )}
                 </motion.div>
